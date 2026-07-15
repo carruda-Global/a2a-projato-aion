@@ -13,7 +13,7 @@
   <Description DefaultValue="Agentes de IA para compliance regulatorio - NR-1, LGPD, CBS/IBS e mais"/>
   <IconUrl DefaultValue="https://engenheiro-producao-ai.onrender.com/static/icons/icon-32.png"/>
   <HighResolutionIconUrl DefaultValue="https://engenheiro-producao-ai.onrender.com/static/icons/icon-64.png"/>
-  <SupportUrl DefaultValue="https://global-engenharia.com/contato.html"/>
+  <SupportUrl DefaultValue="https://global-engenharia.com/alias-suporte.html"/>
   <Hosts>
     <Host Name="Workbook"/>
     <Host Name="Document"/>
