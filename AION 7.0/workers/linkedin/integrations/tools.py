@@ -270,6 +270,90 @@ class LinkedInTools:
                 return {"error": f"upload failed {resp.status_code}"}
         return {"asset": asset, "filename": filename}
 
+    async def upload_video(self, video_bytes: bytes, filename: str) -> dict:
+        """Registers and uploads an MP4 as a LinkedIn Video asset (real Video
+        API: initializeUpload -> PUT each chunk -> finalizeUpload), returning
+        the video URN used to attach the video to a post via create_post()."""
+        profile = await self.get_profile()
+        author_urn = f"urn:li:person:{profile.get('sub', '')}"
+        register = await self._post(
+            "/videos?action=initializeUpload",
+            {"initializeUploadRequest": {
+                "owner": author_urn,
+                "fileSizeBytes": len(video_bytes),
+                "uploadCaptions": False,
+                "uploadThumbnail": False,
+            }},
+            restli=True,
+        )
+        if "error" in register:
+            return register
+        value = register.get("value", {})
+        instructions = value.get("uploadInstructions", [])
+        video_urn = value.get("video")
+        upload_token = value.get("uploadToken", "")
+        if not instructions or not video_urn:
+            return {"error": "no uploadInstructions/video returned", "detail": register}
+
+        token = await self.oauth.ensure_token()
+        uploaded_part_ids = []
+        async with httpx.AsyncClient() as client:
+            for instr in instructions:
+                first, last = instr["firstByte"], instr["lastByte"]
+                resp = await client.put(
+                    instr["uploadUrl"],
+                    content=video_bytes[first:last + 1],
+                    headers={"Authorization": f"Bearer {token}"},
+                    timeout=60,
+                )
+                if resp.status_code not in (200, 201):
+                    logger.error(f"Video chunk upload failed {resp.status_code}: {resp.text[:300]}")
+                    return {"error": f"chunk upload failed {resp.status_code}"}
+                etag = resp.headers.get("etag", "")
+                uploaded_part_ids.append(etag)
+
+        finalize = await self._post(
+            "/videos?action=finalizeUpload",
+            {"finalizeUploadRequest": {
+                "video": video_urn,
+                "uploadToken": upload_token,
+                "uploadedPartIds": uploaded_part_ids,
+            }},
+            restli=True,
+        )
+        if "error" in finalize:
+            return finalize
+        return {"asset": video_urn, "filename": filename}
+
+    async def create_post_with_video(self, text: str, video_asset: str, title: str = "") -> dict:
+        """Publishes a post with an attached native video, referencing an
+        asset already uploaded via upload_video()."""
+        profile = await self.get_profile()
+        author_urn = f"urn:li:person:{profile.get('sub', '')}"
+        post_data = {
+            "author": author_urn,
+            "commentary": text[:3000],
+            "visibility": "PUBLIC",
+            "distribution": {
+                "feedDistribution": "MAIN_FEED",
+                "targetEntities": [],
+                "thirdPartyDistributionChannels": [],
+            },
+            "content": {"media": {"title": title, "id": video_asset}},
+            "lifecycleState": "PUBLISHED",
+            "isReshareDisabledByAuthor": False,
+        }
+        result = await self._post("/posts", post_data, restli=True)
+        if "error" in result:
+            return result
+        post_id = result.get("id", "")
+        return {
+            "status": "published",
+            "post_id": post_id,
+            "url": f"https://www.linkedin.com/feed/update/{post_id}",
+            "created_at": datetime.now().isoformat(),
+        }
+
     async def create_carousel_post(self, text: str, document_asset: str, title: str) -> dict:
         """Publishes a native LinkedIn carousel (Document post) referencing an
         asset already uploaded via upload_document()."""
