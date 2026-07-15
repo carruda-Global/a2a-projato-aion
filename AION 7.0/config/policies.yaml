@@ -1,0 +1,68 @@
+security:
+  aip:
+    enabled: true
+    registry_url: "https://aip.aion.global"
+    require_signature: true
+    signature_algorithm: "Ed25519"
+  
+  abac:
+    enabled: true
+    default_deny: true
+    cache_ttl_seconds: 300
+  
+  trust_agent:
+    enabled: true
+    anomaly_threshold: 0.3
+    belief_decay_rate: 0.05
+    max_anomalies_before_quarantine: 3
+  
+  sanitization:
+    enabled: true
+    pii_masking: true
+    patterns:
+      - cpf
+      - cnpj
+      - email
+      - phone
+      - cep
+  
+  audit:
+    merkle_chain: true
+    retention_days: 365
+    include_payloads: false
+
+access_control:
+  roles:
+    admin:
+      permissions: ["*"]
+      max_agents: -1
+    manager:
+      permissions: ["read", "execute", "create"]
+      max_agents: 50
+    user:
+      permissions: ["read", "execute"]
+      max_agents: 10
+    anonymous:
+      permissions: ["read"]
+      max_agents: 0
+  
+  rate_limiting:
+    enabled: true
+    max_requests_per_minute: 60
+    max_requests_per_hour: 1000
+
+compliance:
+  lgpd:
+    data_localization: "brazil"
+    encryption_at_rest: true
+    encryption_in_transit: true
+    dpo_required: true
+    breach_notification_hours: 24
+  
+  crea:
+    art_required_for:
+      - "pgr_completo"
+      - "engenharia_seguranca"
+    art_not_required_for:
+      - "nr1_psicossocial"
+      - "lgpd_operacional"

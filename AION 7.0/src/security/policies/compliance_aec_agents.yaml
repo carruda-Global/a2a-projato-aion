@@ -1,0 +1,43 @@
+agents:
+  - agent_id: "did:aip:photo_intelligence_001"
+    agent_name: "Photo Intelligence"
+    principal: "Cristiano Arruda (CREA-SP 5071200171)"
+    permissions:
+      deepseek_chat: { allowed: true }
+      vision_api: { allowed: true }
+      supabase_read: { allowed: true }
+      supabase_insert: { allowed: true }
+
+  - agent_id: "did:aip:rfi_creation_001"
+    agent_name: "RFI Creation"
+    principal: "Cristiano Arruda (CREA-SP 5071200171)"
+    permissions:
+      deepseek_chat: { allowed: true }
+      document_read: { allowed: true }
+      document_create: { allowed: true }
+      supabase_read: { allowed: true }
+      supabase_insert: { allowed: true }
+    hitl_actions:
+      rfi_finalize:
+        require_approval: true
+        approver: "Cristiano Arruda"
+
+  - agent_id: "did:aip:compliance_001"
+    agent_name: "Compliance Agent"
+    principal: "Cristiano Arruda (CREA-SP 5071200171)"
+    permissions:
+      deepseek_chat: { allowed: true, constraints: [{ max_tokens: 4096 }] }
+      sharepoint_read: { allowed: true, constraints: [{ max_documents: 100 }, { tenant: "global_match" }] }
+      graph_api: { allowed: true, constraints: [{ read_only: true }, { scopes: ["Files.Read", "Sites.Read.All"] }] }
+      supabase_read: { allowed: true, constraints: [{ max_rows: 1000 }] }
+      supabase_insert: { allowed: false }
+      supabase_delete: { allowed: false }
+      stripe_read: { allowed: true }
+      stripe_create_invoice: { allowed: false }
+    dlp_rules:
+      - { pattern: "CPF|\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}", action: "mask" }
+      - { pattern: "CNPJ|\\d{2}\\.\\d{3}\\.\\d{3}/\\d{4}-\\d{2}", action: "mask" }
+      - { pattern: "RG|\\d{2}\\.\\d{3}\\.\\d{3}-\\d{1}", action: "mask" }
+      - { pattern: "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}", action: "mask" }
+    hitl_actions:
+      relatorio_envio: { require_approval: true, approver: "Cristiano Arruda" }

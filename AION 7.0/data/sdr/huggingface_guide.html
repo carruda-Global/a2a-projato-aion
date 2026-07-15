@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hugging Face Space — AION Compliance</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:Segoe UI,Arial,sans-serif;background:#0a0a1a;color:#e5e7eb;padding:24px;max-width:900px;margin:0 auto}
+h1{color:#ff9d00;margin-bottom:4px;font-size:22px}
+h2{color:#94a3b8;font-size:14px;font-weight:normal;margin-bottom:24px}
+.card{background:#1a1a2e;border-radius:12px;padding:20px;margin-bottom:16px;border:1px solid #2a2a4e}
+.card h3{color:#f3f4f6;margin-bottom:12px}
+pre{background:#0d0d1f;padding:16px;border-radius:8px;overflow-x:auto;font-size:12px;line-height:1.5;max-height:50vh;overflow-y:auto}
+pre code{color:#a5d6ff}
+.steps{list-style:decimal;padding-left:20px;line-height:2}
+.steps li{color:#d1d5db}
+.steps li strong{color:#ff9d00}
+.tabs{display:flex;gap:4px;margin-bottom:12px}
+.tab{background:#2a2a4e;color:#94a3b8;padding:6px 14px;border-radius:6px 6px 0 0;font-size:13px}
+.tab.active{background:#ff9d00;color:#000;font-weight:600}
+</style>
+</head>
+<body>
+
+<h1>Hugging Face Space — AION Compliance</h1>
+<h2>Interface Gradio com 4 tabs de diagnostico de compliance</h2>
+
+<div class="card">
+  <h3>1. Passo a Passo</h3>
+  <ol class="steps">
+    <li>Acesse <strong>https://huggingface.co/new-space</strong></li>
+    <li><strong>Space Name:</strong> aion-compliance</li>
+    <li><strong>License:</strong> mit</li>
+    <li><strong>SDK:</strong> Gradio</li>
+    <li><strong>Gradio Version:</strong> 4.x (latest)</li>
+    <li><strong>Create Space</strong></li>
+    <li>Upload dos arquivos: <strong>app.py</strong> + <strong>requirements.txt</strong></li>
+    <li>Settings → Secrets → Add: <strong>ECOSYSTEM_API</strong> = https://engenheiro-producao-ai.onrender.com</li>
+  </ol>
+</div>
+
+<div class="card">
+  <h3>2. app.py — Cole no editor do Space</h3>
+  <pre><code>import os
+import gradio as gr
+import httpx
+
+API_BASE = os.getenv("ECOSYSTEM_API", "https://engenheiro-producao-ai.onrender.com")
+
+
+async def _call_agent(endpoint: str, payload: dict) -> str:
+    try:
+        async with httpx.AsyncClient(timeout=30) as client:
+            resp = await client.post(f"{API_BASE}{endpoint}", json=payload)
+            data = resp.json()
+            if isinstance(data, dict):
+                lines = []
+                for k, v in data.items():
+                    if isinstance(v, list):
+                        lines.append(f"**{k}:**")
+                        for item in v:
+                            lines.append(f"  {item}" if isinstance(item, str) else f"  {item}")
+                    else:
+                        lines.append(f"**{k}:** {v}")
+                return "\n".join(lines)
+            return str(data)
+    except Exception as e:
+        return f"Erro: {e}\n\nglobal-engenharia.com/ecosystem"
+
+
+async def diagnostico_nr1(empresa: str, num_funcionarios: int, setor: str) -> str:
+    if not empresa:
+        return "Por favor, informe o nome da empresa."
+    return await _call_agent(
+        "/mcp/regulatory/tools/nr1_psicossocial",
+        {"empresa": empresa, "num_funcionarios": num_funcionarios, "setor": setor},
+    )
+
+
+async def scan_lgpd(empresa: str, atividades: str) -> str:
+    if not empresa:
+        return "Por favor, informe o nome da empresa."
+    lista = [a.strip() for a in atividades.split(",") if a.strip()]
+    return await _call_agent(
+        "/mcp/regulatory/tools/lgpd_scan",
+        {"empresa": empresa, "atividades_tratamento": lista},
+    )
+
+
+async def check_eu_ai_act(company: str, ai_systems: str, sector: str) -> str:
+    if not company:
+        return "Please provide company name."
+    systems = [s.strip() for s in ai_systems.split(",") if s.strip()]
+    return await _call_agent(
+        "/mcp/regulatory/tools/eu_ai_act",
+        {"company": company, "ai_systems": systems, "sector": sector},
+    )
+
+
+async def csrd_assessment(company: str, sector: str, employees: int, revenue: float) -> str:
+    if not company:
+        return "Please provide company name."
+    return await _call_agent(
+        "/mcp/regulatory/tools/csrd_assessment",
+        {"company": company, "sector": sector, "employees": employees, "revenue_eur_million": revenue},
+    )
+
+
+with gr.Blocks(
+    title="AION — 86 AI Compliance Agents",
+    theme=gr.themes.Soft(primary_hue="green"),
+    css=".footer { text-align:center; color:#666; font-size:12px; margin-top:24px }",
+) as demo:
+    gr.Markdown(
+        """
+        # AION — 86 AI Compliance Agents
+        **Diagnosticos de conformidade regulatoria em segundos.**
+        NR-1 Psicossocial  LGPD  EU AI Act  CSRD  DORA  NIS2
+
+        > Plano completo: **[global-engenharia.com/ecosystem](https://global-engenharia.com/ecosystem)**
+        """
+    )
+
+    with gr.Tab("NR-1 Psicossocial"):
+        gr.Markdown("Diagnostico de riscos psicossociais — Portaria MTE 1.419/2024")
+        with gr.Row():
+            nr1_empresa = gr.Textbox(label="Nome da Empresa", placeholder="Global Match Engenharia")
+            nr1_funcionarios = gr.Number(label="N de Funcionarios", value=50, minimum=1)
+        nr1_setor = gr.Textbox(label="Setor", placeholder="Industria, Servicos, Tecnologia...")
+        nr1_btn = gr.Button("Gerar Diagnostico NR-1", variant="primary")
+        nr1_output = gr.Markdown()
+        nr1_btn.click(diagnostico_nr1, [nr1_empresa, nr1_funcionarios, nr1_setor], nr1_output)
+
+    with gr.Tab("LGPD Scan"):
+        gr.Markdown("Scan de conformidade LGPD — Lei 13.709/2018")
+        lgpd_empresa = gr.Textbox(label="Nome da Empresa")
+        lgpd_atividades = gr.Textbox(
+            label="Atividades de Tratamento de Dados (separadas por virgula)",
+            placeholder="coleta de dados de clientes, envio de email marketing, armazenamento em cloud...",
+            lines=3,
+        )
+        lgpd_btn = gr.Button("Executar Scan LGPD", variant="primary")
+        lgpd_output = gr.Markdown()
+        lgpd_btn.click(scan_lgpd, [lgpd_empresa, lgpd_atividades], lgpd_output)
+
+    with gr.Tab("EU AI Act"):
+        gr.Markdown("EU AI Act readiness check — deadline agosto 2026")
+        with gr.Row():
+            ai_company = gr.Textbox(label="Company Name")
+            ai_sector = gr.Textbox(label="Sector", placeholder="financial, healthcare, HR, retail...")
+        ai_systems = gr.Textbox(
+            label="AI Systems / Use Cases (comma-separated)",
+            placeholder="credit scoring model, HR recruitment AI, customer chatbot...",
+            lines=3,
+        )
+        ai_btn = gr.Button("Check EU AI Act Readiness", variant="primary")
+        ai_output = gr.Markdown()
+        ai_btn.click(check_eu_ai_act, [ai_company, ai_systems, ai_sector], ai_output)
+
+    with gr.Tab("CSRD Assessment"):
+        gr.Markdown("CSRD double materiality assessment — ESRS standards")
+        with gr.Row():
+            csrd_company = gr.Textbox(label="Company Name")
+            csrd_sector = gr.Textbox(label="Sector", placeholder="manufacturing, finance, retail...")
+        with gr.Row():
+            csrd_employees = gr.Number(label="Employees", value=500, minimum=1)
+            csrd_revenue = gr.Number(label="Revenue (M)", value=50, minimum=0)
+        csrd_btn = gr.Button("Run CSRD Assessment", variant="primary")
+        csrd_output = gr.Markdown()
+        csrd_btn.click(csrd_assessment, [csrd_company, csrd_sector, csrd_employees, csrd_revenue], csrd_output)
+
+    gr.Markdown(
+        """
+        <div class="footer">
+        EcoSystem AEC v7.0  Global Match Engenharia de Producao 
+        <a href="https://global-engenharia.com/ecosystem" target="_blank">Plano completo com 86 agentes </a>
+        </div>
+        """,
+        elem_classes=["footer"],
+    )
+
+if __name__ == "__main__":
+    demo.launch()</code></pre>
+</div>
+
+<div class="card">
+  <h3>3. requirements.txt</h3>
+  <pre><code>gradio>=4.0.0
+httpx>=0.27.0</code></pre>
+</div>
+
+<div class="card">
+  <h3>4. Variáveis de Ambiente (Settings → Secrets)</h3>
+  <pre><code>ECOSYSTEM_API = https://engenheiro-producao-ai.onrender.com</code></pre>
+</div>
+
+</body>
+</html>

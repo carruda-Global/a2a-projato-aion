@@ -1,0 +1,92 @@
+linkedin:
+  client_id: ${LINKEDIN_CLIENT_ID}
+  client_secret: ${LINKEDIN_CLIENT_SECRET}
+  redirect_uri: "http://127.0.0.1:9876/callback"
+  scopes:
+    - profile
+    - email
+    - openid
+    - w_member_social
+  mcp:
+    enabled: true
+    transport: stdio
+    host: "127.0.0.1"
+    port: 9800
+    protocol: json-rpc
+    version: "2025-03-26"
+  scheduler:
+    enabled: true
+    check_interval_seconds: 300
+    timezone: "America/Sao_Paulo"
+  storage:
+    tokens_path: "~/.config/aion/linkedin/tokens"
+    scheduled_posts: "~/.config/aion/linkedin/tokens/scheduled_posts.json"
+
+agents:
+  linkedin_content:
+    enabled: true
+    agent_id: "linkedin_content"
+    name: "LinkedIn Content Agent"
+    description: "Gera e publica conteúdo no LinkedIn com RAG baseado em histórico"
+    price_brl: 490
+    price_usd: 99
+    llm: deepseek-v4-flash
+    actions:
+      - create_post
+      - schedule_post
+      - plan_weekly
+      - generate_with_rag
+
+  linkedin_prospect:
+    enabled: true
+    agent_id: "linkedin_prospect"
+    name: "LinkedIn Prospect Agent"
+    description: "Busca e enriquece perfis de prospects, integrado com Sales Agent #58"
+    price_brl: 590
+    price_usd: 119
+    llm: deepseek-v4-flash
+    actions:
+      - search_prospects
+      - enrich_prospect
+      - find_decision_makers
+      - prepare_outreach
+    integrations:
+      sales_agent_58: true
+      sales_agent_29: true
+
+  linkedin_analytics:
+    enabled: true
+    agent_id: "linkedin_analytics"
+    name: "LinkedIn Analytics Agent"
+    description: "Analisa engajamento, métricas de audiência e performance de conteúdo"
+    price_brl: 390
+    price_usd: 79
+    llm: deepseek-v4-flash
+    actions:
+      - get_post_performance
+      - get_weekly_report
+      - get_best_posts
+      - get_content_mix
+
+workflows:
+  linkedin_prospectao_conteudo:
+    name: "Prospecção → Conteúdo → Engajamento → Análise"
+    steps:
+      - agent: linkedin_prospect
+        action: search_prospects
+      - agent: linkedin_content
+        action: generate_with_rag
+      - agent: linkedin_content
+        action: schedule_post
+      - agent: linkedin_analytics
+        action: get_weekly_report
+
+security:
+  oauth_scopes_minimal:
+    - profile
+    - email
+    - openid
+    - w_member_social
+  token_permissions: "0600"
+  aip_registry_enabled: true
+  pii_masking_enabled: true

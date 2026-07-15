@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>EcoSystem AEC + Regulatory - Arquitetura do Produto</title>
+<style>
+  @media print { @page { margin: 1.5cm; } body { font-size: 10pt; } }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; color: #1a1a1a; font-size: 11pt; line-height: 1.5; padding: 2cm; }
+  h1 { color: #0078d4; font-size: 20pt; border-bottom: 2px solid #0078d4; padding-bottom: 8px; margin-bottom: 15px; }
+  h2 { color: #005a9e; font-size: 14pt; margin-top: 25px; margin-bottom: 10px; }
+  h3 { font-size: 12pt; margin-top: 18px; margin-bottom: 6px; }
+  p { margin: 6px 0; }
+  .section { margin-bottom: 20px; page-break-inside: avoid; }
+  table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 9.5pt; }
+  th, td { border: 1px solid #bbb; padding: 5px 8px; text-align: left; vertical-align: top; }
+  th { background: #0078d4; color: #fff; font-weight: 600; }
+  tr:nth-child(even) { background: #f7f9fc; }
+  .diagram { background: #f0f2f5; padding: 14px; font-family: 'Consolas', 'Courier New', monospace; font-size: 8.5pt; line-height: 1.35; border-radius: 4px; margin: 10px 0; border-left: 3px solid #0078d4; white-space: pre; overflow-x: auto; }
+  .url { color: #0078d4; font-family: 'Consolas', monospace; font-size: 8.5pt; word-break: break-all; }
+  ul, ol { margin: 6px 0 6px 20px; }
+  li { margin: 3px 0; }
+  .subtitle { font-size: 11pt; color: #555; margin-bottom: 20px; }
+  .header-block { margin-bottom: 25px; }
+  .badge { display: inline-block; background: #e8f4fd; color: #0078d4; padding: 2px 8px; border-radius: 3px; font-size: 8.5pt; font-weight: 600; }
+</style>
+</head>
+<body>
+
+<div class="header-block">
+<h1>EcoSystem AEC + Regulatory</h1>
+<p class="subtitle">Plataforma SaaS Multiagente de IA para Compliance Regulatório, Engenharia e ESG</p>
+<p><strong>Empresa:</strong> Global Match Engenharia de Produção</p>
+<p><strong>Versão:</strong> 3.0.0 &nbsp;|&nbsp; <span class="badge">Azure Marketplace</span> <span class="badge">SaaS</span></p>
+</div>
+
+<div class="section">
+<h2>1. Descrição do Produto</h2>
+<p>Plataforma SaaS composta por <strong>mais de 50 agentes de IA generativa</strong> especializados em:</p>
+<ul>
+  <li><strong>Obrigações regulatórias brasileiras</strong> — NR-1 Psicossocial, LGPD, Igualdade Salarial, Canal de Denúncias, CBS/IBS, Anticorrupção</li>
+  <li><strong>Relatórios ESG</strong> — IFRS S1/S2, Inventário de Carbono, Escopo 3, CBAM</li>
+  <li><strong>Processos de engenharia e construção (AEC)</strong> — Spec Analyst, Procurement, Inventory, BIM Coordination</li>
+  <li><strong>Integração com ERPs</strong> — Microsoft Dynamics 365, Salesforce Agentforce, Oracle Fusion, SAP S/4HANA</li>
+</ul>
+<p>Os agentes operam de forma hierárquica e colaborativa utilizando os protocolos <strong>A2A (Agent-to-Agent)</strong> da Google e <strong>MCP (Model Context Protocol)</strong> da Anthropic, permitindo orquestração inteligente de tarefas complexas.</p>
+</div>
+
+<div class="section">
+<h2>2. Arquitetura do Sistema</h2>
+
+<h3>2.1 Diagrama de Camadas</h3>
+<div class="diagram">┌─────────────────────────────────────────────────────────────────────┐
+│  CAMADA 4 — AUTO-APRIMORAMENTO                                       │
+│  Meta-Learning · Ecosystem Evolution · Federated Knowledge            │
+├─────────────────────────────────────────────────────────────────────┤
+│  CAMADA 3 — INTELIGÊNCIA                                              │
+│  Regulatory Watch · Client Intelligence · Quality Critic              │
+├─────────────────────────────────────────────────────────────────────┤
+│  CAMADA 2 — COORDENAÇÃO                                               │
+│  Master Orchestrator · Cross-Platform Bridge                          │
+├─────────────────────────────────────────────────────────────────────┤
+│  CAMADA 1 — AGENTES ESPECIALIZADOS (48 agentes)                      │
+│  AEC (#1-12) | Regulatório (#13-21) | Microsoft (#22-27)             │
+│  Dynamics (#31-36) | Agentforce (#37-41) | Oracle (#42-45) | SAP (#46-48) │
+├─────────────────────────────────────────────────────────────────────┤
+│  CAMADA 0 — MCP SERVERS + A2A PROTOCOL                                │
+│  Regulatory MCP · ESG MCP · ERP MCP                                   │
+│  → Microsoft Copilot Studio · Salesforce Agentforce                   │
+│  → Google Gemini · Claude (Anthropic)                                 │
+└─────────────────────────────────────────────────────────────────────┘</div>
+
+<h3>2.2 Infraestrutura de Hospedagem</h3>
+<table>
+  <tr><th>Componente</th><th>Tecnologia</th><th>Localização</th></tr>
+  <tr><td>API Backend</td><td>FastAPI + Uvicorn (Python 3.12)</td><td>Render.com (US)</td></tr>
+  <tr><td>Frontend Dashboard</td><td>React + Vite</td><td>Vercel</td></tr>
+  <tr><td>Banco Relacional</td><td>PostgreSQL / TimescaleDB</td><td>Render.com + Supabase</td></tr>
+  <tr><td>Banco Vetorial</td><td>ChromaDB + Pinecone</td><td>Render.com + Pinecone Cloud</td></tr>
+  <tr><td>Grafo de Conhecimento</td><td>Neo4j</td><td>Render.com</td></tr>
+  <tr><td>Cache / Mensageria</td><td>Redis Streams</td><td>Render.com</td></tr>
+  <tr><td>Armazenamento Documentos</td><td>MinIO (S3-compatible)</td><td>Render.com</td></tr>
+  <tr><td>Monitoramento</td><td>Prometheus + Grafana + Loki</td><td>Render.com</td></tr>
+  <tr><td>Gerenciamento de Secrets</td><td>HashiCorp Vault</td><td>Render.com</td></tr>
+  <tr><td>Pagamentos</td><td>Stripe + Abacatepay (PIX)</td><td>APIs Externas</td></tr>
+</table>
+
+<h3>2.3 Modelos de IA Utilizados</h3>
+<table>
+  <tr><th>Provedor</th><th>Modelo</th><th>Propósito</th><th>Região</th></tr>
+  <tr><td>DeepSeek</td><td>DeepSeek-V4-Flash</td><td>LLM operacional principal — agentes AEC, ESG, ERP</td><td>API externa (OpenAI-compatível)</td></tr>
+  <tr><td>Google Gemini</td><td>Gemini</td><td>Dados sensíveis LGPD — NR-1, RH, Canal de Denúncias</td><td>southamerica-east1 (Brasil)</td></tr>
+  <tr><td>Anthropic Claude</td><td>Claude API</td><td>Raciocínio complexo — Orquestrador, Quality Critic</td><td>API externa</td></tr>
+</table>
+</div>
+
+<div class="section">
+<h2>3. Fluxo de Funcionamento</h2>
+<ol>
+  <li><strong>Acesso:</strong> Cliente acessa o dashboard web (Vercel) e seleciona um agente ou descreve um objetivo em linguagem natural</li>
+  <li><strong>Requisição:</strong> A requisição é enviada via HTTPS para a API FastAPI hospedada no Render.com</li>
+  <li><strong>Orquestração:</strong> O Master Orchestrator analisa o objetivo, identifica as obrigações legais aplicáveis e delega para o(s) agente(s) especializado(s)</li>
+  <li><strong>Execução:</strong> Cada agente consulta o LLM apropriado (DeepSeek, Gemini ou Claude) com contexto recuperado do banco vetorial (RAG)</li>
+  <li><strong>Revisão:</strong> O Quality Critic valida o output contra a norma vigente antes da entrega ao cliente</li>
+  <li><strong>Entrega:</strong> Resultado é armazenado, apresentado no dashboard e notificado por e-mail</li>
+</ol>
+<p><strong>Nenhum componente é implantado no ambiente Azure do cliente.</strong> Toda a plataforma é SaaS multi-tenant, acessada via navegador.</p>
+</div>
+
+<div class="section">
+<h2>4. Endpoints de Integração com Azure Marketplace</h2>
+<table>
+  <tr><th>Endpoint</th><th>Função</th></tr>
+  <tr><td class="url">https://engenheiro-producao-ai.onrender.com/microsoft/subscribe</td><td>Landing page para assinatura via Azure Marketplace</td></tr>
+  <tr><td class="url">https://engenheiro-producao-ai.onrender.com/microsoft/webhook</td><td>Webhook para eventos de ciclo de vida da assinatura</td></tr>
+  <tr><td class="url">https://engenheiro-producao-ai.onrender.com/microsoft/fulfill</td><td>Ativação da assinatura após compra confirmada</td></tr>
+  <tr><td class="url">https://engenheiro-producao-ai.onrender.com/api/leads/microsoft</td><td>Recepção de leads gerados no Azure Marketplace</td></tr>
+  <tr><td class="url">https://engenheiro-producao-ai.onrender.com/mcp/regulatory/sse</td><td>MCP Server — Regulatory Tools (SSE, port 8010)</td></tr>
+  <tr><td class="url">https://engenheiro-producao-ai.onrender.com/mcp/esg/sse</td><td>MCP Server — ESG Tools (SSE, port 8011)</td></tr>
+</table>
+</div>
+
+<div class="section">
+<h2>5. Segurança e Conformidade</h2>
+<table>
+  <tr><th>Requisito</th><th>Implementação</th></tr>
+  <tr><td>Criptografia</td><td>Todas as comunicações via HTTPS/TLS 1.2+</td></tr>
+  <tr><td>Autenticação</td><td>JWT + API Keys para MCP servers</td></tr>
+  <tr><td>LGPD — Dados Sensíveis</td><td>Roteados exclusivamente via Google Gemini na região southamerica-east1 (Brasil)</td></tr>
+  <tr><td>Controle de Acesso</td><td>RBAC por tenant com níveis admin, manager, viewer</td></tr>
+  <tr><td>Mascaramento de PII</td><td>PII Masker ativo em todos os outputs dos agentes</td></tr>
+  <tr><td>Auditoria</td><td>Audit trail completo com timestamp, usuário, ação e dados alterados</td></tr>
+  <tr><td>Secrets</td><td>Gerenciados via HashiCorp Vault com rotação automática</td></tr>
+  <tr><td>Rate Limiting</td><td>Circuit Breaker com threshold configurável por tenant</td></tr>
+  <tr><td>Backup</td><td>Snapshot diário do banco PostgreSQL com retenção de 30 dias</td></tr>
+</table>
+</div>
+
+<div class="section">
+<h2>6. Planos e Preços</h2>
+<table>
+  <tr><th>Plano</th><th>Agentes Inclusos</th><th>Preço (USD)</th></tr>
+  <tr><td>Compliance Essencial</td><td>NR-1 Psicossocial + LGPD Operacional</td><td>USD 149/mês</td></tr>
+  <tr><td>Regulatory Pro</td><td>NR-1 + LGPD + Denúncias + Igualdade + Anticorrupção</td><td>USD 379/mês</td></tr>
+  <tr><td>ESG + Carbono</td><td>IFRS + Inventário Carbono + Escopo 3</td><td>USD 629/mês</td></tr>
+  <tr><td>Microsoft Pack</td><td>6 agentes Microsoft 365</td><td>USD 1.129/mês</td></tr>
+  <tr><td>Full Suite</td><td>Todos os 50+ agentes</td><td>USD 4.999/mês</td></tr>
+</table>
+</div>
+
+</body>
+</html>

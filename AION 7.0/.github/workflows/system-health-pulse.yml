@@ -1,0 +1,19 @@
+name: System health pulse check
+
+on:
+  schedule:
+    # every 30 minutes -- cheap connectivity-only check, catches outages
+    # like the undetected domain outage from 2026-07-08 within minutes
+    # instead of hours.
+    - cron: "*/30 * * * *"
+  workflow_dispatch: {}
+
+jobs:
+  run-pulse-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run pulse health check
+        run: |
+          curl -sS -X POST "https://engenheiro-producao-ai.onrender.com/api/system-health/run-check?deep=false" \
+            -H "X-Admin-Secret: ${{ secrets.MARKETPLACE_ADMIN_SECRET }}" \
+            --fail-with-body

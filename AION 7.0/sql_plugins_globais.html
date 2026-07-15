@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head><meta charset="UTF-8"><title>SQL Plugins Globais</title></head>
+<body style="background:#0C1322;color:#e2e8f0;font-family:monospace;padding:40px">
+  <h2 style="color:#00C36B">SQL — Worldwide Plugins (rodar no Supabase Dashboard)</h2>
+  <pre id="sql" style="background:#1A2540;padding:24px;border-radius:12px;white-space:pre-wrap;word-break:break-word;font-size:13px;line-height:1.6">
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT FROM pg_tables WHERE tablename = 'plugin_usage') THEN
+    CREATE TABLE plugin_usage (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        plugin_source TEXT,
+        page_context TEXT,
+        message TEXT,
+        response TEXT,
+        created_at TIMESTAMPTZ DEFAULT NOW()
+    );
+    CREATE INDEX idx_plugin_source ON plugin_usage(plugin_source);
+    CREATE INDEX idx_plugin_created ON plugin_usage(created_at DESC);
+  END IF;
+END $$;
+  </pre>
+  <button onclick="copySql()" style="background:#00C36B;border:none;padding:12px 28px;border-radius:8px;color:#fff;font-size:14px;cursor:pointer;margin-top:16px">📋 COPIAR SQL</button>
+  <p style="color:#94a3b8;font-size:12px;margin-top:12px">Cole no Supabase Dashboard &rarr; SQL Editor e execute</p>
+  <script>
+    function copySql() {
+      const el = document.getElementById('sql');
+      const range = document.createRange();
+      range.selectNodeContents(el);
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+      document.execCommand('copy');
+      sel.removeAllRanges();
+      document.querySelector('button').textContent = '✅ COPIADO!';
+    }
+  </script>
+</body>
+</html>

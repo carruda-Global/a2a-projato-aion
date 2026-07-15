@@ -1,0 +1,35 @@
+Product Name: EcoSystem AEC + Regulatory
+Category: AI Agent / AI Tools
+Pricing Model: Subscription (SaaS)
+Regions: sa-saopaulo-1 (Brazil)
+Languages: Portuguese (Brazil)
+
+Short Description (máx 200 caracteres):
+21 agentes de IA para conformidade regulatória brasileira ativa em 2026. NR-1 Psicossocial, LGPD, Tributário CBS/IBS, ESG, Carbono e mais. Planos de R$ 290 a R$ 3.490/mês. Trial de 15 dias.
+
+Target Audience:
+PMEs brasileiras (20-500 funcionários) que precisam de conformidade regulatória. Decisores: RH, Jurídico, Compliance, CFO.
+
+Key Differentiators:
+- Único produto com 9 agentes regulatórios integrados
+- Foco em PMEs (concorrentes atendem apenas enterprise)
+- Preço acessível a partir de R$ 290/mês
+- Trial grátis de 15 dias sem compromisso
+- Base de conhecimento atualizada com legislação brasileira
+
+Plans:
+- NR-1 Psicossocial: R$ 390/mês
+- Tributário CBS/IBS: R$ 390/mês
+- LGPD Operacional: R$ 290/mês
+- ESG IFRS S1/S2: R$ 490/mês
+- Inventário Carbono: R$ 890/mês
+- Escopo 3 Fornecedores: R$ 690/mês
+- Canal de Denúncias: R$ 290/mês
+- Igualdade Salarial: R$ 490/mês
+- Compliance Anticorrupção: R$ 390/mês
+- Regulatory Full (9 agentes): R$ 3.490/mês
+
+Support:
+- Email: contato@global-engenharia.com
+- WhatsApp: +5511994798464
+- Website: https://global-engenharia.com

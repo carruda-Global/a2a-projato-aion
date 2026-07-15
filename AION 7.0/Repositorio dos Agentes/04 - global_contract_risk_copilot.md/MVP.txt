@@ -1,0 +1,99 @@
+# Global Contract Risk Copilot
+
+## Objetivo
+
+Detectar cláusulas críticas em contratos automaticamente.
+
+---
+
+# Problema
+
+Revisão jurídica é lenta.
+
+---
+
+# Público
+
+- Jurídico
+- Compras
+- Compliance
+
+---
+
+# MVP
+
+Entrada
+
+PDF contrato
+
+Saída
+
+Resumo executivo
+
+Cláusulas críticas
+
+Riscos
+
+Sugestões
+
+---
+
+# Fluxo
+
+Upload
+
+↓
+
+OCR
+
+↓
+
+LLM
+
+↓
+
+Classificação
+
+↓
+
+Relatório
+
+---
+
+# Detectar
+
+Limitação responsabilidade
+
+Rescisão
+
+Multas
+
+LGPD
+
+Confidencialidade
+
+Jurisdição
+
+---
+
+# Resultado
+
+Risk Score
+
+High
+
+Medium
+
+Low
+
+---
+
+# Roadmap
+
+Comparação de contratos
+
+Versionamento
+
+Redlines
+
+Integração DocuSign

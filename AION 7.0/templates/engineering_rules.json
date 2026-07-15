@@ -1,0 +1,46 @@
+{
+  "rules": [
+    {
+      "id": "NBR-6118",
+      "title": "Projeto de estruturas de concreto",
+      "category": "estrutural",
+      "description": "Norma que estabelece os requisitos para projetos de estruturas de concreto armado e protendido."
+    },
+    {
+      "id": "NBR-6120",
+      "title": "Cargas para o calculo de estruturas",
+      "category": "estrutural",
+      "description": "Define os valores minimos de cargas a serem considerados em projetos estruturais."
+    },
+    {
+      "id": "NBR-9050",
+      "title": "Acessibilidade a edificacoes",
+      "category": "acessibilidade",
+      "description": "Norma de acessibilidade para pessoas com deficiencia em edificacoes e espacos urbanos."
+    },
+    {
+      "id": "NBR-15575",
+      "title": "Desempenho de edificacoes habitacionais",
+      "category": "desempenho",
+      "description": "Estabelece requisitos de desempenho para edificacoes habitacionais."
+    },
+    {
+      "id": "NBR-5410",
+      "title": "Instalacoes eletricas de baixa tensao",
+      "category": "eletrica",
+      "description": "Norma para projetos e execucao de instalacoes eletricas de baixa tensao."
+    }
+  ],
+  "substitution_rules": [
+    {
+      "material": "cimento CP-II",
+      "alternatives": ["cimento CP-III", "cimento CP-IV"],
+      "notes": "Verificar resistencia requerida no projeto"
+    },
+    {
+      "material": "aco CA-50",
+      "alternatives": ["aco CA-60"],
+      "notes": "CA-60 tem maior resistencia, verificar recalculo estrutural"
+    }
+  ]
+}

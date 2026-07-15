@@ -1,0 +1,118 @@
+# Global SOC2 Copilot
+
+## Objetivo
+
+Auxiliar empresas na preparação para auditorias SOC 2 através da análise automática de documentos internos, identificação de não conformidades e geração de evidências.
+
+---
+
+# Problema
+
+Empresas SaaS gastam semanas organizando evidências para auditorias SOC2.
+
+Grande parte desse trabalho é repetitivo.
+
+---
+
+# Público
+
+- Startups SaaS
+- Empresas B2B
+- Fintechs
+- HealthTechs
+- Software Houses
+
+---
+
+# MVP
+
+Entrada:
+
+- Políticas internas
+- PDFs
+- Word
+- Planilhas
+
+Saída:
+
+- Checklist SOC2
+- Controles encontrados
+- Controles ausentes
+- Evidências existentes
+- Plano de ação
+
+---
+
+# IA
+
+Recebe documento
+
+↓
+
+Extrai texto
+
+↓
+
+Classifica controles
+
+↓
+
+Compara com framework SOC2
+
+↓
+
+Gera relatório
+
+---
+
+# Base de Conhecimento
+
+- SOC2 Trust Services Criteria
+- Common Criteria
+- Security
+- Availability
+- Confidentiality
+
+---
+
+# Ferramentas
+
+- OCR
+- PDF Parser
+- LLM
+- RAG
+
+---
+
+# Entregável
+
+PDF
+
+- Score SOC2
+- Controles implementados
+- Pendências
+- Recomendações
+
+---
+
+# Roadmap
+
+V1
+
+✓ Upload PDF
+
+✓ Checklist
+
+✓ Relatório
+
+V2
+
+- Dashboard
+
+- Evidências automáticas
+
+- Integração Jira
+
+- Integração Confluence
+
+- Integração Google Drive

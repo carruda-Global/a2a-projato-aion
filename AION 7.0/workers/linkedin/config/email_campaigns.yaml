@@ -1,0 +1,97 @@
+campaigns:
+  welcome:
+    name: "Boas-vindas AION"
+    trigger: "lead_created"
+    steps:
+      - day: 0
+        channel: email
+        subject: "Bem-vindo ao AION"
+        template: "Ola {name}, obrigado pelo interesse! Seus agentes estarao prontos em 48h."
+      - day: 2
+        channel: email
+        subject: "Conheca nossos 59 agentes"
+        template: "Oi {name}, temos agentes especificos para {industry}."
+      - day: 5
+        channel: email
+        subject: "Caso de uso: Compliance com IA"
+        template: "{name}, veja como automatizar compliance em 48h."
+      - day: 10
+        channel: linkedin
+        subject: "Pronto para comecar?"
+        template: "{name}, quer testar gratis? Trial de 15 dias em global-engenharia.com/ecosystem"
+
+  diagnostic:
+    name: "Diagnostico Gratuito"
+    trigger: "diagnostic_requested"
+    steps:
+      - day: 1
+        channel: email
+        subject: "Seu diagnostico esta pronto"
+        template: "Ola {name}, acesse seus resultados."
+      - day: 4
+        channel: email
+        subject: "Proximos passos"
+        template: "Recomendamos comecar pelo Compliance Essencial."
+      - day: 8
+        channel: linkedin
+        subject: "Agende uma call"
+        template: "Quer discutir os resultados?"
+
+  abandoned_cart:
+    name: "Carrinho Abandonado"
+    trigger: "checkout_not_completed"
+    steps:
+      - day: 1
+        channel: email
+        subject: "Voce deixou algo para tras"
+        template: "Posso ajudar com alguma duvida?"
+      - day: 3
+        channel: email
+        subject: "Ainda avaliando?"
+        template: "Trial gratuito de 15 dias disponivel."
+      - day: 7
+        channel: linkedin
+        subject: "Ultima chance"
+        template: "59 agentes prontos para sua empresa."
+
+  micro:
+    name: "Micro-agentes Porta de Entrada"
+    trigger: "lead_score_low"
+    steps:
+      - day: 0
+        channel: email
+        subject: "Comece com R$ 99/mes"
+        template: "Ola {name}, conheca nossos micro-agentes de entrada."
+      - day: 3
+        channel: email
+        subject: "Micro Starter - R$ 199/mes"
+        template: "Diagnostico NR-1 + LGPD Scanner por apenas R$ 199."
+
+  cold_outreach_director:
+    name: "Cold Outreach - Diretor de Compliance"
+    trigger: "manual_prospecting_list"
+    # Modelo aprovado pelo usuario em 2026-07 (Apollo.io -> diretores de compliance).
+    # Estrutura: dor real (multas ANPD / custo medio de incidente) + beneficio real
+    # (catalogo regulatorio determinístico, nao "IA chutando") + credibilidade
+    # (atuacao internacional) + CTA suave, sem agenda forcada. Reusar este texto
+    # como base tanto para email quanto para mensagens de LinkedIn.
+    steps:
+      - day: 0
+        channel: email
+        subject: "{empresa} — vi que voces lidam com compliance de perto"
+        template: |
+          Olá {nome},
+
+          Tudo bem? Trabalho com automação de compliance e queria compartilhar algo que pode ser útil pra {empresa}.
+
+          A ANPD já autuou mais de 50 empresas em 2025, com multas que chegam a 2% do faturamento. E na prática, boa parte do trabalho de due diligence de contraparte ainda é feito manualmente — o que consome semanas e, quando falha, pode sair caro de verdade (uma pesquisa da IBM apontou média de US$ 4,91 milhões por incidente ligado a terceiros).
+
+          O que a gente construiu resolve isso de um jeito diferente: em vez de IA "chutando" se algo está conforme ou não, usamos catálogo regulatório real por trás — e entregamos diagnóstico de LGPD, due diligence de fornecedor e relatório pronto pra auditoria em 48h. Empresas que automatizam esse tipo de checagem reduzem em média 82% o tempo de preparação de auditoria (segundo um estudo da IDC de 2025).
+
+          Atuamos com regulação tanto aqui no Brasil quanto lá fora (SOC 2, ISO 27001, EU AI Act, GDPR), sempre nesse mesmo princípio.
+
+          Fico à disposição se tiver alguma dúvida — sei que é um processo novo pra muita gente ainda. Se quiser dar uma olhada com calma, acesse nosso site: www.global-engenharia.com/ecosystem
+
+          Abraço,
+          Cristiano Arruda
+          Global Match Engenharia — CREA-SP 5071200171

@@ -1,0 +1,94 @@
+# Global Vendor Risk Copilot
+
+## Objetivo
+
+Avaliar automaticamente riscos de fornecedores.
+
+---
+
+# Problema
+
+Grandes empresas recebem centenas de fornecedores.
+
+A avaliação manual é lenta.
+
+---
+
+# Público
+
+- Compras
+- Compliance
+- Jurídico
+- Enterprise
+
+---
+
+# MVP
+
+Entrada
+
+- Questionário
+- Contrato
+- Certificações
+
+Saída
+
+- Risk Score
+- Vendor Score
+- Classificação
+
+---
+
+# Fluxo
+
+Upload
+
+↓
+
+Análise IA
+
+↓
+
+Classificação
+
+↓
+
+Risk Report
+
+---
+
+# Critérios
+
+Segurança
+
+LGPD
+
+SOC2
+
+ISO27001
+
+Financeiro
+
+---
+
+# Resultado
+
+Fornecedor
+
+Baixo risco
+
+Médio
+
+Alto
+
+---
+
+# Evolução
+
+Dashboard
+
+Histórico
+
+Alertas
+
+API

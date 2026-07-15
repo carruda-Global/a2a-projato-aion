@@ -1,0 +1,43 @@
+# Regras de Pontuacao de Leads (BANT + Comportamental)
+
+scoring:
+  bant:
+    budget:
+      max_score: 25
+      rules:
+        - industry_high: 15  # technology, finance, healthcare
+        - company_size_large: 10  # >500 funcionarios
+        - company_size_medium: 5  # 50-500
+
+    authority:
+      max_score: 30
+      rules:
+        - c_level: 30  # CEO, CTO, CFO, VP
+        - director: 20  # Director, Head
+        - manager: 10  # Manager, Coordinator
+
+    need:
+      max_score: 25
+      rules:
+        - regulatory_industry: 15  # healthcare, finance, construction
+        - compliance_keywords: 10  # lgpd, nr-1, esg, quality
+
+    timeline:
+      max_score: 20
+      rules:
+        - linkedin_source: 5
+        - urgent_keywords: 10
+        - recent_activity: 10
+
+  behavioral:
+    pageview: 5
+    form_start: 15
+    diagnostic_request: 20
+    checkout_visit: 25
+    max_behavior_score: 40
+
+  thresholds:
+    hot: 80
+    warm: 60
+    tepid: 40
+    cold: 0

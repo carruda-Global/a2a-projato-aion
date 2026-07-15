@@ -1,0 +1,32 @@
+[default]
+  [default.data_access]
+    "public" = { effect = "allow" }
+    "internal" = { effect = "allow" }
+    "confidential" = { effect = "ask" }
+    "restricted" = { effect = "deny" }
+  [default.tool_access]
+    "read" = { effect = "allow" }
+    "write" = { effect = "ask" }
+    "delete" = { effect = "deny" }
+    "execute" = { effect = "ask" }
+
+[agent_specific]
+  [agent_specific."#49"]
+    [agent_specific."#49".tool_access]
+      "*" = { effect = "allow" }
+      "delete" = { effect = "ask" }
+      "system.*" = { effect = "ask" }
+  [agent_specific."#53"]
+    [agent_specific."#53".data_access]
+      "*" = { effect = "allow" }
+      "restricted" = { effect = "ask" }
+  [agent_specific."#12"]
+    [agent_specific."#12".data_access]
+      "pgrs.*" = { effect = "allow" }
+      "lgpd.*" = { effect = "allow" }
+      "*" = { effect = "deny" }
+  [agent_specific."#57"]
+    [agent_specific."#57".tool_access]
+      "github.*" = { effect = "allow" }
+      "docker.*" = { effect = "ask" }
+      "delete.*" = { effect = "deny" }

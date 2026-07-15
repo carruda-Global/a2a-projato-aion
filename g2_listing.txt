@@ -1,0 +1,48 @@
+=== G2 — EcoSystem AEC + Regulatory ===
+
+Nome do produto: EcoSystem AEC + Regulatory
+Categoria G2: Compliance Software / GRC (Governance, Risk & Compliance) Platforms
+Empresa: Global Match Engenharia
+
+Tagline (curta):
+86 AI compliance agents — from SOC2 to NR-1 to EU AI Act — in one platform.
+
+Descrição curta:
+AI-powered compliance and regulatory platform with 86 specialized agents
+covering global standards (SOC2, ISO27001, NIS2, DORA, CSRD, EU AI Act) and
+Brazil-specific regulations (NR-1, LGPD, CBS/IBS). Each agent scores against
+real regulatory catalogs — not generic LLM output — and produces
+audit-ready reports.
+
+Descrição detalhada:
+EcoSystem AEC + Regulatory replaces manual compliance work with AI agents
+built on deterministic, real-catalog rigor: LLMs extract facts, a fixed
+regulatory catalog does the scoring — so results are auditable, not just
+"AI-generated."
+
+Coverage includes:
+• European Compliance: CSRD, DORA, SOC2, ISO27001, NIS2
+• Enterprise Risk: Vendor Risk Assessment, Contract Risk Analysis,
+  M&A Due Diligence, Board ESG Reporting
+• Brazil Regulatory: NR-1 (psychosocial risk), LGPD, CBS/IBS tax reform
+• Global: EU AI Act (Art. 5, Annex III, Art. 50), Regulatory Monitor
+  across 50+ jurisdictions
+• Governance: Whistleblower case management
+
+Pricing: subscription plans from $99 to $4,999/month depending on scope
+(single-agent to full-suite). Free diagnostic available on select plans.
+
+Integrations: Stripe billing, Zapier/Make.com, HubSpot CRM.
+
+Principais recursos p/ preencher nos campos do G2:
+- Deterministic compliance scoring (not black-box LLM classification)
+- Audit-ready PDF/report generation
+- Multi-jurisdiction support (BR, US, EU, MX, CO, AR)
+- 48h turnaround on assessments
+- Subscription model, self-serve checkout
+
+Screenshots sugeridos: usar os já existentes em
+google_screenshot_1.png a google_screenshot_5.png (mesma pasta do projeto)
+e marketplace_screenshot_1-3.png.
+
+Link do site: https://global-engenharia.com/ecosystem

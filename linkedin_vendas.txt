@@ -1,0 +1,289 @@
+markdown
+
+# Implementação: Máquina de Vendas com LinkedIn → Site → AION
+
+## Contexto
+Temos o Ecosystem AION (71 agentes) com integração LinkedIn via MCP. O site de vendas (landing page) está pronto para receber tráfego. Agora precisamos estruturar o fluxo completo de prospecção, qualificação e conversão, onde os agentes do AION atuam como uma máquina de vendas autônoma que:
+
+1. Prospecta leads no LinkedIn
+2. Qualifica leads e enriquece dados
+3. Conduz leads para o site via conteúdo personalizado
+4. Captura leads no site e inicia nutrição
+5. Qualifica para demonstração e venda
+6. Ativa agentes do AION para o cliente
+
+## Arquitetura de Integração
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ MÁQUINA DE VENDAS AION │
+│ │
+│ ┌─────────────────────────────────────────────────────────────────────┐ │
+│ │ ETAPA 1: PROSPECÇÃO NO LINKEDIN │ │
+│ │ │ │
+│ │ Agente #58 (Sales Agent) + Agente LinkedIn MCP │ │
+│ │ - Busca leads por setor, cargo, localização │ │
+│ │ - Filtra por atividade recente (posts, mudanças de cargo) │ │
+│ │ - Enriquece dados (empresa, conexões, interesses) │ │
+│ └─────────────────────────────────────────────────────────────────────┘ │
+│ │ │
+│ ▼ │
+│ ┌─────────────────────────────────────────────────────────────────────┐ │
+│ │ ETAPA 2: QUALIFICAÇÃO E NUTRIÇÃO │ │
+│ │ │ │
+│ │ Agente #29 (Sales Agent) + Agente de Conteúdo │ │
+│ │ - Gera mensagens personalizadas │ │
+│ │ - Envia convites de conexão │ │
+│ │ - Inicia conversas com triggers (posts, comentários) │ │
+│ │ - Envia conteúdo de valor (cases, artigos, webinars) │ │
+│ │ - Direciona para o site com CTAs personalizados │ │
+│ └─────────────────────────────────────────────────────────────────────┘ │
+│ │ │
+│ ▼ │
+│ ┌─────────────────────────────────────────────────────────────────────┐ │
+│ │ ETAPA 3: CAPTURA NO SITE │ │
+│ │ │ │
+│ │ Landing Page + Agente #52 (Client Intelligence) │ │
+│ │ - Formulário de contato (nome, email, telefone, empresa) │ │
+│ │ - "Diagnóstico Gratuito" (lead magnet) │ │
+│ │ - Chat ao vivo com agente #8 (Engineering Assistant) │ │
+│ │ - Agente #52 rastreia comportamento no site │ │
+│ └─────────────────────────────────────────────────────────────────────┘ │
+│ │ │
+│ ▼ │
+│ ┌─────────────────────────────────────────────────────────────────────┐ │
+│ │ ETAPA 4: NUTRIÇÃO E QUALIFICAÇÃO PARA DEMO │ │
+│ │ │ │
+│ │ Agente #52 (Client Intelligence) + Agente #58 (Sales Agent) │ │
+│ │ - Envia e-mails de nutrição (drip campaign) │ │
+│ │ - Pontua leads por engajamento (abertura, cliques, visitas) │ │
+│ │ - Qualifica para demonstração com base no score │ │
+│ │ - Agenda demonstração (Calendly integrado) │ │
+│ └─────────────────────────────────────────────────────────────────────┘ │
+│ │ │
+│ ▼ │
+│ ┌─────────────────────────────────────────────────────────────────────┐ │
+│ │ ETAPA 5: VENDA E ATIVAÇÃO │ │
+│ │ │ │
+│ │ Agente #58 (Sales Agent) + Agente #49 (Master Orchestrator) │ │
+│ │ - Realiza demonstração (humano + IA) │ │
+│ │ - Envia proposta comercial │ │
+│ │ - Fecha venda via Stripe Checkout │ │
+│ │ - Ativa agentes do AION para o cliente │ │
+│ └─────────────────────────────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────────────────────────────────┘
+text
+
+
+## Requisitos Técnicos
+
+### 1. Integração com Site
+- Landing page já pronta com formulários e CTAs
+- Webhooks para capturar leads (Supabase)
+- Rastreamento de comportamento (Google Analytics + Agente #52)
+
+### 2. Agentes Envolvidos
+
+| Agente | Função | Integração |
+|--------|--------|------------|
+| **#58 Sales Agent** | Prospecção no LinkedIn | LinkedIn MCP |
+| **#29 Sales Agent** | Outreach e nutrição | LinkedIn MCP + Email |
+| **#8 Engineering Assistant** | Chat ao vivo no site | API do site |
+| **#52 Client Intelligence** | Qualificação e pontuação | Supabase + Site |
+| **#49 Master Orchestrator** | Ativação de agentes | AION Core |
+
+### 3. Fluxo de Dados
+
+LinkedIn (MCP) → #58 → #29 → Site (Webhook) → Supabase → #52 → #49 → Stripe
+text
+
+
+### 4. Estrutura de Diretórios
+
+aion/
+├── src/
+│ ├── integrations/
+│ │ ├── linkedin/ # Já implementado via MCP
+│ │ │ ├── mcp_client.py
+│ │ │ └── tools.py
+│ │ ├── site/
+│ │ │ ├── init.py
+│ │ │ ├── webhook.py # Recebe leads do site
+│ │ │ └── analytics.py # Rastreia comportamento
+│ │ └── email/
+│ │ ├── init.py
+│ │ ├── campaigns.py # Drip campaigns
+│ │ └── templates.py # Templates de email
+│ ├── agents/
+│ │ ├── sales/
+│ │ │ ├── init.py
+│ │ │ ├── prospect.py # #58 LinkedIn prospecting
+│ │ │ ├── outreach.py # #29 LinkedIn + Email outreach
+│ │ │ └── qualify.py # #52 Lead qualification
+│ │ └── customer/
+│ │ ├── init.py
+│ │ └── activation.py # #49 Agent activation
+│ └── monetization/
+│ ├── init.py
+│ ├── stripe_client.py # Stripe checkout
+│ └── plans.py # Planos de assinatura
+│
+├── config/
+│ ├── sales_pipeline.yaml # Configuração do funil de vendas
+│ ├── lead_scoring.yaml # Regras de pontuação de leads
+│ └── email_campaigns.yaml # Configuração de drip campaigns
+│
+└── webhooks/
+└── site_webhook.py # Endpoint público para o site
+text
+
+
+### 5. Configuração do Funil de Vendas (sales_pipeline.yaml)
+
+```yaml
+# config/sales_pipeline.yaml
+pipeline:
+  stages:
+    - prospect:
+        agent: "#58"
+        action: "linkedin_search"
+        target: "novos leads"
+    - connect:
+        agent: "#29"
+        action: "linkedin_connect"
+        target: "conexões aceitas"
+    - engage:
+        agent: "#29"
+        action: "linkedin_message"
+        target: "respostas"
+    - lead_to_site:
+        agent: "#29"
+        action: "send_content"
+        target: "cliques no site"
+    - capture:
+        agent: "#52"
+        action: "webhook_receive"
+        target: "leads capturados"
+    - nurture:
+        agent: "#52"
+        action: "email_drip"
+        target: "engajamento"
+    - qualify:
+        agent: "#52"
+        action: "score_lead"
+        target: "qualificados"
+    - demo:
+        agent: "#58"
+        action: "schedule_demo"
+        target: "demonstração"
+    - close:
+        agent: "#58"
+        action: "send_proposal"
+        target: "venda"
+    - activate:
+        agent: "#49"
+        action: "activate_agents"
+        target: "cliente ativo"
+
+metrics:
+  conversion_rates:
+    prospect_to_connect: 0.15
+    connect_to_engage: 0.30
+    engage_to_lead: 0.10
+    lead_to_qualify: 0.25
+    qualify_to_demo: 0.40
+    demo_to_close: 0.35
+
+6. Webhook do Site (site_webhook.py)
+python
+
+# webhooks/site_webhook.py
+from fastapi import FastAPI, Request
+from src.database.supabase_client import supabase
+from src.agents.sales.qualify import LeadQualifier
+
+app = FastAPI()
+
+@app.post("/webhook/lead")
+async def receive_lead(request: Request):
+    """
+    Recebe leads do site e inicia processo de qualificação
+    """
+    data = await request.json()
+    
+    # 1. Salva lead no Supabase
+    lead = supabase.table("leads").insert({
+        "name": data["name"],
+        "email": data["email"],
+        "company": data["company"],
+        "phone": data["phone"],
+        "source": "site_landing_page",
+        "status": "new",
+        "created_at": datetime.now().isoformat()
+    }).execute()
+    
+    # 2. Dispara qualificação
+    qualifier = LeadQualifier()
+    score = await qualifier.score_lead(lead.data[0])
+    
+    # 3. Se alto score, agenda demonstração
+    if score >= 80:
+        await schedule_demo(lead.data[0])
+    
+    # 4. Ativa nutrição automática
+    await start_nurture_campaign(lead.data[0])
+    
+    return {"status": "success", "lead_id": lead.data[0]["id"]}
+
+7. Estratégia de Conteúdo para Atrair Leads ao Site
+Tipo de Conteúdo	Onde Publicar	Objetivo
+Posts técnicos (problemas)	LinkedIn	Gerar engajamento e autoridade
+Case studies	LinkedIn, Site	Mostrar resultados reais do AION
+Diagnóstico gratuito	Site	Lead magnet (captura)
+Artigos no blog	Site	SEO e autoridade
+Webinars	LinkedIn, Site	Qualificar leads
+8. Entregáveis
+
+    Webhook do site para captura de leads
+
+    Agente #58 (Sales Agent) com LinkedIn MCP integrado
+
+    Agente #29 (Sales Agent) com outreach multicanal
+
+    Agente #52 (Client Intelligence) com pontuação de leads
+
+    Configuração do funil de vendas (YAML)
+
+    Drip campaigns de nutrição
+
+    Integração Stripe para checkout
+
+    Dashboard de métricas de conversão
+
+9. Próximo Passo
+
+Gere o código base para o webhook do site, a integração com o Supabase para captura de leads, e a lógica inicial de qualificação de leads (Agente #52), seguindo a estrutura de diretórios acima.
+text
+
+
+---
+
+## 📋 O Que Será Entregue
+
+| Item | Descrição |
+|------|-----------|
+| **Webhook do Site** | Endpoint para receber leads do formulário do site |
+| **Agente #52 (Client Intelligence)** | Pontuação de leads e qualificação |
+| **Agente #58 (Sales Agent)** | Prospecção no LinkedIn via MCP |
+| **Agente #29 (Sales Agent)** | Outreach e nutrição multicanal |
+| **Funil de Vendas** | Pipeline configurado no YAML |
+| **Drip Campaigns** | E-mails de nutrição automatizados |
+| **Dashboard** | Métricas de conversão |
+
+---
+
+## 💎 Resumo da Estratégia
+
+A estrutura completa leva o lead do **LinkedIn → Site → Qualificação → Demonstração → Venda → Ativação no AION**, com agentes especializados em cada etapa.
+
+Agora você pode enviar esse prompt para o DeepSeek Flash e iniciar a implementação. 🚀
+

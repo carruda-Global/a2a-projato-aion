@@ -1,0 +1,54 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+*.egg
+.coverage
+
+# Environment
+.env
+.env.*
+!env.example
+
+# IDE
+.vscode/
+.idea/
+.claude/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Stripe App
+stripe-app/node_modules/
+
+# Temp
+temp/
+tmp/
+_aion_backup/
+data/
+
+# Sensitive
+*.pfx
+client_secret_*.json
+render-env-import.env
+codes.txt
+"microsoft ids.txt"
+"mensagens e fotos debug/"
+
+# Exclude scripts with hardcoded secrets
+scripts/create_connected_app.py
+scripts/enable_gcp_billing.py
+
+# Debug / runtime
+mensagens e fotos debug/
+
+# Node
+node_modules/
+evolution-api/node_modules/

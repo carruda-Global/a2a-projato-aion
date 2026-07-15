@@ -1,0 +1,158 @@
+steps:
+  # Build orchestrator image
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - -t
+      - southamerica-east1-docker.pkg.dev/$PROJECT_ID/aion/orchestrator:$SHORT_SHA
+      - -t
+      - southamerica-east1-docker.pkg.dev/$PROJECT_ID/aion/orchestrator:7.0.0
+      - -f
+      - Dockerfile
+      - .
+    id: build-orchestrator
+
+  # Build MCP images (same Dockerfile, different entrypoints)
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - -t
+      - southamerica-east1-docker.pkg.dev/$PROJECT_ID/aion/mcp-regulatory:$SHORT_SHA
+      - -t
+      - southamerica-east1-docker.pkg.dev/$PROJECT_ID/aion/mcp-regulatory:7.0.0
+      - -f
+      - Dockerfile
+      - .
+    id: build-mcp-regulatory
+
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - -t
+      - southamerica-east1-docker.pkg.dev/$PROJECT_ID/aion/mcp-esg:$SHORT_SHA
+      - -t
+      - southamerica-east1-docker.pkg.dev/$PROJECT_ID/aion/mcp-esg:7.0.0
+      - -f
+      - Dockerfile
+      - .
+    id: build-mcp-esg
+
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - -t
+      - southamerica-east1-docker.pkg.dev/$PROJECT_ID/aion/mcp-erp:$SHORT_SHA
+      - -t
+      - southamerica-east1-docker.pkg.dev/$PROJECT_ID/aion/mcp-erp:7.0.0
+      - -f
+      - Dockerfile
+      - .
+    id: build-mcp-erp
+
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - -t
+      - southamerica-east1-docker.pkg.dev/$PROJECT_ID/aion/mcp-microsoft:$SHORT_SHA
+      - -t
+      - southamerica-east1-docker.pkg.dev/$PROJECT_ID/aion/mcp-microsoft:7.0.0
+      - -f
+      - Dockerfile
+      - .
+    id: build-mcp-microsoft
+
+  # Push images
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - push
+      - southamerica-east1-docker.pkg.dev/$PROJECT_ID/aion/orchestrator:7.0.0
+    id: push-orchestrator
+
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - push
+      - southamerica-east1-docker.pkg.dev/$PROJECT_ID/aion/mcp-regulatory:7.0.0
+    id: push-mcp-regulatory
+
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - push
+      - southamerica-east1-docker.pkg.dev/$PROJECT_ID/aion/mcp-esg:7.0.0
+    id: push-mcp-esg
+
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - push
+      - southamerica-east1-docker.pkg.dev/$PROJECT_ID/aion/mcp-erp:7.0.0
+    id: push-mcp-erp
+
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - push
+      - southamerica-east1-docker.pkg.dev/$PROJECT_ID/aion/mcp-microsoft:7.0.0
+    id: push-mcp-microsoft
+
+  # Deploy to GKE
+  - name: gcr.io/cloud-builders/kubectl
+    args:
+      - set
+      - image
+      - deployment/aion-orchestrator
+      - orchestrator=southamerica-east1-docker.pkg.dev/$PROJECT_ID/aion/orchestrator:7.0.0
+      - -n
+      - aion
+    id: deploy-orchestrator
+
+  - name: gcr.io/cloud-builders/kubectl
+    args:
+      - set
+      - image
+      - deployment/aion-mcp-regulatory
+      - mcp-regulatory=southamerica-east1-docker.pkg.dev/$PROJECT_ID/aion/mcp-regulatory:7.0.0
+      - -n
+      - aion
+    id: deploy-mcp-regulatory
+
+  - name: gcr.io/cloud-builders/kubectl
+    args:
+      - set
+      - image
+      - deployment/aion-mcp-esg
+      - mcp-esg=southamerica-east1-docker.pkg.dev/$PROJECT_ID/aion/mcp-esg:7.0.0
+      - -n
+      - aion
+    id: deploy-mcp-esg
+
+  - name: gcr.io/cloud-builders/kubectl
+    args:
+      - set
+      - image
+      - deployment/aion-mcp-erp
+      - mcp-erp=southamerica-east1-docker.pkg.dev/$PROJECT_ID/aion/mcp-erp:7.0.0
+      - -n
+      - aion
+    id: deploy-mcp-erp
+
+  - name: gcr.io/cloud-builders/kubectl
+    args:
+      - set
+      - image
+      - deployment/aion-mcp-microsoft
+      - mcp-microsoft=southamerica-east1-docker.pkg.dev/$PROJECT_ID/aion/mcp-microsoft:7.0.0
+      - -n
+      - aion
+    id: deploy-mcp-microsoft
+
+substitutions:
+  _SERVICE: aion
+
+options:
+  machineType: E2_HIGHCPU_8
+  substitution_option: ALLOW_LOOSE
+
+images:
+  - southamerica-east1-docker.pkg.dev/$PROJECT_ID/aion/orchestrator:7.0.0
+  - southamerica-east1-docker.pkg.dev/$PROJECT_ID/aion/mcp-regulatory:7.0.0
+  - southamerica-east1-docker.pkg.dev/$PROJECT_ID/aion/mcp-esg:7.0.0
+  - southamerica-east1-docker.pkg.dev/$PROJECT_ID/aion/mcp-erp:7.0.0
+  - southamerica-east1-docker.pkg.dev/$PROJECT_ID/aion/mcp-microsoft:7.0.0

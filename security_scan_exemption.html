@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><title>Security Scan Exemption - EcoSystem Compliance API</title>
+<style>
+  body { font-family:'Segoe UI',Arial,sans-serif; padding:2cm; font-size:11pt; line-height:1.5; }
+  h1 { color:#0078d4; font-size:16pt; border-bottom:2px solid #0078d4; }
+  p { margin:8px 0; }
+  ul { margin:8px 0 8px 20px; }
+</style>
+</head>
+<body>
+
+<h1>Security Scan Exemption Letter</h1>
+<p><strong>Solution:</strong> EcoSystem Compliance API v1</p>
+<p><strong>Listing:</strong> EcoSystem AEC + Regulatory</p>
+<p><strong>Date:</strong> June 26, 2026</p>
+
+<p>This solution is classified as <strong>APIA (API-only)</strong> — it does not contain a Salesforce Managed Package, Lightning Components, Apex code, or any deployable Salesforce metadata. The solution is an external SaaS platform that integrates with Salesforce exclusively via REST API calls.</p>
+
+<p><strong>Why a Source Code Scanner is Not Applicable:</strong></p>
+<ul>
+  <li>No Salesforce Managed Package — the solution is not packaged or deployed via SFDX</li>
+  <li>No Apex, Lightning Web Components, Visualforce, or any Salesforce Platform code</li>
+  <li>The backend (Python/FastAPI) runs entirely outside Salesforce on Render.com</li>
+  <li>Communication with Salesforce is strictly via REST API (OAuth 2.0)</li>
+</ul>
+
+<p><strong>Security measures already in place:</strong></p>
+<ul>
+  <li>All API communications use HTTPS/TLS 1.2+</li>
+  <li>Authentication via OAuth 2.0 with short-lived JWT tokens</li>
+  <li>API Keys for MCP server access</li>
+  <li>RBAC per tenant with audit trail</li>
+  <li>PII masking on all agent outputs</li>
+  <li>Secrets managed via HashiCorp Vault</li>
+  <li>Circuit breaker pattern to prevent abuse</li>
+  <li>Rate limiting per tenant</li>
+</ul>
+
+<p>A Dynamic Application Security Testing (DAST) scan has been performed on the public API endpoints using OWASP ZAP. The scan covered authentication, injection, XSS, and data exposure vectors. All critical and high-severity findings have been resolved. The DAST report is attached separately.</p>
+
+</body>
+</html>

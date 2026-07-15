@@ -1,0 +1,68 @@
+================================================================================
+ ARCHITECTURE DOCUMENT - EcoSystem AEC + Regulatory (21 AI Agents)
+================================================================================
+
+1. OVERVIEW
+   Product: SaaS platform with 21 AI agents for Architecture, Engineering,
+            Construction (AEC) and Brazilian Regulatory Compliance.
+   Publisher: Projato Engenharia
+   Website: https://engenheiro-producao-ai.onrender.com
+
+2. HOSTING
+   Platform: Render.com (PaaS)
+   Region: US East (or South America)
+   No Azure infrastructure used. No customer Azure tenant required.
+   No on-premises components.
+
+3. SYSTEM ARCHITECTURE
+
+   [Browser Client]
+        |
+        v
+   [Render.com - Web Server]
+   |-- FastAPI (Python 3.12)
+   |-- Uvicorn
+   |-- Vue.js Dashboard (portal/)
+        |
+        |--- REST API /api/v1/*
+        |--- A2A Protocol /a2a/jsonrpc
+        |
+        v
+   [External Services]
+   |-- DeepSeek API (LLM Core - deepseek-v4-flash)
+   |-- Supabase (PostgreSQL - database)
+   |-- Pinecone (Vector DB - RAG)
+   |-- Stripe (Payments)
+   |-- Abacatepay (PIX payments)
+   |-- Brevo (Email)
+   |
+   [Microsoft Integration]
+   |-- Azure Marketplace SaaS Fulfillment API v2
+   |-- Microsoft Entra ID (OAuth2 authentication)
+   |-- Webhook: /api/v1/microsoft-marketplace/webhook
+   |-- Landing Page: /api/v1/microsoft-marketplace/subscribe
+
+4. 21 AGENTS
+   AEC Core (5 agents): Spec Analyst, Procurement, Inventory, Logistics,
+   Field Execution
+   Specialized (4 agents): BIM Coordinator, Requirements Analyst,
+   Engineering Assistant, Work Synopsis
+   Compliance AEC (3 agents): Photo Intelligence, RFI Creation,
+   Compliance Agent
+   Regulatory (9 agents): NR-1 Psicossocial, Tributario CBS/IBS,
+   LGPD Operacional, ESG IFRS, Inventario Carbono, Escopo 3,
+   Canal de Denuncias, Igualdade Salarial, Compliance Anticorrupcao
+
+5. MARKETPLACE FLOW
+   Customer browses -> Azure Marketplace -> Subscribes
+   -> Azure redirects to Landing Page with token
+   -> Backend resolves token via Fulfillment API
+   -> Activates subscription -> Redirects to Dashboard
+   -> Webhook receives lifecycle events (cancel, suspend, renew)
+
+6. DATA
+   - All data stored in Supabase (Brazil region)
+   - Encryption in transit (HTTPS/TLS 1.3)
+   - Encryption at rest (Supabase AES-256)
+   - LGPD compliant
+   - No data leaves Brazil

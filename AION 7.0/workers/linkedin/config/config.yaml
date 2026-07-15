@@ -1,0 +1,153 @@
+app:
+  name: "AION"
+  version: "6.0"
+  description: "Agents Intelligence Orchestration Network"
+  environment: development
+  debug: false
+
+server:
+  host: "0.0.0.0"
+  port: 8000
+  workers: 4
+  cors_origins:
+    - "*"
+
+llm:
+  default: "deepseek-v4-flash"
+  sensitive: "gemini"
+  reasoning: "claude"
+  deepseek:
+    model: "deepseek-v4-flash"
+    api_key: ${DEEPSEEK_API_KEY}
+    temperature: 0.1
+    max_tokens: 4096
+  gemini:
+    model: "gemini-pro"
+    api_key: ${GEMINI_API_KEY}
+    temperature: 0.1
+    max_tokens: 4096
+  claude:
+    model: "claude-sonnet-4"
+    api_key: ${CLAUDE_API_KEY}
+    temperature: 0.2
+    max_tokens: 8192
+
+database:
+  supabase:
+    url: ${SUPABASE_URL}
+    key: ${SUPABASE_KEY}
+  qdrant:
+    host: "localhost"
+    port: 6333
+    collection: "aion_embeddings"
+  timescaledb:
+    host: "localhost"
+    port: 5432
+    database: "aion_metrics"
+    user: ${TIMESCALE_USER}
+    password: ${TIMESCALE_PASSWORD}
+
+orchestrator:
+  type: "langgraph"
+  max_concurrent_agents: 10
+  default_timeout_seconds: 300
+  retry_attempts: 3
+  fallback_enabled: true
+
+quality:
+  enabled: true
+  auto_fix: true
+  gates:
+    coverage_threshold: 80
+    max_security_issues: 0
+    max_duplication_pct: 3
+    max_reliability_issues: 0
+
+security:
+  aip_enabled: true
+  abac_enabled: true
+  trust_agent_enabled: true
+  audit_merkle_chain: true
+  sanitization_enabled: true
+
+monetization:
+  currency_brl: "BRL"
+  currency_usd: "USD"
+  stripe:
+    api_key: ${STRIPE_API_KEY}
+    webhook_secret: ${STRIPE_WEBHOOK_SECRET}
+  pix:
+    provider: "abacatepay"
+    api_key: ${ABACATEPAY_API_KEY}
+
+monitoring:
+  prometheus_port: 9091
+  grafana_enabled: true
+  loki_enabled: true
+
+logging:
+  level: "INFO"
+  format: "json"
+  output: "stdout"
+
+llm_routing:
+  default: deepseek
+  sensitive_llm: gemini
+  reasoning_llm: claude
+  sensitive_agents:
+    - nr1_psicossocial
+    - lgpd_operacional
+    - canal_denuncias
+    - igualdade_salarial
+    - compliance_anticorrupcao
+    - dynamics_hr
+    - oracle_hcm_regulatory
+    - onboarding_funcionarios
+  reasoning_agents:
+    - master_orchestrator
+    - quality_critic
+    - ecosystem_evolution
+
+integrations:
+  linkedin:
+    enabled: true
+    auto_initialize: true
+    config_path: "config/linkedin.yaml"
+    mcp:
+      enabled: true
+      transport: stdio
+      port: 9800
+    agents:
+      - linkedin_content
+      - linkedin_prospect
+      - linkedin_analytics
+    security:
+      oauth_scopes:
+        - profile
+        - email
+        - openid
+        - w_member_social
+      aip_registry: true
+
+agents:
+  linkedin_content:
+    enabled: true
+    agent_id: "linkedin_content"
+    name: "LinkedIn Content Agent"
+    price_brl: 490
+    price_usd: 99
+    llm: deepseek-v4-flash
+  linkedin_prospect:
+    enabled: true
+    agent_id: "linkedin_prospect"
+    name: "LinkedIn Prospect Agent"
+    price_brl: 590
+    price_usd: 119
+    llm: deepseek-v4-flash
+  linkedin_analytics:
+    enabled: true
+    agent_id: "linkedin_analytics"
+    name: "LinkedIn Analytics Agent"
+    price_brl: 390
+    price_usd: 79
+    llm: deepseek-v4-flash

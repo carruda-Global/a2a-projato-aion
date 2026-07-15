@@ -1,0 +1,41 @@
+venv/
+.env
+.env.*
+!.env.example
+EcoSystem 2.0.env
+EcoSystem_2_0.env
+__pycache__/
+*.pyc
+*.pyo
+.DS_Store
+*.log
+node_modules/
+dist/
+.vite/
+.pytest_cache/
+chave api- projeto engenharia.txt
+chave_api.txt
+data/snapshots/
+data/audit/
+data/trust_history/
+*.pem
+*.key
+microsoft ids.txt
+.env.render
+
+# GCP service account credentials (nunca commitar)
+service-account.json
+*-sa-key.json
+*.googleusercontent.com.json
+
+scripts/deploy_render_env.ps1
+
+# Local sales/SDR pipeline DB (contains real lead emails/PII, never commit)
+sales_pipeline.db
+sales_pipeline.db-wal
+sales_pipeline.db-shm
+gsc_token.json
+
+# WhatsApp Web session/auth cache (contains live session tokens, never commit)
+whatsapp-bot/.wwebjs_auth/
+whatsapp-bot/.wwebjs_cache/

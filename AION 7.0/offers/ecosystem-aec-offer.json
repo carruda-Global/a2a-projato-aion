@@ -1,0 +1,168 @@
+{
+  "$schema": "https://schema.mp.azure.com/schema/2024-03-01/offer.json",
+  "id": "alias-compliance-regulatorio",
+  "name": "Alias — H-MAS EcoSystem 59 Agentes de IA",
+  "alias": "alias-compliance-regulatorio",
+  "description": "H-MAS EcoSystem: 59 agentes de IA para Compliance Regulatorio Brasileiro, Engenharia, Tecnologia e ERP. NR-1 Psicossocial, LGPD, Igualdade Salarial, Canal de Denuncias, Engenharia de Software, Vendas Autonomas, Orquestracao de Workforce, Dynamics 365, Salesforce Agentforce, Oracle Fusion, SAP. Arquitetura RAG hibrida (BM25 + vetorial + grafo de normas) com controle de custo por token (R$ 0,10/tarefa) e fallback automatico DeepSeek/Gemini. 3 MCP servers publicados para Copilot Studio, Agentforce e Claude. Comece por R$ 590/mes.",
+  "publisher": {
+    "id": "projato_engenharia",
+    "name": "Projato Engenharia"
+  },
+  "kind": "SaaS",
+  "categories": [
+    "AI + Machine Learning",
+    "Developer Tools",
+    "Human Resources"
+  ],
+  "industries": [
+    "Engineering and Construction",
+    "Architecture",
+    "Professional Services",
+    "Software and IT Services"
+  ],
+  "plans": [
+    {
+      "id": "compliance_essencial",
+      "name": "Compliance Essencial - NR-1 + LGPD",
+      "description": "Plano Compliance Essencial - NR-1 + LGPD - assinatura mensal",
+      "pricing": {
+        "type": "recurring",
+        "interval": "month",
+        "price_brl": 59000,
+        "price_usd": 14900
+      }
+    },
+    {
+      "id": "regulatory_pro",
+      "name": "Regulatory Pro - 5 Agentes",
+      "description": "Plano Regulatory Pro - 5 Agentes - assinatura mensal",
+      "pricing": {
+        "type": "recurring",
+        "interval": "month",
+        "price_brl": 149000,
+        "price_usd": 37900
+      }
+    },
+    {
+      "id": "esg_carbono",
+      "name": "ESG + Carbono",
+      "description": "Plano ESG + Carbono - assinatura mensal",
+      "pricing": {
+        "type": "recurring",
+        "interval": "month",
+        "price_brl": 249000,
+        "price_usd": 62900
+      }
+    },
+    {
+      "id": "microsoft_pack",
+      "name": "Microsoft Pack - 6 Agentes",
+      "description": "Plano Microsoft Pack - 6 Agentes - assinatura mensal",
+      "pricing": {
+        "type": "recurring",
+        "interval": "month",
+        "price_brl": 448200,
+        "price_usd": 112900
+      }
+    },
+    {
+      "id": "dynamics_pack",
+      "name": "Dynamics 365 Pack",
+      "description": "Plano Dynamics 365 Pack - assinatura mensal",
+      "pricing": {
+        "type": "recurring",
+        "interval": "month",
+        "price_brl": 399000,
+        "price_usd": 99900
+      }
+    },
+    {
+      "id": "agentforce_pack",
+      "name": "Agentforce Pack",
+      "description": "Plano Agentforce Pack - assinatura mensal",
+      "pricing": {
+        "type": "recurring",
+        "interval": "month",
+        "price_brl": 369000,
+        "price_usd": 92900
+      }
+    },
+    {
+      "id": "oracle_pack",
+      "name": "Oracle Fusion Pack",
+      "description": "Plano Oracle Fusion Pack - assinatura mensal",
+      "pricing": {
+        "type": "recurring",
+        "interval": "month",
+        "price_brl": 399000,
+        "price_usd": 99900
+      }
+    },
+    {
+      "id": "sap_pack",
+      "name": "SAP Integration Pack",
+      "description": "Plano SAP Integration Pack - assinatura mensal",
+      "pricing": {
+        "type": "recurring",
+        "interval": "month",
+        "price_brl": 429000,
+        "price_usd": 107900
+      }
+    },
+    {
+      "id": "erp_full_bridge",
+      "name": "ERP Full Bridge",
+      "description": "Plano ERP Full Bridge - assinatura mensal",
+      "pricing": {
+        "type": "recurring",
+        "interval": "month",
+        "price_brl": 1299000,
+        "price_usd": 329900
+      }
+    },
+    {
+      "id": "tech_starter",
+      "name": "Tech Starter",
+      "description": "Plano Tech Starter - assinatura mensal",
+      "pricing": {
+        "type": "recurring",
+        "interval": "month",
+        "price_brl": 199700,
+        "price_usd": 49900
+      }
+    },
+    {
+      "id": "tech_enterprise",
+      "name": "Tech Enterprise",
+      "description": "Plano Tech Enterprise - assinatura mensal",
+      "pricing": {
+        "type": "recurring",
+        "interval": "month",
+        "price_brl": 599700,
+        "price_usd": 149900
+      }
+    },
+    {
+      "id": "full_suite",
+      "name": "Full Suite - 71 Agentes",
+      "description": "Plano Full Suite - 71 Agentes - assinatura mensal",
+      "pricing": {
+        "type": "recurring",
+        "interval": "month",
+        "price_brl": 1999700,
+        "price_usd": 499900
+      }
+    },
+    {
+      "id": "cross_sell_pack",
+      "name": "Cross-Sell Pack",
+      "description": "Plano Cross-Sell Pack - assinatura mensal",
+      "pricing": {
+        "type": "recurring",
+        "interval": "month",
+        "price_brl": 29700,
+        "price_usd": 7900
+      }
+    }
+  ]
+}

@@ -1,0 +1,179 @@
+Roteiro de Integração (Passo a Passo)
+1️⃣ Conectar o LinkedIn MCP ao Orquestrador
+
+Primeiro, garanta que o servidor MCP do LinkedIn esteja rodando e conectado ao seu orquestrador (#49 Master Orchestrator).
+
+No terminal:
+bash
+
+# Iniciar o servidor MCP do LinkedIn (modo daemon)
+uv run linkedin-mcp-scheduler --daemon
+
+# Ou via Docker
+docker run -d --name linkedin-mcp \
+  -v ~/.linkedin-mcp:/home/pwuser/.linkedin-mcp \
+  stickerdaniel/linkedin-mcp-server:latest
+
+No código do orquestrador:
+python
+
+# src/orchestrator/mcp_client.py
+class MCPClient:
+    def __init__(self):
+        self.servers = {
+            "linkedin": {
+                "command": "docker",
+                "args": ["run", "--rm", "-i", "stickerdaniel/linkedin-mcp-server:latest"]
+            }
+        }
+    
+    async def call_tool(self, server: str, tool: str, params: dict):
+        # Chama a ferramenta MCP do LinkedIn
+        pass
+
+2️⃣ Configurar os Workflows no AION
+
+Os arquivos YAML que criamos (linkedin_workflow.yaml, outreach_workflow.yaml, content_workflow.yaml, site_integration.yaml) precisam ser carregados pelo orquestrador.
+
+No código:
+python
+
+# src/orchestrator/workflow_runner.py
+import yaml
+from pathlib import Path
+
+class WorkflowRunner:
+    def __init__(self):
+        self.workflows = self._load_workflows()
+    
+    def _load_workflows(self):
+        workflows = {}
+        for yaml_file in Path("config").glob("*_workflow.yaml"):
+            with open(yaml_file) as f:
+                workflows[yaml_file.stem] = yaml.safe_load(f)
+        return workflows
+    
+    async def run(self, workflow_name: str):
+        workflow = self.workflows.get(workflow_name)
+        if not workflow:
+            raise ValueError(f"Workflow {workflow_name} not found")
+        
+        for step in workflow.get("steps", []):
+            agent = self._get_agent(step["agent"])
+            result = await agent.execute(step["params"])
+            # Armazena resultado para próximo passo
+
+3️⃣ Conectar o Site ao Webhook
+
+A landing page precisa enviar os leads para o webhook que criamos.
+
+No site (HTML/JS):
+javascript
+
+// frontend/js/lead_capture.js
+document.getElementById('lead-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const data = {
+        name: document.getElementById('name').value,
+        email: document.getElementById('email').value,
+        company: document.getElementById('company').value,
+        phone: document.getElementById('phone').value,
+        interesse: document.getElementById('interesse').value
+    };
+    
+    const response = await fetch('https://api.aion.global/webhook/site-lead', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+    });
+    
+    if (response.ok) {
+        // Mostra mensagem de sucesso e redireciona para checkout
+        window.location.href = '/obrigado';
+    }
+});
+
+4️⃣ Integrar o Stripe Checkout
+
+No site, o checkout precisa ser acionado após a captura do lead (ou diretamente via botão "Comprar").
+
+No backend (Python):
+python
+
+# src/monetization/stripe_client.py
+import stripe
+
+class StripeClient:
+    def __init__(self):
+        stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
+    
+    def create_checkout_session(self, plan_id: str, customer_email: str):
+        return stripe.checkout.Session.create(
+            success_url="https://aion.global/sucesso?session_id={CHECKOUT_SESSION_ID}",
+            cancel_url="https://aion.global/cancelado",
+            customer_email=customer_email,
+            line_items=[{
+                "price": plan_id,
+                "quantity": 1,
+            }],
+            mode="subscription",
+            metadata={
+                "source": "linkedin_automation",
+                "lead_id": lead_id
+            }
+        )
+
+5️⃣ Ativar Agentes Após a Compra
+
+Quando o cliente comprar, o webhook da Stripe ativa os agentes.
+
+No webhook da Stripe:
+python
+
+# src/monetization/webhooks.py
+@app.post("/webhook/stripe")
+async def stripe_webhook(request: Request):
+    payload = await request.body()
+    sig_header = request.headers.get("stripe-signature")
+    event = stripe.Webhook.construct_event(payload, sig_header, os.getenv("STRIPE_WEBHOOK_SECRET"))
+    
+    if event.type == "checkout.session.completed":
+        session = event.data.object
+        customer_email = session["customer_email"]
+        plan = session["line_items"]["data"][0]["price"]["id"]
+        
+        # 1. Captura o lead
+        lead = await save_lead_from_stripe(customer_email, plan)
+        
+        # 2. Ativa os agentes para o cliente
+        await activate_agents_for_client(lead.id, plan)
+        
+        # 3. Notifica o time (Slack)
+        await notify_slack(f"🎉 Nova venda! {customer_email} - {plan}")
+    
+    return {"status": "success"}
+
+📋 Resumo do Fluxo Completo
+Etapa	Local	Como
+1	LinkedIn → AION	Servidor MCP + Agente #58
+2	Workflows	YAML carregados pelo orquestrador
+3	Site → Webhook	Formulário JS envia para API
+4	Checkout	Stripe integrado com webhook
+5	Ativação	Webhook da Stripe ativa agentes
+🚀 Comando para Testar o Funil
+bash
+
+# 1. Rodar o orquestrador
+python src/main.py --config config.yaml
+
+# 2. Executar o workflow de prospecção manualmente
+python src/orchestrator/workflow_runner.py --workflow linkedin
+
+# 3. Simular uma captura de lead no site
+curl -X POST https://api.aion.global/webhook/site-lead \
+  -H "Content-Type: application/json" \
+  -d '{"name":"João Silva","email":"joao@empresa.com","company":"Tech Ltda"}'
+
+# 4. Verificar se o lead foi salvo no Supabase
+curl https://api.aion.global/api/leads

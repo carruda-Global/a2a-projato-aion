@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: aion
+  labels:
+    app.kubernetes.io/name: aion
+    app.kubernetes.io/version: "7.0.0"

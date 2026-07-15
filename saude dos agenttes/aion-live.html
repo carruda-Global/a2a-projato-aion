@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>AION — Saúde ao Vivo</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, sans-serif; background: #080810; color: #e2e2f0; padding: 20px; min-height: 100vh; }
+
+.bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 14px; border-bottom: 1px solid #1a1a28; }
+.bar h1 { font-size: 17px; font-weight: 700; }
+.live { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #22d3a5; font-weight: 700; }
+.dot { width: 7px; height: 7px; border-radius: 50%; background: #22d3a5; animation: p 2s infinite; }
+@keyframes p { 0%,100%{opacity:1} 50%{opacity:.2} }
+#ts { font-size: 10px; color: #3b3b55; }
+
+.kpis { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-bottom: 18px; }
+.kpi { background: #10101e; border: 1px solid #1a1a28; border-radius: 8px; padding: 14px; }
+.kl { font-size: 9px; color: #6b6b8a; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+.kv { font-size: 28px; font-weight: 800; }
+.ks { font-size: 10px; color: #6b6b8a; margin-top: 3px; }
+.g{color:#22d3a5} .b{color:#60a5fa} .pu{color:#a78bfa} .a{color:#fbbf24} .r{color:#f87171}
+
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+.card { background: #10101e; border: 1px solid #1a1a28; border-radius: 8px; padding: 14px; }
+.ct { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #6b6b8a; margin-bottom: 12px; }
+
+.ep { display: flex; flex-direction: column; gap: 6px; }
+.ep-row { display: flex; justify-content: space-between; align-items: center; background: #08080f; border-radius: 5px; padding: 7px 10px; }
+.ep-name { font-size: 11px; color: #c4c4d8; }
+.ep-st { font-size: 11px; font-weight: 700; }
+
+.stripe-rows { display: flex; flex-direction: column; gap: 0; }
+.sr { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #1a1a28; }
+.sr:last-child { border: none; }
+.sl { font-size: 11px; color: #9898b0; }
+.sv { font-size: 14px; font-weight: 700; }
+
+.crons { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.cron { background: #08080f; border-radius: 6px; padding: 10px; }
+.ci { font-size: 18px; margin-bottom: 4px; }
+.cn { font-size: 11px; font-weight: 600; }
+.cd { font-size: 10px; color: #6b6b8a; }
+.cv { font-size: 13px; font-weight: 700; color: #a78bfa; margin-top: 4px; }
+
+.profiles { display: flex; flex-direction: column; gap: 6px; }
+.pr { display: flex; justify-content: space-between; align-items: center; background: #08080f; border-radius: 6px; padding: 8px 10px; }
+.pn { font-size: 11px; font-weight: 600; }
+.ps { font-size: 9px; color: #6b6b8a; }
+.pc { font-size: 13px; font-weight: 700; color: #22d3a5; }
+.pt { font-size: 9px; color: #6b6b8a; }
+
+.opt { display: flex; flex-direction: column; gap: 6px; }
+.or { display: flex; gap: 8px; background: #08080f; border-radius: 6px; padding: 8px 10px; }
+.ob { font-size: 9px; font-weight: 700; padding: 2px 5px; border-radius: 3px; white-space: nowrap; flex-shrink: 0; height: fit-content; margin-top: 1px; }
+.ph{background:#7f1d1d;color:#fca5a5} .pm{background:#78350f;color:#fcd34d} .pl{background:#1e3a5f;color:#93c5fd}
+.oa { font-size: 11px; color: #e2e2f0; }
+.oi { font-size: 9px; color: #6b6b8a; }
+
+.err-banner { background: #1a0808; border: 1px solid #7f1d1d; border-radius: 8px; padding: 14px; color: #fca5a5; font-size: 12px; line-height: 1.6; }
+
+@media(max-width:600px){
+  .kpis{grid-template-columns:1fr 1fr}
+  .grid2{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="bar">
+  <h1>🤖 AION — Saúde dos Agentes</h1>
+  <div style="display:flex;gap:14px;align-items:center">
+    <span id="ts">carregando...</span>
+    <div class="live"><div class="dot"></div>AO VIVO</div>
+  </div>
+</div>
+
+<div class="kpis">
+  <div class="kpi"><div class="kl">Agentes</div><div class="kv g" id="k-agents">86</div><div class="ks">ativos na plataforma</div></div>
+  <div class="kpi"><div class="kl">API Health</div><div class="kv b" id="k-health">—</div><div class="ks" id="k-health-s">verificando</div></div>
+  <div class="kpi"><div class="kl">MRR</div><div class="kv pu" id="k-mrr">$—</div><div class="ks" id="k-arr">ARR: $—</div></div>
+  <div class="kpi"><div class="kl">Assinaturas</div><div class="kv a" id="k-subs">—</div><div class="ks" id="k-charges">— cobranças total</div></div>
+</div>
+
+<div class="grid2">
+  <div class="card">
+    <div class="ct">Endpoints ao Vivo</div>
+    <div class="ep" id="ep-list"><div style="color:#3b3b55;font-size:11px">verificando...</div></div>
+  </div>
+  <div class="card">
+    <div class="ct">Receita Stripe</div>
+    <div class="stripe-rows" id="stripe-block"><div style="color:#3b3b55;font-size:11px">consultando...</div></div>
+  </div>
+</div>
+
+<div class="grid2">
+  <div class="card">
+    <div class="ct">Automações 24/7</div>
+    <div class="crons">
+      <div class="cron"><div class="ci">🔍</div><div class="cn">SEO Engine</div><div class="cd">a cada 6h</div><div class="cv">40 pág/dia</div></div>
+      <div class="cron"><div class="ci">📝</div><div class="cn">Dev.to</div><div class="cd">a cada 8h</div><div class="cv">3 artigos/dia</div></div>
+      <div class="cron"><div class="ci">📧</div><div class="cn">SDR Emails</div><div class="cd">a cada 12h</div><div class="cv">1.000/dia</div></div>
+      <div class="cron"><div class="ci">📰</div><div class="cn">Press Release</div><div class="cd">semanal</div><div class="cv">auto OpenPR</div></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ct">Perfis de Compradores</div>
+    <div class="profiles" id="profiles">
+      <div class="pr"><div><div class="pn">HR / Safety Manager</div><div class="ps">NR-1 · eSocial · PCMSO</div></div><div style="text-align:right"><div class="pc">45%</div><div class="pt">avg $149</div></div></div>
+      <div class="pr"><div><div class="pn">Legal / Compliance</div><div class="ps">GDPR · LGPD · DPA</div></div><div style="text-align:right"><div class="pc">38%</div><div class="pt">avg $299</div></div></div>
+      <div class="pr"><div><div class="pn">CTO / IT Director</div><div class="ps">ISO27001 · NIS2 · cyber</div></div><div style="text-align:right"><div class="pc">31%</div><div class="pt">avg $249</div></div></div>
+      <div class="pr"><div><div class="pn">CFO / Finance</div><div class="ps">DORA · SOC2 · audit</div></div><div style="text-align:right"><div class="pc">22%</div><div class="pt">avg $499</div></div></div>
+      <div class="pr"><div><div class="pn">CEO / Founder PME</div><div class="ps">ecosystem · enterprise</div></div><div style="text-align:right"><div class="pc">18%</div><div class="pt">avg $999</div></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="card" style="margin-top:12px">
+  <div class="ct">Próximas Ações (por impacto)</div>
+  <div class="opt">
+    <div class="or"><span class="ob ph">HIGH</span><div><div class="oa">Azure credentials no Render</div><div class="oi">Desbloqueia Microsoft Marketplace — enterprise B2B</div></div></div>
+    <div class="or"><span class="ob ph">HIGH</span><div><div class="oa">Criar perfil G2.com + Capterra</div><div class="oi">+200 leads orgânicos/mês, custo zero</div></div></div>
+    <div class="or"><span class="ob pm">MED</span><div><div class="oa">Distribuir press release OpenPR / EIN Presswire</div><div class="oi">Backlinks RegTech + cobertura mídia especializada</div></div></div>
+    <div class="or"><span class="ob pm">MED</span><div><div class="oa">Trial 15 dias grátis por agente individual</div><div class="oi">HR Manager (45% conv) fecha mais rápido com trial</div></div></div>
+    <div class="or"><span class="ob pl">LOW</span><div><div class="oa">Webhook Zapier na página de vendas</div><div class="oi">Self-serve integração reduz churn ~20%</div></div></div>
+  </div>
+</div>
+
+<script>
+const API = 'https://engenheiro-producao-ai.onrender.com';
+
+const CHECKS = [
+  { name: 'Health / DeepSeek',  url: '/api/health',                  method: 'GET'  },
+  { name: 'SDR Sectors',        url: '/api/sdr/sectors',             method: 'GET'  },
+  { name: 'Syndication Topics', url: '/api/syndication/topics',      method: 'GET'  },
+  { name: 'Reg Monitor',        url: '/api/reg-monitor/latest-updates', method: 'GET' },
+  { name: 'Partner Types',      url: '/api/partnership/partner-types', method: 'GET' },
+  { name: 'Zapier Triggers',    url: '/api/zapier/triggers',         method: 'GET'  },
+  { name: 'Dashboard Stats',    url: '/api/dashboard/stats',         method: 'GET'  },
+];
+
+async function checkEndpoints() {
+  const list = document.getElementById('ep-list');
+  list.innerHTML = CHECKS.map(c => `<div class="ep-row"><span class="ep-name">${c.name}</span><span class="ep-st" id="ep-${c.name.replace(/\W/g,'_')}">...</span></div>`).join('');
+
+  let ok = 0;
+  await Promise.all(CHECKS.map(async c => {
+    const id = 'ep-' + c.name.replace(/\W/g,'_');
+    const el = document.getElementById(id);
+    try {
+      const r = await fetch(API + c.url, { method: c.method });
+      const good = r.status < 500;
+      if (good) ok++;
+      el.textContent = good ? `✓ ${r.status}` : `✗ ${r.status}`;
+      el.className = 'ep-st ' + (good ? 'g' : 'r');
+    } catch {
+      el.textContent = '✗ offline';
+      el.className = 'ep-st r';
+    }
+  }));
+
+  document.getElementById('k-health').textContent = Math.round(ok / CHECKS.length * 100) + '%';
+  document.getElementById('k-health-s').textContent = `${ok}/${CHECKS.length} endpoints OK`;
+}
+
+async function loadDashboard() {
+  try {
+    const r = await fetch(API + '/api/dashboard/stats');
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const d = await r.json();
+    const s = d.stripe || {};
+
+    if (!s.error) {
+      document.getElementById('k-mrr').textContent = '$' + (s.mrr_usd || 0).toLocaleString('en');
+      document.getElementById('k-arr').textContent = 'ARR: $' + (s.arr_usd || 0).toLocaleString('en');
+      document.getElementById('k-subs').textContent = s.active_subscriptions ?? '—';
+      document.getElementById('k-charges').textContent = (s.total_charges ?? '—') + ' cobranças total';
+
+      document.getElementById('stripe-block').innerHTML = `
+        <div class="sr"><span class="sl">MRR</span><span class="sv g">$${(s.mrr_usd||0).toLocaleString('en')}</span></div>
+        <div class="sr"><span class="sl">ARR (projeção)</span><span class="sv g">$${(s.arr_usd||0).toLocaleString('en')}</span></div>
+        <div class="sr"><span class="sl">Assinaturas ativas</span><span class="sv b">${s.active_subscriptions||0}</span></div>
+        <div class="sr"><span class="sl">Total cobranças</span><span class="sv pu">${s.total_charges||0}</span></div>
+        <div class="sr"><span class="sl">Receita total</span><span class="sv a">$${(s.total_revenue_usd||0).toLocaleString('en')}</span></div>
+      `;
+    } else {
+      document.getElementById('stripe-block').innerHTML = `<div style="color:#f87171;font-size:11px">Stripe: ${s.error}</div>`;
+    }
+
+    document.getElementById('ts').textContent = new Date(d.timestamp).toLocaleTimeString('pt-BR');
+  } catch (e) {
+    document.getElementById('stripe-block').innerHTML = `<div style="color:#6b6b8a;font-size:11px">Aguardando Render... (cold start ~30s)</div>`;
+    document.getElementById('ts').textContent = 'erro: ' + e.message;
+  }
+}
+
+async function refresh() {
+  await Promise.all([checkEndpoints(), loadDashboard()]);
+}
+
+refresh();
+setInterval(refresh, 30000); // atualiza a cada 30s
+</script>
+</body>
+</html>

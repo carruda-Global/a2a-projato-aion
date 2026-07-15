@@ -1,0 +1,36 @@
+name: "AION Agency Partner Outreach"
+description: "Generates personalized outreach for qualified home-services/real-estate/property-management agency leads. NOTE: send_connection/send_followup/track_engagement below still have no real handler behind their action names (linkedin_connect, linkedin_message, track_linkedin_response don't exist on SalesAgent) -- generate_message is the only step in this file confirmed to actually run."
+value_proposition: "White-label AI voice receptionist for your agency's clients -- real deployments show 47-day payback and 6.8x year-1 ROI"
+
+steps:
+  - id: generate_message
+    agent: "outreach"
+    action: generate_outreach
+    params:
+      value_proposition: "White-label AI voice receptionist for your agency's clients -- real deployments show 47-day payback and 6.8x year-1 ROI"
+
+  - id: send_connection
+    agent: "outreach"
+    action: linkedin_connect
+    params:
+      message: "{generated_message}"
+      wait_after: 48
+
+  - id: send_followup
+    agent: "outreach"
+    action: linkedin_message
+    params:
+      delay_days: 3
+      message: "Ola {first_name}, vi que voce atua em {industry}..."
+
+  - id: track_engagement
+    agent: "outreach"
+    action: track_linkedin_response
+    params:
+      keywords: ["interesse", "sim", "vamos marcar", "gostaria de saber"]
+
+  - id: qualify_engagement
+    agent: "lead_qualifier"
+    action: update_lead_score
+    params:
+      increase: 20

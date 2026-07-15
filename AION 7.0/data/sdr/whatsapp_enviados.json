@@ -1,0 +1,289 @@
+[
+  {
+    "empresa": "MRV Engenharia",
+    "cargo": "Diretor Comercial",
+    "msg": "Oi, tudo bem? Pra MRV Engenharia, acho que o combo NR-1 (riscos psicossociais) + Spec Analyst (an�lise de projetos/plantas) pode ser bem �til. Se fizer sentido, bora trocar ideia.",
+    "campanha": "20260702_224408",
+    "enviado_em": "2026-07-03T02:24:43.220Z",
+    "status": "enviado"
+  },
+  {
+    "empresa": "Cyrela Brazil Realty",
+    "cargo": "Gerente de Incorporacao",
+    "msg": "Oi, tudo bem? Para a Cyrela, acho que a combina��o do NR-1 com o Spec Analyst pode ser bem �til pra voc�s, principalmente na parte de riscos psicossociais e an�lise de projetos. Se fizer sentido, bora trocar ideia.",
+    "campanha": "20260702_224408",
+    "enviado_em": "2026-07-03T02:25:06.093Z",
+    "status": "enviado"
+  },
+  {
+    "empresa": "Gafisa",
+    "cargo": "Diretor de Opera��es",
+    "msg": "Oi, tudo bem? Pra Gafisa, acho que o combo NR-1 (riscos psicossociais) e Spec Analyst (an�lise de projetos/plantas) seria o ideal. Se fizer sentido, bora trocar ideia.",
+    "campanha": "20260702_224408",
+    "enviado_em": "2026-07-03T02:25:37.280Z",
+    "status": "enviado"
+  },
+  {
+    "empresa": "Valeco",
+    "cargo": "Gerente de Sustentabilidade",
+    "msg": "Oi, tudo bem? Pra Valeco, acho que o combo NR-1 (obriga��o trabalhista) + Invent�rio Carbono (ESG) pode ser uma boa. Se fizer sentido, bora trocar ideia.",
+    "campanha": "20260702_224408",
+    "enviado_em": "2026-07-03T02:25:58.112Z",
+    "status": "enviado"
+  },
+  {
+    "empresa": "Braskem",
+    "cargo": "Diretor de Responsabilidade Social",
+    "msg": "Oi, tudo bem? Pra Braskem, acho que o combo NR-1 (obriga��o trabalhista) + Invent�rio Carbono (ESG) pode ser uma boa. Se fizer sentido, bora trocar ideia.",
+    "campanha": "20260702_224408",
+    "enviado_em": "2026-07-03T02:26:18.230Z",
+    "status": "enviado"
+  },
+  {
+    "empresa": "Suzano Papel e Celulose",
+    "cargo": "Coordenador de Meio Ambiente",
+    "msg": "Oi, tudo bem? Pra Suzano, acho que a combina��o do NR-1 (obriga��o trabalhista) com o Invent�rio Carbono (ESG) pode ser bem �til. Se fizer sentido, bora trocar ideia.",
+    "campanha": "20260702_224408",
+    "enviado_em": "2026-07-03T02:26:40.265Z",
+    "status": "enviado"
+  },
+  {
+    "empresa": "Samba Tech",
+    "cargo": "Diretor de Tecnologia",
+    "msg": "Oi, tudo bem? Acho que pra Samba Tech o combo LGPD (privacidade de dados) + Software Engineering (code review) pode ser bem interessante. Se fizer sentido, bora trocar ideia.",
+    "campanha": "20260702_224408",
+    "enviado_em": "2026-07-03T02:27:00.470Z",
+    "status": "enviado"
+  },
+  {
+    "empresa": "Dito",
+    "cargo": "Chief Data Officer",
+    "msg": "Oi, tudo bem? Vi que voc� � CDO na Dito e acho que a combina��o da LGPD com o Software Engineering pode ajudar bastante na privacidade dos dados. Se fizer sentido, bora trocar ideia.",
+    "campanha": "20260702_224408",
+    "enviado_em": "2026-07-03T02:27:21.052Z",
+    "status": "enviado"
+  },
+  {
+    "empresa": "PSafe",
+    "cargo": "Gerente de Seguran�a da Informa��o",
+    "msg": "Oi, tudo bem? Pra sua �rea de tecnologia, acho que a combina��o do LGPD com o Software Engineering (code review) pode ser bem �til. Se fizer sentido, bora trocar ideia.",
+    "campanha": "20260702_224408",
+    "enviado_em": "2026-07-03T02:27:41.286Z",
+    "status": "enviado"
+  },
+  {
+    "empresa": "Magazine Luiza",
+    "cargo": "Diretor de TI",
+    "msg": "Oi, tudo bem? Pra Magazine Luiza, acho que a combina��o do LGPD (dados de clientes) com o Compliance (score regulat�rio) � a melhor. Se fizer sentido, bora trocar ideia.",
+    "campanha": "20260702_224408",
+    "enviado_em": "2026-07-03T02:28:01.436Z",
+    "status": "enviado"
+  },
+  {
+    "empresa": "Grupo P�o de A��car",
+    "cargo": "Gerente de Compliance",
+    "msg": "Oi, tudo bem? Pra voc�s do Grupo P�o de A��car, acho que a combina��o ideal seria LGPD (dados de clientes) + Compliance (score regulat�rio). Se fizer sentido, bora trocar ideia.",
+    "campanha": "20260702_224408",
+    "enviado_em": "2026-07-03T02:28:21.791Z",
+    "status": "enviado"
+  },
+  {
+    "empresa": "Lojas Americanas",
+    "cargo": "Coordenador de Prote��o de Dados",
+    "msg": "Oi, tudo bem? Pra Lojas Americanas, o combo ideal � LGPD (dados de clientes) + Compliance (score regulat�rio). Se fizer sentido, bora trocar ideia.",
+    "campanha": "20260702_224408",
+    "enviado_em": "2026-07-03T02:28:42.005Z",
+    "status": "enviado"
+  },
+  {
+    "empresa": "Hospital das Cl�nicas",
+    "cargo": "Diretor Administrativo",
+    "msg": "Oi, tudo bem? Pra �rea de sa�de, acho que o combo NR-1 (riscos hospitalares) e LGPD (dados sens�veis de pacientes) pode te ajudar bastante. Se fizer sentido, bora trocar ideia.",
+    "campanha": "20260702_224408",
+    "enviado_em": "2026-07-03T02:29:02.298Z",
+    "status": "enviado"
+  },
+  {
+    "empresa": "Unimed",
+    "cargo": "Gerente de Produtos",
+    "msg": "Oi, tudo bem? Pra Unimed, acho que a combina��o do NR-1 (riscos hospitalares) com a LGPD (dados sens�veis de pacientes) seria a melhor. Se fizer sentido, bora trocar ideia.",
+    "campanha": "20260702_224408",
+    "enviado_em": "2026-07-03T02:29:22.496Z",
+    "status": "enviado"
+  },
+  {
+    "empresa": "Hospital S�rio-Liban�s",
+    "cargo": "Coordenador de Qualidade",
+    "msg": "Oi, tudo certo? Pra �rea de sa�de, acho que o combo NR-1 (riscos hospitalares) + LGPD (dados sens�veis de pacientes) pode ser bem �til pra voc�s. Se fizer sentido, bora trocar ideia.",
+    "campanha": "20260702_224408",
+    "enviado_em": "2026-07-03T02:29:42.631Z",
+    "status": "enviado"
+  },
+  {
+    "empresa": "Eletrobras",
+    "cargo": "Diretor de Sustentabilidade",
+    "msg": "Oi, tudo bem? Pra Eletrobras, acho que o combo ideal seria o Invent�rio Carbono + ESG, pra ajudar na parte de sustentabilidade e compliance. Se fizer sentido, bora trocar ideia.",
+    "campanha": "20260702_224408",
+    "status": "enviado_para_voce",
+    "enviado_em": "2026-07-03T03:02:08.509Z"
+  },
+  {
+    "empresa": "Sabesp",
+    "cargo": "Gerente de Projetos Sociais",
+    "msg": "Oi, tudo bem? Pra Sabesp, acho que o combo ideal seria NR-1 (obriga��o trabalhista) + Invent�rio Carbono (ESG). Se fizer sentido, bora trocar ideia.",
+    "campanha": "20260702_224408",
+    "status": "enviado_para_voce",
+    "enviado_em": "2026-07-03T03:02:23.838Z"
+  },
+  {
+    "empresa": "Engie Brasil",
+    "cargo": "Coordenador de Sustentabilidade",
+    "msg": "Oi, tudo bem? Pra Engie, acho que o combo ideal seria o Invent�rio Carbono e o ESG, pra ajudar na parte de sustentabilidade. Se fizer sentido, bora trocar ideia.",
+    "campanha": "20260702_224408",
+    "status": "enviado_para_voce",
+    "enviado_em": "2026-07-03T03:02:39.153Z"
+  },
+  {
+    "empresa": "Tenda",
+    "cargo": "Coordenador de Vendas",
+    "motivo": "Necessita de estrat�gias para aumentar a capta��o de clientes e projetos.",
+    "setor": "construcao",
+    "combo": "NR-1 + Spec Analyst (BIM)",
+    "numero": "551140071000",
+    "msg": "Oi, tudo bem? Pra Tenda, acho que o combo NR-1 (riscos psicossociais) + Spec Analyst (an�lise de projetos/plantas) pode ser bem interessante. Se fizer sentido, bora trocar ideia.",
+    "status": "enviado_para_voce",
+    "enviado_em": "2026-07-03T03:02:54.588Z"
+  },
+  {
+    "empresa": "Suzano S.A.",
+    "cargo": "Gerente de Sustentabilidade",
+    "motivo": "Implementar pr�ticas de redu��o de carbono e atender �s normas NR-1.",
+    "setor": "industria",
+    "combo": "NR-1 + Inventario Carbono",
+    "numero": "551131469000",
+    "msg": "Oi, tudo bem? Pra Suzano, acho que o combo NR-1 (obriga��o trabalhista) e Invent�rio Carbono (ESG) pode ser uma boa. Se fizer sentido, bora trocar ideia.",
+    "status": "enviado_para_voce",
+    "enviado_em": "2026-07-03T03:03:09.868Z"
+  },
+  {
+    "empresa": "Gerdau S.A.",
+    "cargo": "Coordenador de Seguran�a do Trabalho",
+    "motivo": "Garantir conformidade com a NR-1 e minimizar a emiss�o de carbono.",
+    "setor": "industria",
+    "combo": "NR-1 + Inventario Carbono",
+    "numero": "551133232000",
+    "msg": "Oi, tudo certo? Vi que voc� t� na Gerdau e acho que o combo NR-1 (obriga��o trabalhista) + Invent�rio Carbono pode te ajudar bastante. Se fizer sentido, bora trocar ideia.",
+    "status": "enviado_para_voce",
+    "enviado_em": "2026-07-03T03:03:25.217Z"
+  },
+  {
+    "empresa": "Vale S.A.",
+    "cargo": "Analista de Meio Ambiente",
+    "motivo": "Desenvolver projetos que reduzam a pegada de carbono e seguir as diretrizes da NR-1.",
+    "setor": "industria",
+    "combo": "NR-1 + Inventario Carbono",
+    "numero": "553135019111",
+    "msg": "Oi, tudo bem? Pra Vale S.A., o combo NR-1 (obriga��o trabalhista) + Invent�rio Carbono (ESG) � o que mais faz sentido. Se fizer sentido, bora trocar ideia.",
+    "status": "enviado_para_voce",
+    "enviado_em": "2026-07-03T03:03:41.954Z"
+  },
+  {
+    "empresa": "Movile",
+    "cargo": "Diretor de Seguran�a da Informa��o",
+    "motivo": "Precisa garantir a conformidade com a LGPD para proteger os dados dos usu�rios.",
+    "setor": "tecnologia",
+    "combo": "LGPD + Code Review",
+    "numero": "551130788000",
+    "msg": "Oi, tudo bem? Pra sua �rea de Seguran�a da Informa��o, acho que a combina��o do LGPD com o Software Engineering (code review) pode ser bem �til. Se fizer sentido, bora trocar ideia.",
+    "status": "enviado_para_voce",
+    "enviado_em": "2026-07-03T03:03:57.692Z"
+  },
+  {
+    "empresa": "Vtex",
+    "cargo": "Chief Compliance Officer",
+    "motivo": "Necessita implementar pol�ticas de privacidade e prote��o de dados de acordo com a LGPD.",
+    "setor": "tecnologia",
+    "combo": "LGPD + Code Review",
+    "numero": "551130787300",
+    "msg": "Oi, tudo bem? Pra Vtex, acho que o combo LGPD (privacidade de dados) + Software Engineering (code review) seria o ideal. Se fizer sentido, bora trocar ideia.",
+    "status": "enviado_para_voce",
+    "enviado_em": "2026-07-03T03:04:13.104Z"
+  },
+  {
+    "empresa": "Grupo Sabin",
+    "cargo": "Gerente de Compliance",
+    "motivo": "Deve assegurar a conformidade com a LGPD em rela��o aos dados sens�veis dos pacientes.",
+    "setor": "tecnologia",
+    "combo": "LGPD + Code Review",
+    "numero": "551133159333",
+    "msg": "Oi, tudo bem? Vi que no Grupo Sabin voc�s precisam de LGPD e Code Review pra garantir a privacidade dos dados. Se fizer sentido, bora trocar ideia.",
+    "status": "enviado_direto",
+    "enviado_em": "2026-07-03T03:04:28.800Z"
+  },
+  {
+    "empresa": "Even Construtora e Incorporadora",
+    "cargo": "Executivo de Desenvolvimento Imobili�rio",
+    "motivo": "Para identificar novas oportunidades de investimento e parcerias.",
+    "setor": "construcao",
+    "combo": "NR-1 + Spec Analyst (BIM)",
+    "numero": "551130787000",
+    "msg": "Oi, tudo bem? Acho que a combina��o do NR-1 com o Spec Analyst pode ajudar bastante no desenvolvimento dos projetos da Even. Se fizer sentido, bora trocar ideia.",
+    "status": "enviado_para_voce",
+    "enviado_em": "2026-07-03T03:38:59.267Z"
+  },
+  {
+    "empresa": "Usiminas",
+    "cargo": "Gerente de Sustentabilidade",
+    "motivo": "Implementa��o de pr�ticas de sustentabilidade e redu��o de emiss�o de carbono.",
+    "setor": "industria",
+    "combo": "NR-1 + Inventario Carbono",
+    "numero": "553135016000",
+    "msg": "Oi, tudo bem? Acho que o combo NR-1 com o Invent�rio Carbono pode ser uma boa pra voc�s na Usiminas. Se fizer sentido, bora trocar ideia.",
+    "status": "enviado_para_voce",
+    "enviado_em": "2026-07-03T03:39:14.739Z"
+  },
+  {
+    "empresa": "Vale",
+    "cargo": "Diretor de Meio Ambiente",
+    "motivo": "Desenvolvimento de iniciativas para atender �s normas NR-1 e otimiza��o da gest�o de carbono.",
+    "setor": "industria",
+    "combo": "NR-1 + Inventario Carbono",
+    "numero": "553135019111",
+    "msg": "Oi, tudo bem? Acho que a combina��o NR-1 e Invent�rio Carbono pode ser uma boa pra voc�s na Vale, principalmente pra lidar com os riscos ambientais. Se fizer sentido, bora trocar ideia.",
+    "status": "enviado_para_voce",
+    "enviado_em": "2026-07-03T03:39:30.143Z"
+  },
+  {
+    "empresa": "Gerdau",
+    "cargo": "Coordenador de Responsabilidade Social",
+    "motivo": "Aprimorar processos industriais e garantir conformidade com a legisla��o ambiental.",
+    "setor": "industria",
+    "combo": "NR-1 + Inventario Carbono",
+    "numero": "551133159333",
+    "msg": "Oi, tudo bem? Acho que a combina��o NR-1 e Invent�rio Carbono pode ser bem legal pra Gerdau, principalmente na parte de responsabilidade social. Se fizer sentido, bora trocar ideia.",
+    "status": "enviado_direto",
+    "enviado_em": "2026-07-03T03:39:46.150Z"
+  },
+  {
+    "empresa": "TOTVS",
+    "cargo": "Diretor de Tecnologia",
+    "motivo": "Necessita de updates constantes em seus sistemas para atender �s demandas do mercado.",
+    "setor": "tecnologia",
+    "combo": "NR-1 + Software Engineering",
+    "numero": "551140072020",
+    "msg": "Oi, tudo bem? Acho que a combina��o do NR-1 com o Software Engineering pode ser bem legal pra TOTVS, ajudando na parte de compliance e revis�o de c�digo. Se fizer sentido, bora trocar ideia.",
+    "status": "enviado_para_voce",
+    "enviado_em": "2026-07-03T03:40:01.678Z"
+  },
+  {
+    "empresa": "Resultados Digitais",
+    "cargo": "Co-Fundador",
+    "motivo": "Precisa de tecnologia avan�ada para qualidade de seus produtos e servi�os de marketing digital.",
+    "setor": "tecnologia",
+    "combo": "NR-1 + Software Engineering",
+    "numero": "554832392000",
+    "msg": "Oi, tudo bem? Acho que a combina��o do NR-1 com o Software Engineering pode ser uma boa pra voc�s, principalmente pra garantir a conformidade e melhorar o c�digo. Se fizer sentido, bora trocar ideia.",
+    "status": "enviado_para_voce",
+    "enviado_em": "2026-07-03T03:40:17.289Z"
+  }
+]

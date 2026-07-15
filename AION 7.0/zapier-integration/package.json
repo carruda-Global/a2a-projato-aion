@@ -1,0 +1,28 @@
+{
+  "name": "aion-compliance",
+  "version": "1.0.0",
+  "description": "AION Compliance is a deterministic AI compliance platform for NR-1, LGPD, EU AI Act, CSRD, SOC 2 and ISO 27001 — automated regulatory readiness checks backed by real regulatory catalogs, triggered directly from your Zaps.",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest --testTimeout 10000",
+    "build": "zapier build",
+    "deploy": "zapier push",
+    "validate": "zapier validate"
+  },
+  "engines": {
+    "node": ">=18",
+    "zapier": ">=14"
+  },
+  "dependencies": {
+    "zapier-platform-core": "15.19.0",
+    "node-fetch": "^3.3.0"
+  },
+  "devDependencies": {
+    "jest": "^29.0.0"
+  },
+  "zapier": {
+    "conceptual_dir": ".",
+    "app": "./index.js",
+    "build": "build/"
+  }
+}

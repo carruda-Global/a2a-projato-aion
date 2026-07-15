@@ -1,0 +1,102 @@
+{
+  "acp": "1.0.0",
+  "merchant": {
+    "name": "Projato Engenharia",
+    "description": "Sistema multiagente de IA para a indústria AEC",
+    "website": "https://engenheiro-producao-ai.onrender.com",
+    "support_url": "https://engenheiro-producao-ai.onrender.com/support",
+    "terms_url": "https://engenheiro-producao-ai.onrender.com/terms",
+    "privacy_url": "https://engenheiro-producao-ai.onrender.com/privacy",
+    "refund_policy": "Reembolso integral em até 7 dias, conforme Código de Defesa do Consumidor"
+  },
+  "checkout": {
+    "endpoint": "https://engenheiro-producao-ai.onrender.com/api/v1/acp/checkout",
+    "method": "POST",
+    "authentication": {
+      "type": "api_key",
+      "header": "X-ACP-Key"
+    }
+  },
+  "products": [
+    {
+      "id": "spec-analyst",
+      "name": "Analisador de Especificações Técnicas",
+      "description": "Agente IA que analisa documentos técnicos de engenharia, extrai requisitos e aponta inconsistências com normas NBR (ABNT).",
+      "price": {
+        "amount": 99700,
+        "currency": "BRL",
+        "type": "one_time",
+        "interval": null
+      },
+      "category": "Engineering and Construction",
+      "fulfillment": {
+        "type": "digital",
+        "url": "https://engenheiro-producao-ai.onrender.com/api/v1/agents/spec-analyst/execute"
+      }
+    },
+    {
+      "id": "procurement",
+      "name": "Processador de Ordens de Compra",
+      "description": "Agente IA que processa pedidos de materiais, compara cotações de fornecedores e otimiza aquisições para obras.",
+      "price": {
+        "amount": 159700,
+        "currency": "BRL",
+        "type": "one_time",
+        "interval": null
+      },
+      "category": "Procurement",
+      "fulfillment": {
+        "type": "digital",
+        "url": "https://engenheiro-producao-ai.onrender.com/api/v1/agents/procurement/execute"
+      }
+    },
+    {
+      "id": "inventory",
+      "name": "Gestor de Estoque de Obra",
+      "description": "Agente IA que monitora níveis de estoque em tempo real, sugere reposições e indica materiais substitutos.",
+      "price": {
+        "amount": 159700,
+        "currency": "BRL",
+        "type": "one_time",
+        "interval": null
+      },
+      "category": "Inventory Management",
+      "fulfillment": {
+        "type": "digital",
+        "url": "https://engenheiro-producao-ai.onrender.com/api/v1/agents/inventory/execute"
+      }
+    },
+    {
+      "id": "logistics",
+      "name": "Rastreador Logístico de Materiais",
+      "description": "Agente IA que acompanha remessas de materiais, identifica atrasos e problemas de entrega em tempo real.",
+      "price": {
+        "amount": 299700,
+        "currency": "BRL",
+        "type": "one_time",
+        "interval": null
+      },
+      "category": "Logistics",
+      "fulfillment": {
+        "type": "digital",
+        "url": "https://engenheiro-producao-ai.onrender.com/api/v1/agents/logistics/execute"
+      }
+    },
+    {
+      "id": "field-execution",
+      "name": "Gerador de Instruções de Execução em Campo",
+      "description": "Agente IA que gera instruções passo a passo para execução em campo a partir de plantas, memoriais e modelos BIM.",
+      "price": {
+        "amount": 350000,
+        "currency": "BRL",
+        "type": "subscription",
+        "interval": "month"
+      },
+      "category": "Engineering and Construction",
+      "fulfillment": {
+        "type": "digital",
+        "url": "https://engenheiro-producao-ai.onrender.com/api/v1/agents/field-execution/execute"
+      }
+    }
+  ]
+}

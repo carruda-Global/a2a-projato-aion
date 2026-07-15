@@ -1,0 +1,17 @@
+{
+  "manifest_version": 3,
+  "name": "SallesJam Compliance - NR-1, LGPD e mais",
+  "version": "1.0.0",
+  "description": "Agentes de IA para compliance regulatorio disponiveis em qualquer site",
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": "icon48.png"
+  },
+  "permissions": ["activeTab", "storage"],
+  "host_permissions": ["https://engenheiro-producao-ai.onrender.com/*"]
+}

@@ -1,0 +1,19 @@
+name: System health daily deep check
+
+on:
+  schedule:
+    # 11:00 UTC = 08:00 America/Sao_Paulo -- full sweep including a live
+    # sample of the real orchestrator agents (costs real LLM tokens, so
+    # this runs once/day, not on the 30-min pulse).
+    - cron: "0 11 * * *"
+  workflow_dispatch: {}
+
+jobs:
+  run-daily-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run deep health check
+        run: |
+          curl -sS -X POST "https://engenheiro-producao-ai.onrender.com/api/system-health/run-check?deep=true" \
+            -H "X-Admin-Secret: ${{ secrets.MARKETPLACE_ADMIN_SECRET }}" \
+            --fail-with-body

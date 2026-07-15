@@ -1,0 +1,39 @@
+=== ENGLISH ===
+App name: SallesJam Compliance
+Short description: AI compliance assistant for Gmail. Check emails for LGPD, NR-1 and Brazilian regulations.
+Detailed description:
+SallesJam Compliance brings AI-powered regulatory analysis directly to your Gmail inbox.
+
+Features:
+• Analyze emails for LGPD (Brazilian data privacy law) compliance
+• Detect personal data exposure risks in email conversations
+• Check labor compliance requirements (NR-1)
+• Get instant AI responses about Brazilian regulations
+• Multi-market support: Brazil, US, Mexico, Colombia, Argentina
+
+How it works:
+1. Open any email in Gmail
+2. Click the SallesJam icon in the add-on panel
+3. The AI analyzes the email for compliance risks
+4. Get instant recommendations
+
+Privacy: No email content is stored. All processing is done via encrypted API calls to SallesJam servers.
+
+=== PORTUGUESE (adicionar como segundo idioma) ===
+Nome: SallesJam Compliance
+Descricao curta: Assistente de IA para compliance no Gmail. Analise emails para LGPD, NR-1 e normas brasileiras.
+Descricao detalhada:
+SallesJam Compliance traz analise regulatoria com IA diretamente para sua caixa de entrada do Gmail.
+
+Recursos:
+• Analise emails para conformidade com LGPD
+• Detecte riscos de exposicao de dados pessoais
+• Verifique requisitos trabalhistas (NR-1)
+• Respostas instantaneas sobre normas brasileiras
+• Suporte multi-mercado: Brasil, EUA, Mexico, Colombia, Argentina
+
+Como funciona:
+1. Abra qualquer email no Gmail
+2. Clique no icone do SallesJam
+3. A IA analisa o email para riscos de compliance
+4. Receba recomendacoes instantaneas

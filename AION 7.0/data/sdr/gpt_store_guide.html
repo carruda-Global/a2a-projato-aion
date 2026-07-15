@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GPT Store — AION Compliance</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:Segoe UI,Arial,sans-serif;background:#111827;color:#e5e7eb;padding:24px;max-width:1200px;margin:0 auto}
+h1{color:#10b981;margin-bottom:4px;font-size:22px}
+h2{color:#94a3b8;font-size:14px;font-weight:normal;margin-bottom:24px}
+.card{background:#1f2937;border-radius:12px;padding:20px;margin-bottom:16px;border:1px solid #374151}
+.card h3{color:#f3f4f6;margin-bottom:12px}
+.card .val{font-family:monospace;background:#0f172a;padding:6px 12px;border-radius:6px;display:inline-block;margin:4px 0;word-break:break-all}
+.btn{background:#10b981;color:#fff;border:none;padding:10px 24px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:600}
+.btn:hover{background:#059669}
+pre{background:#0f172a;padding:16px;border-radius:8px;overflow-x:auto;font-size:12px;line-height:1.5;max-height:70vh;overflow-y:auto;position:relative}
+pre code{color:#e2e8f0}
+.copied{position:absolute;top:8px;right:8px;background:#10b981;color:#fff;padding:4px 12px;border-radius:6px;font-size:12px;display:none}
+.steps{list-style:decimal;padding-left:20px;line-height:1.8}
+.steps li{color:#d1d5db;margin-bottom:8px}
+.steps li strong{color:#10b981}
+</style>
+</head>
+<body>
+
+<h1>AION Compliance — GPT Store</h1>
+<h2>Copie o schema abaixo e cole no ChatGPT GPT Editor</h2>
+
+<div class="card">
+  <h3>1. Dados do GPT</h3>
+  <p><strong>Nome:</strong> AION Compliance</p>
+  <p><strong>Descrição:</strong> AI-powered compliance agent for NR-1, LGPD, EU AI Act, CSRD, DORA, NIS2. Get instant risk assessments with 106 AI agents.</p>
+  <p><strong>Instrução:</strong> You are AION, an AI compliance assistant with 106 specialized agents. Help users with NR-1 psychosocial risk, LGPD data privacy, EU AI Act readiness, and CSRD reporting. Always use the API actions for real compliance diagnostics.</p>
+</div>
+
+<div class="card">
+  <h3>2. Authentication</h3>
+  <p><strong>Tipo:</strong> API Key</p>
+  <p><strong>Auth Type:</strong> Bearer</p>
+  <p><strong>API Key (copie):</strong></p>
+  <div class="val" id="apikey" style="cursor:pointer" onclick="copyId('apikey')" title="Clique para copiar">COLE_AQUI_SUA_OPENAI_API_KEY (valor real em .env, nunca commitar)</div>
+</div>
+
+<div class="card">
+  <h3>3. OpenAPI Schema — CLIQUE NO BLOCO ABAIXO E COPIE (Ctrl+A / Ctrl+C)</h3>
+  <pre id="schema"><code>openapi: 3.1.0
+info:
+  title: EcoSystem AEC — 86 AI Compliance Agents
+  description: >
+    AI-powered compliance diagnostics for NR-1, LGPD, EU AI Act, CSRD, DORA, NIS2, and more.
+    Returns structured risk reports in seconds. Covers Brazil, EU, US markets.
+  version: "7.0.0"
+  contact:
+    name: Global Match Engenharia de Produção
+    url: https://global-engenharia.com
+    email: contact@global-engenharia.com
+
+servers:
+  - url: https://engenheiro-producao-ai.onrender.com
+
+paths:
+  /mcp/regulatory/tools/nr1_psicossocial:
+    post:
+      operationId: generateNR1Inventory
+      summary: NR-1 Psychosocial Risk Inventory
+      description: Generates a psychosocial risk inventory (FRPRT) per Portaria MTE 1.419/2024. Returns risk factors, severity classification, and 90-day action plan.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [empresa, num_funcionarios]
+              properties:
+                empresa:
+                  type: string
+                  description: Company name
+                num_funcionarios:
+                  type: integer
+                  description: Number of employees
+                cnpj:
+                  type: string
+                  description: Brazilian company tax ID (optional)
+                setor:
+                  type: string
+                  description: Industry sector (e.g., manufacturing, retail, tech)
+      responses:
+        "200":
+          description: NR-1 risk inventory with action plan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ComplianceReport"
+
+  /mcp/regulatory/tools/lgpd_scan:
+    post:
+      operationId: runLGPDScan
+      summary: LGPD Data Privacy Scan
+      description: Scans company data processing activities for LGPD compliance (Lei 13.709/2018). Returns gap analysis and ANPD notification recommendations.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [empresa]
+              properties:
+                empresa:
+                  type: string
+                atividades_tratamento:
+                  type: array
+                  items:
+                    type: string
+                  description: List of data processing activities
+      responses:
+        "200":
+          description: LGPD compliance scan results
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ComplianceReport"
+
+  /mcp/regulatory/tools/eu_ai_act:
+    post:
+      operationId: checkEUAIActReadiness
+      summary: EU AI Act Readiness Check
+      description: Assesses AI system compliance with EU AI Act (August 2026 deadline). Classifies risk level (prohibited/high/limited/minimal) and provides remediation roadmap.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [company, ai_systems]
+              properties:
+                company:
+                  type: string
+                ai_systems:
+                  type: array
+                  items:
+                    type: string
+                  description: List of AI systems or use cases to assess
+                sector:
+                  type: string
+                  description: Industry sector (financial, healthcare, HR, etc.)
+      responses:
+        "200":
+          description: EU AI Act compliance assessment
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ComplianceReport"
+
+  /mcp/regulatory/tools/csrd_assessment:
+    post:
+      operationId: runCSRDAssessment
+      summary: CSRD Double Materiality Assessment
+      description: Performs double materiality assessment for CSRD reporting (ESRS standards). Identifies material sustainability topics and disclosure gaps.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [company, sector]
+              properties:
+                company:
+                  type: string
+                sector:
+                  type: string
+                  description: Industry sector (important for ESRS sector-specific standards)
+                employees:
+                  type: integer
+                  description: Employee count (determines mandatory reporting threshold)
+                revenue_eur_million:
+                  type: number
+                  description: Annual revenue in EUR millions
+      responses:
+        "200":
+          description: CSRD double materiality assessment
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ComplianceReport"
+
+  /api/pricing/quote:
+    post:
+      operationId: getPricingQuote
+      summary: Get Dynamic Pricing Quote
+      description: Returns a personalized pricing quote based on company profile, country, and compliance needs.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                country:
+                  type: string
+                  description: ISO 3166-1 alpha-2 country code
+                company_size:
+                  type: string
+                  enum: [startup, smb, mid_market, enterprise]
+                compliance_needs:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        "200":
+          description: Personalized pricing quote
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  segment:
+                    type: string
+                  price_usd:
+                    type: number
+                  price_local:
+                    type: number
+                  currency:
+                    type: string
+                  checkout_url:
+                    type: string
+
+components:
+  schemas:
+    ComplianceReport:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [compliant, partial, non_compliant]
+        risk_score:
+          type: integer
+          minimum: 0
+          maximum: 100
+        summary:
+          type: string
+        findings:
+          type: array
+          items:
+            type: object
+            properties:
+              category:
+                type: string
+              severity:
+                type: string
+                enum: [critical, high, medium, low]
+              description:
+                type: string
+              recommendation:
+                type: string
+        action_plan:
+          type: array
+          items:
+            type: object
+            properties:
+              priority:
+                type: integer
+              action:
+                type: string
+              deadline_days:
+                type: integer
+        report_id:
+          type: string
+        generated_at:
+          type: string
+          format: date-time</code></pre>
+</div>
+
+<div class="card">
+  <h3>4. Passo a Passo</h3>
+  <ol class="steps">
+    <li>Acesse <strong>https://chatgpt.com/gpts/editor</strong></li>
+    <li><strong>Create</strong> novo GPT</li>
+    <li>Configure tab: cole nome, descrição e instrução</li>
+    <li><strong>Actions</strong> → Create new action → cole o schema acima</li>
+    <li>Authentication: <strong>API Key → Bearer</strong> → cole a API Key</li>
+    <li><strong>Publish</strong> → Everyone</li>
+  </ol>
+</div>
+
+<script>
+function copyId(id) {
+  const el = document.getElementById(id);
+  navigator.clipboard.writeText(el.innerText);
+  el.style.background = '#065f46';
+  setTimeout(() => el.style.background = '#0f172a', 1000);
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,337 @@
+[
+  {
+    "empresa": "MRV Engenharia",
+    "cargo": "Diretor Comercial",
+    "msg": "Oi, tudo bem? Pra MRV Engenharia, acho que o combo NR-1 (riscos psicossociais) + Spec Analyst (anï¿½lise de projetos/plantas) pode ser bem ï¿½til. Se fizer sentido, bora trocar ideia.",
+    "campanha": "20260702_224408",
+    "enviado_em": "2026-07-03T02:24:43.220Z",
+    "status": "enviado"
+  },
+  {
+    "empresa": "Cyrela Brazil Realty",
+    "cargo": "Gerente de Incorporacao",
+    "msg": "Oi, tudo bem? Para a Cyrela, acho que a combinaï¿½ï¿½o do NR-1 com o Spec Analyst pode ser bem ï¿½til pra vocï¿½s, principalmente na parte de riscos psicossociais e anï¿½lise de projetos. Se fizer sentido, bora trocar ideia.",
+    "campanha": "20260702_224408",
+    "enviado_em": "2026-07-03T02:25:06.093Z",
+    "status": "enviado"
+  },
+  {
+    "empresa": "Gafisa",
+    "cargo": "Diretor de Operaï¿½ï¿½es",
+    "msg": "Oi, tudo bem? Pra Gafisa, acho que o combo NR-1 (riscos psicossociais) e Spec Analyst (anï¿½lise de projetos/plantas) seria o ideal. Se fizer sentido, bora trocar ideia.",
+    "campanha": "20260702_224408",
+    "enviado_em": "2026-07-03T02:25:37.280Z",
+    "status": "enviado"
+  },
+  {
+    "empresa": "Valeco",
+    "cargo": "Gerente de Sustentabilidade",
+    "msg": "Oi, tudo bem? Pra Valeco, acho que o combo NR-1 (obrigaï¿½ï¿½o trabalhista) + Inventï¿½rio Carbono (ESG) pode ser uma boa. Se fizer sentido, bora trocar ideia.",
+    "campanha": "20260702_224408",
+    "enviado_em": "2026-07-03T02:25:58.112Z",
+    "status": "enviado"
+  },
+  {
+    "empresa": "Braskem",
+    "cargo": "Diretor de Responsabilidade Social",
+    "msg": "Oi, tudo bem? Pra Braskem, acho que o combo NR-1 (obrigaï¿½ï¿½o trabalhista) + Inventï¿½rio Carbono (ESG) pode ser uma boa. Se fizer sentido, bora trocar ideia.",
+    "campanha": "20260702_224408",
+    "enviado_em": "2026-07-03T02:26:18.230Z",
+    "status": "enviado"
+  },
+  {
+    "empresa": "Suzano Papel e Celulose",
+    "cargo": "Coordenador de Meio Ambiente",
+    "msg": "Oi, tudo bem? Pra Suzano, acho que a combinaï¿½ï¿½o do NR-1 (obrigaï¿½ï¿½o trabalhista) com o Inventï¿½rio Carbono (ESG) pode ser bem ï¿½til. Se fizer sentido, bora trocar ideia.",
+    "campanha": "20260702_224408",
+    "enviado_em": "2026-07-03T02:26:40.265Z",
+    "status": "enviado"
+  },
+  {
+    "empresa": "Eletrobras",
+    "cargo": "Diretor de Sustentabilidade",
+    "msg": "Oi, tudo bem? Pra Eletrobras, acho que o combo ideal seria o Inventï¿½rio Carbono + ESG, pra ajudar na parte de sustentabilidade e compliance. Se fizer sentido, bora trocar ideia.",
+    "campanha": "20260702_224408",
+    "status": "enviado_para_voce",
+    "enviado_em": "2026-07-03T03:02:08.509Z"
+  },
+  {
+    "empresa": "Sabesp",
+    "cargo": "Gerente de Projetos Sociais",
+    "msg": "Oi, tudo bem? Pra Sabesp, acho que o combo ideal seria NR-1 (obrigaï¿½ï¿½o trabalhista) + Inventï¿½rio Carbono (ESG). Se fizer sentido, bora trocar ideia.",
+    "campanha": "20260702_224408",
+    "status": "enviado_para_voce",
+    "enviado_em": "2026-07-03T03:02:23.838Z"
+  },
+  {
+    "empresa": "Engie Brasil",
+    "cargo": "Coordenador de Sustentabilidade",
+    "msg": "Oi, tudo bem? Pra Engie, acho que o combo ideal seria o Inventï¿½rio Carbono e o ESG, pra ajudar na parte de sustentabilidade. Se fizer sentido, bora trocar ideia.",
+    "campanha": "20260702_224408",
+    "status": "enviado_para_voce",
+    "enviado_em": "2026-07-03T03:02:39.153Z"
+  },
+  {
+    "empresa": "Cyrela Brazil Realty",
+    "cargo": "Diretor de Incorporaï¿½ï¿½o",
+    "motivo": "Precisa de soluï¿½ï¿½es inovadoras para otimizaï¿½ï¿½o de processos de construï¿½ï¿½o.",
+    "setor": "construcao",
+    "combo": "NR-1 + Spec Analyst (BIM)",
+    "numero": "551130788000",
+    "msg": "Oi, tudo bem? Pra Cyrela, acho que o combo NR-1 (riscos psicossociais) e Spec Analyst (anï¿½lise de projetos/plantas) pode ser bem ï¿½til. Se fizer sentido, bora trocar ideia."
+  },
+  {
+    "empresa": "MRV Engenharia",
+    "cargo": "Gerente de Projetos",
+    "motivo": "Busca aprimorar a eficiï¿½ncia e sustentabilidade em projetos habitacionais.",
+    "setor": "construcao",
+    "combo": "NR-1 + Spec Analyst (BIM)",
+    "numero": "553133565000",
+    "msg": "Oi, tudo bem? Pra MRV Engenharia, acho que o combo NR-1 (riscos psicossociais) + Spec Analyst (anï¿½lise de projetos/plantas) pode ser bem interessante. Se fizer sentido, bora trocar ideia."
+  },
+  {
+    "empresa": "Tenda",
+    "cargo": "Coordenador de Vendas",
+    "motivo": "Necessita de estratï¿½gias para aumentar a captaï¿½ï¿½o de clientes e projetos.",
+    "setor": "construcao",
+    "combo": "NR-1 + Spec Analyst (BIM)",
+    "numero": "551140071000",
+    "msg": "Oi, tudo bem? Pra Tenda, acho que o combo NR-1 (riscos psicossociais) + Spec Analyst (anï¿½lise de projetos/plantas) pode ser bem interessante. Se fizer sentido, bora trocar ideia.",
+    "status": "enviado_para_voce",
+    "enviado_em": "2026-07-03T03:02:54.588Z"
+  },
+  {
+    "empresa": "Suzano S.A.",
+    "cargo": "Gerente de Sustentabilidade",
+    "motivo": "Implementar prï¿½ticas de reduï¿½ï¿½o de carbono e atender ï¿½s normas NR-1.",
+    "setor": "industria",
+    "combo": "NR-1 + Inventario Carbono",
+    "numero": "551131469000",
+    "msg": "Oi, tudo bem? Pra Suzano, acho que o combo NR-1 (obrigaï¿½ï¿½o trabalhista) e Inventï¿½rio Carbono (ESG) pode ser uma boa. Se fizer sentido, bora trocar ideia.",
+    "status": "enviado_para_voce",
+    "enviado_em": "2026-07-03T03:03:09.868Z"
+  },
+  {
+    "empresa": "Gerdau S.A.",
+    "cargo": "Coordenador de Seguranï¿½a do Trabalho",
+    "motivo": "Garantir conformidade com a NR-1 e minimizar a emissï¿½o de carbono.",
+    "setor": "industria",
+    "combo": "NR-1 + Inventario Carbono",
+    "numero": "551133232000",
+    "msg": "Oi, tudo certo? Vi que vocï¿½ tï¿½ na Gerdau e acho que o combo NR-1 (obrigaï¿½ï¿½o trabalhista) + Inventï¿½rio Carbono pode te ajudar bastante. Se fizer sentido, bora trocar ideia.",
+    "status": "enviado_para_voce",
+    "enviado_em": "2026-07-03T03:03:25.217Z"
+  },
+  {
+    "empresa": "Vale S.A.",
+    "cargo": "Analista de Meio Ambiente",
+    "motivo": "Desenvolver projetos que reduzam a pegada de carbono e seguir as diretrizes da NR-1.",
+    "setor": "industria",
+    "combo": "NR-1 + Inventario Carbono",
+    "numero": "553135019111",
+    "msg": "Oi, tudo bem? Pra Vale S.A., o combo NR-1 (obrigaï¿½ï¿½o trabalhista) + Inventï¿½rio Carbono (ESG) ï¿½ o que mais faz sentido. Se fizer sentido, bora trocar ideia.",
+    "status": "enviado_para_voce",
+    "enviado_em": "2026-07-03T03:03:41.954Z"
+  },
+  {
+    "empresa": "Cyrela Brazil Realty",
+    "cargo": "Diretor de Incorporaï¿½ï¿½o",
+    "motivo": "Para expandir o portfï¿½lio de projetos e terrenos.",
+    "setor": "construcao",
+    "combo": "NR-1 + Spec Analyst (BIM)",
+    "numero": "551130787000",
+    "msg": "Oi, tudo certo? Acho que a combinaï¿½ï¿½o do NR-1 com o Spec Analyst pode ser bem legal pra vocï¿½s, principalmente pra anï¿½lise de projetos e plantas. Se fizer sentido, bora trocar ideia."
+  },
+  {
+    "empresa": "MRV Engenharia",
+    "cargo": "Gerente de Vendas",
+    "motivo": "Para aumentar as vendas e promover novos lanï¿½amentos.",
+    "setor": "construcao",
+    "combo": "NR-1 + Spec Analyst (BIM)",
+    "numero": "553133508000",
+    "msg": "Oi, tudo bem? Acho que a combinaï¿½ï¿½o do NR-1 com o Spec Analyst pode ajudar bastante na anï¿½lise de projetos e na gestï¿½o de riscos psicossociais na MRV. Se fizer sentido, bora trocar ideia."
+  },
+  {
+    "empresa": "Even Construtora e Incorporadora",
+    "cargo": "Executivo de Desenvolvimento Imobiliï¿½rio",
+    "motivo": "Para identificar novas oportunidades de investimento e parcerias.",
+    "setor": "construcao",
+    "combo": "NR-1 + Spec Analyst (BIM)",
+    "numero": "551130787000",
+    "msg": "Oi, tudo bem? Acho que a combinaï¿½ï¿½o do NR-1 com o Spec Analyst pode ajudar bastante no desenvolvimento dos projetos da Even. Se fizer sentido, bora trocar ideia.",
+    "status": "enviado_para_voce",
+    "enviado_em": "2026-07-03T03:38:59.267Z"
+  },
+  {
+    "empresa": "Usiminas",
+    "cargo": "Gerente de Sustentabilidade",
+    "motivo": "Implementaï¿½ï¿½o de prï¿½ticas de sustentabilidade e reduï¿½ï¿½o de emissï¿½o de carbono.",
+    "setor": "industria",
+    "combo": "NR-1 + Inventario Carbono",
+    "numero": "553135016000",
+    "msg": "Oi, tudo bem? Acho que o combo NR-1 com o Inventï¿½rio Carbono pode ser uma boa pra vocï¿½s na Usiminas. Se fizer sentido, bora trocar ideia.",
+    "status": "enviado_para_voce",
+    "enviado_em": "2026-07-03T03:39:14.739Z"
+  },
+  {
+    "empresa": "Vale",
+    "cargo": "Diretor de Meio Ambiente",
+    "motivo": "Desenvolvimento de iniciativas para atender ï¿½s normas NR-1 e otimizaï¿½ï¿½o da gestï¿½o de carbono.",
+    "setor": "industria",
+    "combo": "NR-1 + Inventario Carbono",
+    "numero": "553135019111",
+    "msg": "Oi, tudo bem? Acho que a combinaï¿½ï¿½o NR-1 e Inventï¿½rio Carbono pode ser uma boa pra vocï¿½s na Vale, principalmente pra lidar com os riscos ambientais. Se fizer sentido, bora trocar ideia.",
+    "status": "enviado_para_voce",
+    "enviado_em": "2026-07-03T03:39:30.143Z"
+  },
+  {
+    "empresa": "Gerdau",
+    "cargo": "Coordenador de Responsabilidade Social",
+    "motivo": "Aprimorar processos industriais e garantir conformidade com a legislaï¿½ï¿½o ambiental.",
+    "setor": "industria",
+    "combo": "NR-1 + Inventario Carbono",
+    "numero": "551133159333",
+    "msg": "Oi, tudo bem? Acho que a combinaï¿½ï¿½o NR-1 e Inventï¿½rio Carbono pode ser bem legal pra Gerdau, principalmente na parte de responsabilidade social. Se fizer sentido, bora trocar ideia.",
+    "status": "enviado_direto",
+    "enviado_em": "2026-07-03T03:39:46.150Z"
+  },
+  {
+    "empresa": "Movile",
+    "cargo": "CEO",
+    "motivo": "Busca inovaï¿½ï¿½o e desenvolvimento de soluï¿½ï¿½es tecnolï¿½gicas para aprimorar seus serviï¿½os.",
+    "setor": "tecnologia",
+    "combo": "NR-1 + Software Engineering",
+    "numero": "551130780000",
+    "msg": "Oi, tudo bem? Acho que a combinaï¿½ï¿½o do NR-1 com o Software Engineering pode ajudar bastante na parte de compliance e revisï¿½o de cï¿½digo da Movile. Se fizer sentido, bora trocar ideia."
+  },
+  {
+    "empresa": "TOTVS",
+    "cargo": "Diretor de Tecnologia",
+    "motivo": "Necessita de updates constantes em seus sistemas para atender ï¿½s demandas do mercado.",
+    "setor": "tecnologia",
+    "combo": "NR-1 + Software Engineering",
+    "numero": "551140072020",
+    "msg": "Oi, tudo bem? Acho que a combinaï¿½ï¿½o do NR-1 com o Software Engineering pode ser bem legal pra TOTVS, ajudando na parte de compliance e revisï¿½o de cï¿½digo. Se fizer sentido, bora trocar ideia.",
+    "status": "enviado_para_voce",
+    "enviado_em": "2026-07-03T03:40:01.678Z"
+  },
+  {
+    "empresa": "Resultados Digitais",
+    "cargo": "Co-Fundador",
+    "motivo": "Precisa de tecnologia avanï¿½ada para qualidade de seus produtos e serviï¿½os de marketing digital.",
+    "setor": "tecnologia",
+    "combo": "NR-1 + Software Engineering",
+    "numero": "554832392000",
+    "msg": "Oi, tudo bem? Acho que a combinaï¿½ï¿½o do NR-1 com o Software Engineering pode ser uma boa pra vocï¿½s, principalmente pra garantir a conformidade e melhorar o cï¿½digo. Se fizer sentido, bora trocar ideia.",
+    "status": "enviado_para_voce",
+    "enviado_em": "2026-07-03T03:40:17.289Z"
+  },
+  {
+    "empresa": "Eletrobras",
+    "cargo": "Diretor de Sustentabilidade",
+    "motivo": "A Eletrobras precisa do Inventário de Carbono e relatórios ESG para atender aos requisitos regulatórios e aumentar a transparência em suas operações, alinhando-se às normas IFRS.",
+    "setor": "energia",
+    "combo": "Inventario Carbono + ESG IFRS",
+    "numero": "552122249000",
+    "msg": "Oi, tudo bem? Acho que o Inventário Carbono e o ESG IFRS podem ser uma boa combinação pra vocês na Eletrobras. Se fizer sentido, bora trocar ideia."
+  },
+  {
+    "empresa": "Sabesp",
+    "cargo": "Gerente de Gestão Ambiental",
+    "motivo": "A Sabesp busca elaborar um Inventário de Carbono e relatórios ESG para melhorar sua performance ambiental e cumprir com as diretrizes de sustentabilidade exigidas pelo mercado.",
+    "setor": "energia",
+    "combo": "Inventario Carbono + ESG IFRS",
+    "numero": "",
+    "msg": "Oi, tudo bem? Pra sua área de gestão ambiental, o Inventário Carbono junto com o ESG pode ser uma boa combinação. Se fizer sentido, bora trocar ideia."
+  },
+  {
+    "empresa": "Enel Brasil",
+    "cargo": "Coordenador de Sustentabilidade",
+    "motivo": "A Enel Brasil necessita do Inventário de Carbono e relatórios de ESG para monitorar suas emissões e promover práticas sustentáveis, assegurando conformidade com padrões internacionais de contabilidade.",
+    "setor": "energia",
+    "combo": "Inventario Carbono + ESG IFRS",
+    "numero": "551127984000",
+    "msg": "Oi, tudo bem? Vi que você tá na Enel e acho que o Inventário Carbono pode ajudar bastante na parte de ESG. Se fizer sentido, bora trocar ideia."
+  },
+  {
+    "empresa": "Hospital das Clínicas de São Paulo",
+    "cargo": "Gerente de Segurança do Paciente",
+    "motivo": "Necessidade de NR-1 para gestão de riscos hospitalares e para atender às normas de inventário de carbono.",
+    "setor": "saude",
+    "combo": "NR-1 (riscos hospitalares) + Inventario Carbono",
+    "numero": "551130699100",
+    "msg": "Oi, tudo bem? Pra sua área, acho que a combinação do NR-1 (riscos hospitalares) com o Inventário Carbono pode ser bem útil. Se fizer sentido, bora trocar ideia."
+  },
+  {
+    "empresa": "Hospital Israelita Albert Einstein",
+    "cargo": "Coordenador de Sustentabilidade",
+    "motivo": "Requer NR-1 para avaliação de riscos e implementação de práticas de sustentabilidade, incluindo inventário de carbono.",
+    "setor": "saude",
+    "combo": "NR-1 (riscos hospitalares) + Inventario Carbono",
+    "numero": "551121519000",
+    "msg": "Oi, tudo bem? Pra área de saúde, acho que o combo NR-1 (riscos hospitalares) + Inventário Carbono pode ser bem útil pra vocês. Se fizer sentido, bora trocar ideia."
+  },
+  {
+    "empresa": "Unimed Rio",
+    "cargo": "Diretor de Operações",
+    "motivo": "Precisa da NR-1 para garantir a segurança em serviços de saúde e integrar o inventário de carbono na gestão de resíduos.",
+    "setor": "saude",
+    "combo": "NR-1 (riscos hospitalares) + Inventario Carbono",
+    "numero": "552140071000",
+    "msg": "Oi, tudo bem? Pra Unimed Rio, acho que a combinação NR-1 (riscos hospitalares) + Inventário Carbono pode ser uma boa. Se fizer sentido, bora trocar ideia."
+  },
+  {
+    "empresa": "JBS S.A.",
+    "cargo": "Gerente de Segurança do Trabalho",
+    "motivo": "A JBS, como uma das maiores empresas de processamento de alimentos do Brasil, precisa da NR-1 para garantir a segurança do trabalho no setor. Além disso, um inventário de carbono é necessário para alinhar suas práticas com as normas ESG.",
+    "setor": "agro",
+    "combo": "NR-1 (seguranca trabalho) + Inventario Carbono (ESG)",
+    "numero": "",
+    "msg": "Oi, tudo bem? Pra JBS, acho que a combinação NR-1 (segurança do trabalho) + Inventário Carbono (ESG) é a melhor. Se fizer sentido, bora trocar ideia."
+  },
+  {
+    "empresa": "Marfrig Global Foods",
+    "cargo": "Coordenador de Sustentabilidade",
+    "motivo": "A Marfrig, atuando no agronegócio e no processamento de carnes, necessita da NR-1 para assegurar condições seguras para seus trabalhadores. O inventário de carbono é crucial para atender às exigências ESG e reduzir sua pegada ambiental.",
+    "setor": "agro",
+    "combo": "NR-1 (seguranca trabalho) + Inventario Carbono (ESG)",
+    "numero": "",
+    "msg": "Oi, tudo bem? Pra Marfrig, acho que o combo NR-1 (segurança do trabalho) + Inventário Carbono (ESG) pode ser bem interessante. Se fizer sentido, bora trocar ideia."
+  },
+  {
+    "empresa": "Amaggi",
+    "cargo": "Analista de Segurança do Trabalho",
+    "motivo": "A Amaggi, uma das maiores empresas do agronegócio, precisa da NR-1 para estabelecer normas de segurança no trabalho agrícola. Um inventário de carbono é essencial para suas estratégias ESG e para mitigar impactos ambientais.",
+    "setor": "agro",
+    "combo": "NR-1 (seguranca trabalho) + Inventario Carbono (ESG)",
+    "numero": "",
+    "msg": "Oi, tudo bem? Pra sua área na Amaggi, acho que o combo NR-1 (riscos psicossociais) + Inventário Carbono pode ser bem interessante. Se fizer sentido, bora trocar ideia."
+  },
+  {
+    "empresa": "Transportes Mário Nunes",
+    "cargo": "Motorista",
+    "motivo": "NR-1 exigida para garantir segurança e saúde dos motoristas, além de Inventário Carbono para monitorar e reduzir as emissões da frota.",
+    "setor": "logistica",
+    "combo": "NR-1 (motoristas/armazem) + Inventario Carbono (frota)",
+    "numero": "",
+    "msg": "Oi, tudo bem? Pra Transportes Mário Nunes, o combo NR-1 (motoristas/armazém) + Inventário Carbono (frota) pode ser uma boa. Se fizer sentido, bora trocar ideia."
+  },
+  {
+    "empresa": "Logística Júnior",
+    "cargo": "Operador de Armazém",
+    "motivo": "NR-1 necessária para a segurança dos trabalhadores no armazém e Inventário Carbono para avaliar o impacto ambiental das operações logísticas.",
+    "setor": "logistica",
+    "combo": "NR-1 (motoristas/armazem) + Inventario Carbono (frota)",
+    "numero": "",
+    "msg": "E aí, tudo certo? Pra Logística Júnior, o combo NR-1 (motoristas/armazém) + Inventário Carbono (frota) é o ideal. Se fizer sentido, bora trocar ideia."
+  },
+  {
+    "empresa": "Transporte Rápido S.A.",
+    "cargo": "Motorista",
+    "motivo": "NR-1 obrigatória para assegurar a saúde e segurança dos motoristas, e Inventário Carbono para acompanhamento das emissões da frota.",
+    "setor": "logistica",
+    "combo": "NR-1 (motoristas/armazem) + Inventario Carbono (frota)",
+    "numero": "",
+    "msg": "Oi, tudo bem? Pra Transporte Rápido S.A., o combo ideal seria NR-1 pra motoristas e o Inventário Carbono pra frota. Se fizer sentido, bora trocar ideia."
+  }
+]

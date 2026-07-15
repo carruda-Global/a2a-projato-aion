@@ -1,0 +1,60 @@
+{
+  "type": "record",
+  "name": "MarketplaceEntitlementEvent",
+  "namespace": "com.globalengenharia.aion.marketplace",
+  "doc": "Schema para eventos de entitlement do Google Cloud Marketplace",
+  "fields": [
+    {
+      "name": "eventType",
+      "type": {
+        "type": "enum",
+        "name": "EventType",
+        "symbols": [
+          "ENTITLEMENT_CREATED",
+          "ENTITLEMENT_ACTIVATED",
+          "ENTITLEMENT_CANCELLED",
+          "ENTITLEMENT_SUSPENDED",
+          "ENTITLEMENT_RENEWED",
+          "ENTITLEMENT_PLAN_CHANGED"
+        ]
+      },
+      "doc": "Tipo do evento de entitlement"
+    },
+    {
+      "name": "entitlementId",
+      "type": "string",
+      "doc": "ID único do entitlement"
+    },
+    {
+      "name": "customerId",
+      "type": "string",
+      "doc": "ID do cliente no Google Cloud Marketplace"
+    },
+    {
+      "name": "planId",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "ID do plano assinado (compliance_essencial, regulatory_pro, etc)"
+    },
+    {
+      "name": "customerEmail",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Email do cliente"
+    },
+    {
+      "name": "timestamp",
+      "type": {
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      },
+      "doc": "Timestamp do evento em millisegundos UTC"
+    },
+    {
+      "name": "providerId",
+      "type": "string",
+      "default": "global-engenharia-498823",
+      "doc": "ID do provider no Marketplace"
+    }
+  ]
+}

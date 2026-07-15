@@ -1,0 +1,41 @@
+name: "Geracao de Conteudo LinkedIn"
+description: "Cria posts otimizados com base em dados de leads"
+
+triggers:
+  - schedule: "weekly monday 09:00"
+  - manual: true
+
+steps:
+  - id: analyze_industry
+    agent: "lead_qualifier"
+    action: analyze_lead_industry
+    params:
+      timeframe: "last_7_days"
+
+  - id: generate_post_ideas
+    agent: "content"
+    action: generate_linkedin_post_ideas
+    params:
+      topics: ["problemas_identificados", "cases_sucesso", "tendencias_setor"]
+      quantity: 5
+
+  - id: create_post
+    agent: "content"
+    action: create_linkedin_post
+    params:
+      style: "autoridade"
+      includes: ["dados", "insights", "call_to_action"]
+      link: "https://global-engenharia.com/ecosystem"
+
+  - id: schedule_post
+    agent: "content"
+    action: schedule_linkedin_post
+    params:
+      date: "{next_available_date}"
+      time: "08:00"
+
+  - id: track_performance
+    agent: "content"
+    action: track_post_performance
+    params:
+      engagement_threshold: 10

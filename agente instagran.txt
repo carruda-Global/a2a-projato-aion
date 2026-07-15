@@ -1,0 +1,88 @@
+Via Framework (Pydantic AI, AutoGen, OpenAI Agents SDK)
+
+Para um agente autônomo que você pode integrar ao seu Ecosystem AION, a abordagem programática é mais poderosa.
+📝 Guia de Implementação com Python
+Passo 1: Instalar Dependências
+bash
+
+pip install composio python-dotenv
+pip install pydantic-ai  # ou autogen-agentchat, dependendo do framework
+
+Passo 2: Configurar .env
+env
+
+COMPOSIO_API_KEY=sua-chave-aqui
+USER_ID=seu-email@exemplo.com
+OPENAI_API_KEY=chave-openai
+
+Passo 3: Criar o Agente (Exemplo com Pydantic AI)
+python
+
+import os
+import asyncio
+from dotenv import load_dotenv
+from composio import Composio
+from pydantic_ai import Agent
+from pydantic_ai.models.openai import OpenAIModel
+
+load_dotenv()
+
+async def main():
+    # 1. Conecta ao Composio
+    composio = Composio(api_key=os.getenv("COMPOSIO_API_KEY"))
+    session = composio.create(
+        user_id=os.getenv("USER_ID"),
+        toolkits=["instagram"]
+    )
+    mcp_url = session.mcp.url
+
+    # 2. Inicializa o agente com MCP
+    agent = Agent(
+        model=OpenAIModel('gpt-4'),
+        system_prompt="""Você é um assistente especialista em Instagram.
+        Você pode criar e publicar posts carrossel com múltiplas imagens.
+        Siga as instruções do usuário passo a passo.""",
+        mcp_server_url=mcp_url
+    )
+
+    # 3. Executa comando
+    result = await agent.run(
+        "Crie um carrossel com 3 imagens sobre manutenção preditiva para engenharia"
+    )
+    print(result.data)
+
+asyncio.run(main())
+
+🖼️ Como Funciona a Criação de Carrossel
+
+O agente usa dois passos da API do Instagram :
+
+    Criar Container: Ação INSTAGRAM_CREATE_CAROUSEL_CONTAINER
+
+    Publicar: Ação INSTAGRAM_CREATE_POST
+
+Especificações Técnicas do Carrossel
+Item	Especificação
+Formato	JPEG ou PNG
+Tamanho Máximo	8 MB por imagem
+Aspect Ratio	4:5 a 1.91:1
+Mínimo de Imagens	2
+Máximo de Imagens	10
+
+    "You can select up to 10 images or videos for your carousel" 
+
+⚠️ Ponto Importante: Conta Business
+
+Para publicar via API, você precisa de uma Instagram Business ou Creator Account. O Instagram Personal não suporta publicação via API.
+
+    "You need to convert your Instagram profile to an Instagram Business Profile" 
+
+🔗 Integrando com o Ecosystem AION
+
+Você pode adicionar esse agente como um novo membro do seu ecossistema (Agente #60). Ele se conecta naturalmente ao seu fluxo de conteúdo:
+
+    Agente #8 (Content Generator) → Gera imagens e textos
+
+    Agente #60 (Instagram Publisher) → Publica automaticamente
+
+    Agente #58 (Sales Agent) → Pode usar o Instagram como canal de prospecção

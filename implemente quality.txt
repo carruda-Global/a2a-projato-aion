@@ -1,0 +1,768 @@
+markdown
+
+# 🏛️ AION — Agents Intelligence Orchestration Network
+
+## Guia de Implementação para DeepSeek Flash
+
+**Projeto:** AION — Plataforma de Orquestração de Agentes
+**Proprietário:** Cristiano Arruda | Global Match Engenharia de Produção
+**Versão:** 6.0
+**Data:** 27/06/2026
+**LLM Core:** DeepSeek-V4-Flash
+
+---
+
+## 📋 ÍNDICE
+
+1. [Visão Geral da Implementação](#visão-geral)
+2. [Estrutura de Diretórios](#estrutura-de-diretórios)
+3. [Camada de Agentes (71)](#camada-de-agentes)
+4. [Camada de Orquestração](#camada-de-orquestração)
+5. [Camada de Segurança](#camada-de-segurança)
+6. [Camada de Qualidade](#camada-de-qualidade)
+7. [Camada de Dados e Memória](#camada-de-dados-e-memória)
+8. [Camada de Monetização](#camada-de-monetização)
+9. [Comandos de Implementação](#comandos-de-implementação)
+10. [Checklist de Validação](#checklist-de-validação)
+
+---
+
+## 1. VISÃO GERAL DA IMPLEMENTAÇÃO
+
+### O que o DeepSeek Flash deve implementar
+
+| Ordem | Componente | Prioridade | Prazo Estimado |
+|:---|:---|:---|:---|
+| 1 | Estrutura de diretórios | Alta | 1 dia |
+| 2 | Agentes #1 a #12 (AEC) | Alta | 3 dias |
+| 3 | Agentes #13 a #21 (Regulatórios) | Alta | 3 dias |
+| 4 | Agentes #22 a #27 (Microsoft) | Alta | 2 dias |
+| 5 | Agentes #N1 a #N3 (Cross-Sell) | Média | 1 dia |
+| 6 | Agentes #31 a #36 (Dynamics) | Média | 2 dias |
+| 7 | Agentes #37 a #41 (Agentforce) | Média | 2 dias |
+| 8 | Agentes #42 a #45 (Oracle) | Baixa | 2 dias |
+| 9 | Agentes #46 a #48 (SAP) | Baixa | 2 dias |
+| 10 | Agentes #49 a #50 (Coordenação) | Alta | 2 dias |
+| 11 | Agentes #51 a #53 (Inteligência) | Média | 2 dias |
+| 12 | Agentes #54 a #56 (Auto-aprimoramento) | Baixa | 3 dias |
+| 13 | Agentes #57 a #59 (Tech) | Alta | 3 dias |
+| 14 | Micro-agentes M1 a M15 | Alta | 2 dias |
+| 15 | Orquestrador (LangGraph) | Alta | 3 dias |
+| 16 | Segurança (AIP + ABAC) | Alta | 3 dias |
+| 17 | Qualidade (Gates + Critic) | Alta | 2 dias |
+| 18 | Monetização (Marketplaces) | Alta | 2 dias |
+
+---
+
+## 2. ESTRUTURA DE DIRETÓRIOS
+
+aion/
+├── src/
+│ ├── orchestrator/
+│ │ ├── init.py
+│ │ ├── graph.py # LangGraph
+│ │ ├── planner.py # Planner Agent
+│ │ ├── router.py # Router Agent
+│ │ ├── coordinator.py # Coordinator Agent
+│ │ └── synthesizer.py # Synthesizer Agent
+│ │
+│ ├── agents/
+│ │ ├── init.py
+│ │ ├── base.py # BaseAgent
+│ │ ├── aec/ # #1 a #12
+│ │ │ ├── init.py
+│ │ │ ├── spec_analyst.py # #1
+│ │ │ ├── procurement.py # #2
+│ │ │ ├── inventory.py # #3
+│ │ │ ├── logistics.py # #4
+│ │ │ ├── field_execution.py # #5
+│ │ │ ├── bim_coordinator.py # #6
+│ │ │ ├── requirements_analyst.py # #7
+│ │ │ ├── engineering_assistant.py # #8
+│ │ │ ├── work_synopsis.py # #9
+│ │ │ ├── photo_intelligence.py # #10
+│ │ │ ├── rfi_creation.py # #11
+│ │ │ └── compliance.py # #12
+│ │ │
+│ │ ├── regulatory/ # #13 a #21
+│ │ │ ├── init.py
+│ │ │ ├── nr1_psicossocial.py # #13
+│ │ │ ├── tributario_cbs_ibs.py # #14
+│ │ │ ├── lgpd_operacional.py # #15
+│ │ │ ├── esg_ifrs.py # #16
+│ │ │ ├── inventario_carbono.py # #17
+│ │ │ ├── escopo3_fornecedores.py # #18
+│ │ │ ├── canal_denuncias.py # #19
+│ │ │ ├── igualdade_salarial.py # #20
+│ │ │ └── compliance_anticorrupcao.py # #21
+│ │ │
+│ │ ├── microsoft/ # #22 a #27
+│ │ │ ├── init.py
+│ │ │ ├── regulatory_analyst.py # #22
+│ │ │ ├── compliance_pm.py # #23
+│ │ │ ├── channel_agent.py # #24
+│ │ │ ├── knowledge_agent.py # #25
+│ │ │ ├── facilitator_agent.py # #26
+│ │ │ └── dev_experience.py # #27
+│ │ │
+│ │ ├── cross_sell/ # #N1 a #N3
+│ │ │ ├── init.py
+│ │ │ ├── onboarding.py # N1
+│ │ │ ├── atendimento_cliente.py # N2
+│ │ │ └── conciliacao.py # N3
+│ │ │
+│ │ ├── dynamics/ # #31 a #36
+│ │ │ ├── init.py
+│ │ │ ├── sales.py # #31
+│ │ │ ├── finance.py # #32
+│ │ │ ├── supply_chain.py # #33
+│ │ │ ├── hr.py # #34
+│ │ │ ├── customer_service.py # #35
+│ │ │ └── power_bi_compliance.py # #36
+│ │ │
+│ │ ├── agentforce/ # #37 a #41
+│ │ │ ├── init.py
+│ │ │ ├── sdr.py # #37
+│ │ │ ├── field_service.py # #38
+│ │ │ ├── contracts.py # #39
+│ │ │ ├── revenue.py # #40
+│ │ │ └── sustainability.py # #41
+│ │ │
+│ │ ├── oracle/ # #42 a #45
+│ │ │ ├── init.py
+│ │ │ ├── erp_compliance.py # #42
+│ │ │ ├── hcm_regulatory.py # #43
+│ │ │ ├── supply_chain_esg.py # #44
+│ │ │ └── cx_sales.py # #45
+│ │ │
+│ │ ├── sap/ # #46 a #48
+│ │ │ ├── init.py
+│ │ │ ├── compliance_bridge.py # #46
+│ │ │ ├── predictive_maint.py # #47
+│ │ │ └── cbam_export.py # #48
+│ │ │
+│ │ ├── coordination/ # #49 a #50
+│ │ │ ├── init.py
+│ │ │ ├── master_orchestrator.py # #49
+│ │ │ └── cross_platform_bridge.py # #50
+│ │ │
+│ │ ├── intelligence/ # #51 a #53
+│ │ │ ├── init.py
+│ │ │ ├── regulatory_watch.py # #51
+│ │ │ ├── client_intelligence.py # #52
+│ │ │ └── quality_critic.py # #53
+│ │ │
+│ │ ├── self_improvement/ # #54 a #56
+│ │ │ ├── init.py
+│ │ │ ├── meta_learning.py # #54
+│ │ │ ├── ecosystem_evolution.py # #55
+│ │ │ └── federated_knowledge.py # #56
+│ │ │
+│ │ ├── tech/ # #57 a #59
+│ │ │ ├── init.py
+│ │ │ ├── software_engineering.py # #57
+│ │ │ ├── sales_agent.py # #58
+│ │ │ └── workforce_orchestrator.py # #59
+│ │ │
+│ │ └── micro/ # M1 a M15
+│ │ ├── init.py
+│ │ ├── nr1_rapid.py # M1
+│ │ ├── lgpd_scanner.py # M2
+│ │ ├── folha_equidade.py # M3
+│ │ ├── contrato_review.py # M4
+│ │ ├── teams_risk.py # M5
+│ │ ├── meeting_minutes.py # M6
+│ │ ├── pr_lgpd.py # M7
+│ │ ├── admissao_checklist.py # M8
+│ │ ├── sales_pipeline.py # M9
+│ │ ├── expense_anomaly.py # M10
+│ │ ├── compliance_score.py # M11
+│ │ ├── lead_qualifier.py # M12
+│ │ ├── code_reviewer.py # M13
+│ │ ├── headcount_alert.py # M14
+│ │ └── regulatory_alert.py # M15
+│ │
+│ ├── security/
+│ │ ├── init.py
+│ │ ├── aip_registry.py # Agent Identity Protocol
+│ │ ├── aip_proxy.py # Enforcement Proxy
+│ │ ├── abac.py # Attribute-Based Access Control
+│ │ ├── trust_agent.py # Stateful Trust Agent
+│ │ ├── sanitization.py # DLP sanitization
+│ │ └── audit.py # Merkle chain audit
+│ │
+│ ├── quality/
+│ │ ├── init.py
+│ │ ├── orchestrator.py # Quality Orchestrator
+│ │ ├── gates.py # Quality Gates
+│ │ └── kalibra_integration.py # Kalibra regression detection
+│ │
+│ ├── data/
+│ │ ├── init.py
+│ │ ├── supabase_client.py # Supabase connection
+│ │ ├── qdrant_client.py # Qdrant vector DB
+│ │ ├── timescaledb.py # TimescaleDB metrics
+│ │ └── experience_library.py # HERA Experience Library
+│ │
+│ ├── monetization/
+│ │ ├── init.py
+│ │ ├── plans.py # 15+ plans
+│ │ ├── stripe_client.py # Stripe integration
+│ │ ├── azure_marketplace.py # Microsoft Marketplace
+│ │ ├── google_marketplace.py # Google Cloud Marketplace
+│ │ └── salesforce_marketplace.py # Salesforce AgentExchange
+│ │
+│ ├── api/
+│ │ ├── init.py
+│ │ ├── routes.py # API routes
+│ │ └── middleware.py # Middleware
+│ │
+│ └── main.py # Entrypoint
+│
+├── config/
+│ ├── config.yaml # Central configuration
+│ ├── budgets.yaml # Token budgets per agent
+│ ├── policies.yaml # Security policies
+│ └── quality_gates.yaml # Quality gate rules
+│
+├── tests/
+│ ├── test_agents.py
+│ ├── test_orchestrator.py
+│ ├── test_security.py
+│ └── test_quality.py
+│
+├── scripts/
+│ ├── deploy_marketplace.py
+│ ├── seed_database.py
+│ └── init_agents.py
+│
+├── docs/
+│ ├── ARCHITECTURE.md
+│ ├── DEPLOYMENT.md
+│ └── AGENTS.md
+│
+├── .env.example
+├── requirements.txt
+├── Dockerfile
+├── docker-compose.yml
+├── pyproject.toml
+└── README.md
+text
+
+
+---
+
+## 3. CAMADA DE AGENTES (71)
+
+### 3.1 BaseAgent (Base para todos)
+
+```python
+# src/agents/base.py
+from abc import ABC, abstractmethod
+from typing import Dict, Any, List, Optional
+from datetime import datetime
+import json
+
+class BaseAgent(ABC):
+    """
+    Classe base para todos os 71 agentes
+    """
+    
+    def __init__(
+        self,
+        agent_id: str,
+        name: str,
+        description: str,
+        group: str,
+        price_brl: float,
+        price_usd: float,
+        tools: List[str],
+        llm: str = "deepseek-v4-flash",
+        budget: int = 100000,
+        parent_id: Optional[str] = None
+    ):
+        self.agent_id = agent_id
+        self.name = name
+        self.description = description
+        self.group = group
+        self.price_brl = price_brl
+        self.price_usd = price_usd
+        self.tools = tools
+        self.llm = llm
+        self.budget = budget
+        self.parent_id = parent_id
+        self.created_at = datetime.now()
+        self.version = "1.0"
+    
+    @abstractmethod
+    async def execute(self, context: Dict[str, Any]) -> Dict[str, Any]:
+        """Executa a lógica específica do agente"""
+        pass
+    
+    def get_tools(self) -> List[str]:
+        """Retorna ferramentas disponíveis para este agente"""
+        return self.tools
+    
+    def get_config(self) -> Dict[str, Any]:
+        """Retorna configuração do agente"""
+        return {
+            "agent_id": self.agent_id,
+            "name": self.name,
+            "description": self.description,
+            "group": self.group,
+            "price_brl": self.price_brl,
+            "price_usd": self.price_usd,
+            "llm": self.llm,
+            "budget": self.budget,
+            "parent_id": self.parent_id,
+            "version": self.version
+        }
+    
+    async def _call_llm(self, prompt: str, system: Optional[str] = None) -> Dict[str, Any]:
+        """Chama o LLM com validação de orçamento"""
+        # Implementação com DeepSeek-V4-Flash
+        pass
+
+3.2 Agentes #1 a #12 (AEC)
+
+Prompt para DeepSeek Flash:
+
+    "Implemente os 12 agentes AEC (Spec Analyst, Procurement, Inventory, Logistics, Field Execution, BIM Coordinator, Requirements Analyst, Engineering Assistant, Work Synopsis, Photo Intelligence, RFI Creation, Compliance). Cada agente deve herdar de BaseAgent, com execute() implementado. Use DeepSeek-V4-Flash como LLM. Inclua validação de orçamento e logs de execução."
+
+3.3 Agentes #13 a #21 (Regulatórios)
+
+Prompt para DeepSeek Flash:
+
+    "Implemente os 9 agentes regulatórios (NR-1 Psicossocial, Tributário CBS/IBS, LGPD Operacional, ESG IFRS S1/S2, Inventário Carbono, Escopo 3 Fornecedores, Canal de Denúncias, Igualdade Salarial, Compliance Anticorrupção). Cada agente deve ter: nome, norma aplicável, descrição, preço variável por porte da empresa, e integração com bases de dados regulatórias via RAG."
+
+3.4 Agentes #22 a #27 (Microsoft)
+
+Prompt para DeepSeek Flash:
+
+    "Implemente os 6 agentes Microsoft (Regulatory Analyst, Compliance PM, Channel Agent, Knowledge Agent, Facilitator Agent, Dev Experience Agent). Cada agente deve se integrar com Microsoft Graph API, Teams SDK, SharePoint, Planner, GitHub. Inclua autenticação OAuth 2.0 e escopos específicos."
+
+3.5 Agentes #N1 a #N3 (Cross-Sell)
+
+Prompt para DeepSeek Flash:
+
+    "Implemente os 3 agentes de cross-sell (Onboarding Funcionários, Atendimento Cliente PT-BR, Conciliação Financeira). Cada agente deve custar R$ 99/mês, ter trigger de upsell automático, e desconto de conversão de 15% para clientes existentes."
+
+3.6 Agentes #31 a #36 (Dynamics)
+
+Prompt para DeepSeek Flash:
+
+    "Implemente os 6 agentes Dynamics (Dynamics Sales, Dynamics Finance, Dynamics Supply Chain, Dynamics HR, Dynamics Customer Service, Power BI Compliance). Cada agente deve se integrar com Microsoft Dynamics 365 via API OAuth 2.0."
+
+3.7 Agentes #37 a #41 (Agentforce)
+
+Prompt para DeepSeek Flash:
+
+    "Implemente os 5 agentes Agentforce (Agentforce SDR, Agentforce Field Service, Agentforce Contracts, Agentforce Revenue, Agentforce Sustainability). Cada agente deve se integrar com Salesforce Agentforce via REST API OAuth 2.0."
+
+3.8 Agentes #42 a #45 (Oracle)
+
+Prompt para DeepSeek Flash:
+
+    "Implemente os 4 agentes Oracle (Oracle ERP Compliance, Oracle HCM Regulatory, Oracle Supply Chain ESG, Oracle CX Sales). Cada agente deve se integrar com Oracle Cloud via OCI SDK."
+
+3.9 Agentes #46 a #48 (SAP)
+
+Prompt para DeepSeek Flash:
+
+    "Implemente os 3 agentes SAP (SAP Compliance Bridge, SAP Predictive Maintenance, SAP CBAM Export). Cada agente deve se integrar com SAP via RFC/BAPI ou OData API."
+
+3.10 Agentes #49 a #50 (Coordenação)
+
+Prompt para DeepSeek Flash:
+
+    "Implemente os 2 agentes de coordenação (Master Orchestrator, Cross-Platform Bridge). O Master Orchestrator (#49) deve orquestrar todos os 71 agentes usando LangGraph. O Cross-Platform Bridge (#50) deve conectar as 7 plataformas: Microsoft, Google, Salesforce, Oracle, AWS, Dynamics, SAP."
+
+3.11 Agentes #51 a #53 (Inteligência)
+
+Prompt para DeepSeek Flash:
+
+    "Implemente os 3 agentes de inteligência (Regulatory Watch, Client Intelligence, Quality Critic). Regulatory Watch (#51) deve monitorar mudanças em leis e normas. Client Intelligence (#52) deve analisar padrões de clientes. Quality Critic (#53) deve revisar outputs dos agentes."
+
+3.12 Agentes #54 a #56 (Auto-aprimoramento)
+
+Prompt para DeepSeek Flash:
+
+    "Implemente os 3 agentes de auto-aprimoramento (Meta-Learning, Ecosystem Evolution, Federated Knowledge). Meta-Learning (#54) deve aprender sobre aprendizado. Ecosystem Evolution (#55) deve evoluir o ecossistema continuamente. Federated Knowledge (#56) deve gerenciar conhecimento distribuído entre agentes."
+
+3.13 Agentes #57 a #59 (Tech)
+
+Prompt para DeepSeek Flash:
+
+    "Implemente os 3 agentes de tecnologia (Software Engineering, Sales Agent, Workforce Orchestrator). Software Engineering (#57) deve planejar, escrever, revisar e testar código. Sales Agent (#58) deve prospectar, qualificar e agendar reuniões. Workforce Orchestrator (#59) deve coordenar agentes em workflows complexos."
+
+3.14 Micro-Agentes M1 a M15
+
+Prompt para DeepSeek Flash:
+
+    "Implemente os 15 micro-agentes (NR-1 Diagnóstico Rápido, LGPD Scanner, Folha Equidade, Contrato Review, Teams Risk Monitor, Meeting Minutes, PR LGPD Checker, Admissão Checklist, Sales Pipeline Checker, Expense Anomaly, Compliance Score, Lead Qualifier, Code Reviewer, Headcount Alert, Regulatory Alert). Cada micro-agente deve custar R$ 99/mês, ter um trigger de upsell específico, e herdar de BaseAgent. O escopo de cada micro-agente deve ser limitado a uma única tarefa bem definida (1-3 passos)."
+
+4. CAMADA DE ORQUESTRAÇÃO
+
+Prompt para DeepSeek Flash:
+
+    "Implemente o orquestrador usando LangGraph com os seguintes componentes:
+
+        Planner Agent: Decompõe consultas em subtarefas usando DeepSeek-V4-Flash
+
+        Router Agent: Direciona cada subtarefa para o agente correto
+
+        Coordinator Agent: Gerencia execução paralela com asyncio.gather
+
+        Synthesizer Agent: Síntese hierárquica com merge recursivo
+
+    O orquestrador deve:
+
+        Suportar os 71 agentes
+
+        Ter orçamento de tokens por agente
+
+        Integrar com o Master Orchestrator (#49)
+
+        Ter fallback em caso de falha de agente"
+
+python
+
+# src/orchestrator/graph.py
+from langgraph.graph import StateGraph, END
+from typing import TypedDict, List, Dict, Any
+import asyncio
+
+class AgentState(TypedDict):
+    query: str
+    plan: List[Dict[str, Any]]
+    documents: List[Dict[str, Any]]
+    synthesis: str
+    action_results: Dict[str, Any]
+    metadata: Dict[str, Any]
+    quality_status: bool
+    quality_report: str
+
+def create_multi_agent_graph():
+    workflow = StateGraph(AgentState)
+    
+    workflow.add_node("planner", planner_node)
+    workflow.add_node("router", router_node)
+    workflow.add_node("coordinator", coordinator_node)
+    workflow.add_node("quality_check", quality_check_node)
+    workflow.add_node("synthesizer", synthesizer_node)
+    
+    workflow.set_entry_point("planner")
+    workflow.add_edge("planner", "router")
+    workflow.add_edge("router", "coordinator")
+    workflow.add_edge("coordinator", "quality_check")
+    workflow.add_edge("quality_check", "synthesizer")
+    workflow.add_edge("synthesizer", END)
+    
+    return workflow.compile()
+
+5. CAMADA DE SEGURANÇA
+
+Prompt para DeepSeek Flash:
+
+    "Implemente a camada de segurança com:
+
+        AIP Registry: Registro de identidade dos agentes com DID
+
+        AIP Proxy: Enforcement de políticas com verificação de assinatura
+
+        ABAC: Controle de acesso baseado em atributos
+
+        Trust Agent: Detecção de ataques multietapa com belief state
+
+        Sanitização: Multi-Agent Semantic Rewriting para remover PII
+
+        Audit: Merkle chain SHA-256 para compliance LGPD/CREA"
+
+python
+
+# src/security/aip_registry.py
+from aip_identity import AIPClient
+import uuid
+
+class AIPRegistry:
+    def __init__(self):
+        self.registry_url = "https://aip.aion.global"
+        self.agents = {}
+    
+    def register_agent(self, agent_id: str, agent_name: str, principal: str) -> dict:
+        client = AIPClient.register(self.registry_url, agent_name)
+        client.save(f"credentials/{agent_id}.json")
+        
+        self.agents[agent_id] = {
+            "did": client.did,
+            "public_key": client.public_key,
+            "principal": principal,
+            "status": "active"
+        }
+        return self.agents[agent_id]
+    
+    def verify_agent(self, agent_id: str, signature: bytes) -> bool:
+        if agent_id not in self.agents:
+            return False
+        return self.agents[agent_id]["status"] == "active"
+    
+    def revoke_agent(self, agent_id: str):
+        if agent_id in self.agents:
+            self.agents[agent_id]["status"] = "revoked"
+
+6. CAMADA DE QUALIDADE
+
+Prompt para DeepSeek Flash:
+
+    "Implemente a camada de qualidade com:
+
+        Quality Orchestrator: Coordena verificação de qualidade dos outputs
+
+        Quality Gates: Condições obrigatórias (coverage ≥ 80%, security issues = 0, duplication ≤ 3%)
+
+        Quality Critic: Revisão cruzada entre agentes
+
+        Kalibra: Detecção de regressão contínua com baseline"
+
+python
+
+# src/quality/orchestrator.py
+class QualityOrchestrator:
+    def __init__(self):
+        self.gates = self._load_gates()
+        self.critic = QualityCritic()
+    
+    async def execute(self, agent_output: Dict[str, Any], agent_id: str) -> Dict[str, Any]:
+        # 1. Apply gates
+        gate_results = await self._apply_gates(agent_output, agent_id)
+        
+        # 2. If failed, attempt auto-fix
+        if not gate_results["passed"]:
+            corrected = await self._attempt_fix(agent_output, gate_results)
+            gate_results = await self._apply_gates(corrected, agent_id)
+            agent_output = corrected
+        
+        # 3. Critic review
+        critic_review = await self.critic.review(agent_output, agent_id)
+        
+        return {
+            "output": agent_output,
+            "quality_status": gate_results["passed"] and critic_review["passed"],
+            "gate_report": gate_results["report"],
+            "critic_report": critic_review["report"]
+        }
+    
+    def _load_gates(self) -> dict:
+        return {
+            "coverage": {"min": 80},
+            "security_issues": {"max": 0},
+            "duplication": {"max": 3},
+            "reliability_issues": {"max": 0}
+        }
+
+7. CAMADA DE DADOS E MEMÓRIA
+
+Prompt para DeepSeek Flash:
+
+    "Implemente a camada de dados com:
+
+        Supabase: Banco de dados principal (clientes, assinaturas, configurações)
+
+        Qdrant: Vector database para RAG (embeddings)
+
+        TimescaleDB: Métricas e logs temporais
+
+        Experience Library: HERA framework (ADD/MERGE/PRUNE) para aprendizado contínuo"
+
+python
+
+# src/data/supabase_client.py
+from supabase import create_client
+import os
+
+class SupabaseClient:
+    def __init__(self):
+        self.url = os.getenv("SUPABASE_URL")
+        self.key = os.getenv("SUPABASE_KEY")
+        self.client = create_client(self.url, self.key)
+    
+    def get_subscriptions(self, status: str = "active"):
+        return self.client.table("subscriptions")\
+            .select("*")\
+            .eq("status", status)\
+            .execute()
+    
+    def create_subscription(self, data: dict):
+        return self.client.table("subscriptions").insert(data).execute()
+
+8. CAMADA DE MONETIZAÇÃO
+
+Prompt para DeepSeek Flash:
+
+    "Implemente a camada de monetização com:
+
+        Plans: 15 planos de assinatura
+
+        Stripe: Cobrança por assinatura e PIX
+
+        Microsoft Marketplace: Fulfillment API v2 com webhook
+
+        Google Marketplace: Private Offers e metered billing
+
+        Salesforce AgentExchange: Flex Credits e consumo"
+
+python
+
+# src/monetization/plans.py
+PLANS = [
+    {"id": "starter", "name": "AEC Starter", "price_brl": 997, "agents": ["#1"]},
+    {"id": "professional", "name": "AEC Professional", "price_brl": 2391, "agents": ["#1", "#2", "#3"]},
+    {"id": "enterprise", "name": "AEC Enterprise", "price_brl": 4685, "agents": ["#1", "#2", "#3", "#4", "#5"]},
+    {"id": "regulatory_starter", "name": "Regulatory Starter", "price_brl": 590, "agents": ["#13", "#15"]},
+    {"id": "regulatory_full", "name": "Regulatory Full", "price_brl": 3490, "agents": ["#13", "#14", "#15", "#16", "#17", "#18", "#19", "#20", "#21"]},
+    {"id": "microsoft_pack", "name": "Microsoft Pack", "price_brl": 3497, "agents": ["#22", "#23", "#24", "#25", "#26", "#27"]},
+    {"id": "dynamics_pack", "name": "Dynamics Pack", "price_brl": 4997, "agents": ["#31", "#32", "#33", "#34", "#35", "#36"]},
+    {"id": "agentforce_pack", "name": "Agentforce Pack", "price_brl": 4497, "agents": ["#37", "#38", "#39", "#40", "#41"]},
+    {"id": "oracle_pack", "name": "Oracle Pack", "price_brl": 3997, "agents": ["#42", "#43", "#44", "#45"]},
+    {"id": "sap_pack", "name": "SAP Pack", "price_brl": 2997, "agents": ["#46", "#47", "#48"]},
+    {"id": "tech_starter", "name": "Tech Starter", "price_brl": 1997, "agents": ["#57"]},
+    {"id": "tech_professional", "name": "Tech Professional", "price_brl": 3497, "agents": ["#57", "#58", "#59"]},
+    {"id": "tech_enterprise", "name": "Tech Enterprise", "price_brl": 5997, "agents": ["#57", "#58", "#59", "#49", "#50"]},
+    {"id": "cross_sell_pack", "name": "Cross-Sell Pack", "price_brl": 297, "agents": ["N1", "N2", "N3"]},
+    {"id": "full_suite", "name": "Full Suite", "price_brl": 9497, "agents": ["all_71"]}
+]
+
+9. COMANDOS DE IMPLEMENTAÇÃO
+9.1 Instalação
+bash
+
+# Clone e instale
+git clone https://github.com/global-engenharia/aion.git
+cd aion
+
+# Criar ambiente virtual
+python -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
+
+# Instalar dependências
+pip install -r requirements.txt
+
+# Configurar variáveis de ambiente
+cp .env.example .env
+# Editar .env com suas credenciais
+
+9.2 Inicializar Agentes
+bash
+
+# Inicializar todos os agentes
+python scripts/init_agents.py
+
+# Inicializar grupo específico
+python scripts/init_agents.py --group aec
+python scripts/init_agents.py --group regulatory
+python scripts/init_agents.py --group microsoft
+
+9.3 Rodar Orquestrador
+bash
+
+# Rodar localmente
+python src/main.py --config config.yaml
+
+# Modo debug
+python src/main.py --config config.yaml --debug
+
+# Testar agente específico
+python src/main.py --agent #1 --input "analisar documento"
+
+9.4 Testes
+bash
+
+# Rodar todos os testes
+pytest tests/ -v
+
+# Rodar testes de agentes
+pytest tests/test_agents.py -v
+
+# Rodar testes de qualidade
+pytest tests/test_quality.py -v
+
+9.5 Deploy
+bash
+
+# Docker build
+docker build -t aion .
+
+# Docker compose
+docker-compose up -d
+
+# Deploy para Vercel
+vercel --prod
+
+10. CHECKLIST DE VALIDAÇÃO
+10.1 Agentes
+#	Item	Status
+1	Todos os 71 agentes implementados	⬜
+2	Todos os 15 micro-agentes implementados	⬜
+3	BaseAgent funcional com herança	⬜
+4	Cada agente tem execute() implementado	⬜
+5	Orçamento de tokens por agente	⬜
+10.2 Orquestração
+#	Item	Status
+1	LangGraph configurado	⬜
+2	Planner, Router, Coordinator, Synthesizer	⬜
+3	Master Orchestrator (#49)	⬜
+4	Cross-Platform Bridge (#50)	⬜
+10.3 Segurança
+#	Item	Status
+1	AIP Registry	⬜
+2	AIP Proxy	⬜
+3	ABAC Policies	⬜
+4	Trust Agent (MMA-RAG)	⬜
+5	Merkle Chain Audit	⬜
+10.4 Qualidade
+#	Item	Status
+1	Quality Orchestrator	⬜
+2	Quality Gates (coverage, security, duplication)	⬜
+3	Quality Critic (#53)	⬜
+4	Kalibra integration	⬜
+10.5 Dados
+#	Item	Status
+1	Supabase client	⬜
+2	Qdrant vector DB	⬜
+3	TimescaleDB metrics	⬜
+4	Experience Library (HERA)	⬜
+10.6 Monetização
+#	Item	Status
+1	15 planos de assinatura	⬜
+2	Stripe integration	⬜
+3	Microsoft Marketplace fulfillment	⬜
+4	Google Marketplace integration	⬜
+5	Salesforce AgentExchange	⬜
+11. PROMPTS PARA DEEPSEEK FLASH
+Prompt 1: Estrutura Base
+
+    "Crie a estrutura completa de diretórios do projeto AION com todos os arquivos __init__.py e a classe BaseAgent. Inclua os arquivos de configuração config.yaml, budgets.yaml, policies.yaml e quality_gates.yaml."
+
+Prompt 2: Agentes AEC
+
+    "Implemente os 12 agentes AEC (#1 a #12) herdando de BaseAgent. Cada agente deve ter execute() implementado com lógica específica. Use DeepSeek-V4-Flash como LLM. Inclua validação de orçamento e logs."
+
+Prompt 3: Orquestrador
+
+    "Implemente o orquestrador LangGraph com Planner, Router, Coordinator, Synthesizer. O orquestrador deve suportar os 71 agentes e ter fallback em caso de falha."
+
+Prompt 4: Segurança
+
+    "Implemente a camada de segurança com AIP Registry, AIP Proxy, ABAC, Trust Agent e Merkle Chain Audit. Baseie-se no padrão AIP (Agent Identity Protocol)."
+
+Prompt 5: Qualidade
+
+    "Implemente a camada de qualidade com Quality Orchestrator, Quality Gates, Quality Critic e integração com Kalibra para detecção de regressão."
+
+Prompt 6: Monetização
+
+    "Implemente a camada de monetização com 15 planos de assinatura, Stripe, Microsoft Marketplace Fulfillment API v2, Google Marketplace e Salesforce AgentExchange."
+
+Documento gerado em 27/06/2026 | Global Match Engenharia de Produção
+Versão 6.0 — Guia de Implementação para DeepSeek Flash
+text

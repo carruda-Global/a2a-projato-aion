@@ -1,0 +1,44 @@
+{
+  "uid": "AIONCompliance_app",
+  "type": "app",
+  "config": {
+    "description": "19 deterministic AI Copilots covering NR-1, LGPD/Whistleblower (EU Directive 2019/1937), EU AI Act, CSRD Double Materiality, SOC 2 and ISO 27001, plus GHG Protocol carbon/Scope 3 inventory, Brazilian tax reform (CBS/IBS) and pay-equity readiness — automated regulatory readiness checks, backed by real regulatory catalogs, directly from your CRM records.",
+    "name": "AION Compliance",
+    "logo": "/app/app-logo.png",
+    "distribution": "marketplace",
+    "auth": {
+      "type": "oauth",
+      "redirectUrls": [
+        "https://engenheiro-producao-ai.onrender.com/hubspot/oauth/callback"
+      ],
+      "requiredScopes": [
+        "oauth",
+        "crm.objects.companies.read",
+        "crm.objects.companies.write",
+        "crm.objects.contacts.read",
+        "crm.objects.contacts.write",
+        "crm.objects.custom.read",
+        "crm.objects.custom.write",
+        "crm.schemas.companies.read",
+        "crm.schemas.contacts.read",
+        "crm.schemas.custom.read"
+      ],
+      "optionalScopes": [],
+      "conditionallyRequiredScopes": []
+    },
+    "permittedUrls": {
+      "fetch": [
+        "https://api.hubapi.com",
+        "https://engenheiro-producao-ai.onrender.com"
+      ],
+      "iframe": [],
+      "img": []
+    },
+    "support": {
+      "supportEmail": "contact@global-engenharia.com",
+      "documentationUrl": "https://global-engenharia.com/ecosystem",
+      "supportUrl": "https://global-engenharia.com/ecosystem",
+      "supportPhone": "+5511994798464"
+    }
+  }
+}

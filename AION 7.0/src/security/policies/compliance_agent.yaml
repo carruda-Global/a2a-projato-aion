@@ -1,0 +1,48 @@
+agent_id: "did:aip:compliance_001"
+agent_name: "Compliance Agent"
+principal: "Cristiano Arruda (CREA-SP 5071200171)"
+
+permissions:
+  sharepoint_read:
+    allowed: true
+    constraints:
+      - max_documents: 100
+      - tenant: "global_match"
+  graph_api:
+    allowed: true
+    constraints:
+      - read_only: true
+      - scopes: ["Files.Read", "Sites.Read.All"]
+  supabase_read:
+    allowed: true
+    constraints:
+      - max_rows: 1000
+  supabase_insert:
+    allowed: false
+  supabase_delete:
+    allowed: false
+  stripe_create_invoice:
+    allowed: false
+  stripe_read:
+    allowed: true
+  deepseek_chat:
+    allowed: true
+    constraints:
+      - max_tokens: 4096
+
+dlp_rules:
+  - pattern: "CPF|\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}"
+    action: "mask"
+  - pattern: "CNPJ|\\d{2}\\.\\d{3}\\.\\d{3}/\\d{4}-\\d{2}"
+    action: "mask"
+  - pattern: "RG|\\d{2}\\.\\d{3}\\.\\d{3}-\\d{1}"
+    action: "mask"
+  - pattern: "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}"
+    action: "mask"
+  - pattern: "\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}"
+    action: "mask"
+
+hitl_actions:
+  relatorio_envio:
+    require_approval: true
+    approver: "Cristiano Arruda"

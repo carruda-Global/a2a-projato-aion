@@ -1,0 +1,84 @@
+.privacy-consent {
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 30px;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.1);
+}
+.privacy-consent h2 {
+    font-size: 24px;
+    color: #0f172a;
+    margin-bottom: 20px;
+    text-align: center;
+}
+.privacy-consent .consent-text {
+    margin-bottom: 20px;
+    color: #334155;
+    line-height: 1.6;
+}
+.privacy-consent .link-button {
+    background: none;
+    border: none;
+    color: #2563eb;
+    text-decoration: underline;
+    cursor: pointer;
+    font-size: inherit;
+    font-weight: 600;
+}
+.privacy-consent .consent-checkbox {
+    margin: 20px 0;
+    padding: 15px;
+    background: #f8fafc;
+    border-radius: 8px;
+    border-left: 4px solid #2563eb;
+}
+.privacy-consent .consent-checkbox label {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    cursor: pointer;
+}
+.privacy-consent .consent-checkbox input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    margin-top: 2px;
+    accent-color: #2563eb;
+}
+.privacy-consent .error-message {
+    background: #fee2e2;
+    color: #dc2626;
+    padding: 12px;
+    border-radius: 8px;
+    margin: 10px 0;
+    font-size: 14px;
+}
+.privacy-consent .btn {
+    width: 100%;
+    padding: 14px;
+    background: #2563eb;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.privacy-consent .btn:hover { background: #1d4ed8; }
+.privacy-consent .btn:disabled { background: #94a3b8; cursor: not-allowed; }
+.privacy-consent .modal {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.5); display: flex; align-items: center;
+    justify-content: center; z-index: 9999;
+}
+.privacy-consent .modal-content {
+    background: #fff; border-radius: 12px; width: 90%;
+    max-width: 800px; max-height: 90vh; position: relative; overflow: hidden;
+}
+.privacy-consent .modal-close {
+    position: absolute; top: 12px; right: 16px; background: none;
+    border: none; font-size: 28px; cursor: pointer; color: #64748b; z-index: 10;
+}
+.privacy-consent .modal-close:hover { color: #0f172a; }
+.privacy-consent .modal-iframe { width: 100%; height: 80vh; border: none; }

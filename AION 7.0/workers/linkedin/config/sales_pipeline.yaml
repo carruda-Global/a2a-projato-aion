@@ -1,0 +1,81 @@
+pipeline:
+  stages:
+    - id: prospect
+      name: "Prospeccao LinkedIn"
+      agent: "prospect"
+      action: "linkedin_search"
+      target: "novos leads"
+      score_min: 0
+
+    - id: connect
+      name: "Conexao LinkedIn"
+      agent: "outreach"
+      action: "linkedin_connect"
+      target: "conexoes aceitas"
+      score_min: 40
+
+    - id: engage
+      name: "Engajamento"
+      agent: "outreach"
+      action: "linkedin_message"
+      target: "respostas"
+      score_min: 40
+
+    - id: lead_to_site
+      name: "Lead para Site"
+      agent: "outreach"
+      action: "send_content"
+      target: "cliques no site"
+      score_min: 40
+
+    - id: capture
+      name: "Captura no Site"
+      agent: "site_webhook"
+      action: "webhook_receive"
+      target: "leads capturados"
+      score_min: 0
+
+    - id: nurture
+      name: "Nutricao Automatica"
+      agent: "email_campaigns"
+      action: "email_drip"
+      target: "engajamento"
+      score_min: 60
+
+    - id: qualify
+      name: "Qualificacao"
+      agent: "lead_qualifier"
+      action: "score_lead"
+      target: "qualificados"
+      score_min: 60
+
+    - id: demo
+      name: "Demonstracao"
+      agent: "sales_agent"
+      action: "schedule_demo"
+      target: "demonstracao agendada"
+      score_min: 80
+
+    - id: close
+      name: "Fechamento"
+      agent: "sales_agent"
+      action: "send_proposal"
+      target: "venda"
+      score_min: 80
+
+    - id: activate
+      name: "Ativacao"
+      agent: "activation"
+      action: "activate_agents"
+      target: "cliente ativo"
+      score_min: 100
+
+metrics:
+  conversion_rates:
+    prospect_to_connect: 0.15
+    connect_to_engage: 0.30
+    engage_to_lead: 0.10
+    lead_to_qualify: 0.25
+    qualify_to_demo: 0.40
+    demo_to_close: 0.35
+    close_to_activate: 0.90

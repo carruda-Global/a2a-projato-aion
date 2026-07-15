@@ -1,0 +1,222 @@
+[
+  {
+    "id": "RF0001",
+    "categoria": "Físico",
+    "perigo": "Ruído contínuo",
+    "fonte": "Compressores, prensas, serras",
+    "consequencias": "PAIR, fadiga",
+    "controles": "Enclausuramento; manutenção; rodízio",
+    "epi": "Protetor auricular",
+    "epc": "Barreira acústica",
+    "documentos": "Inventário; Plano de Ação; PGR"
+  },
+  {
+    "id": "RF0002",
+    "categoria": "Físico",
+    "perigo": "Ruído de impacto",
+    "fonte": "Prensas e marteletes",
+    "consequencias": "PAIR",
+    "controles": "Isolamento da fonte",
+    "epi": "Protetor auricular",
+    "epc": "Barreira acústica",
+    "documentos": "Inventário; PGR"
+  },
+  {
+    "id": "RF0003",
+    "categoria": "Físico",
+    "perigo": "Calor",
+    "fonte": "Fornos",
+    "consequencias": "Estresse térmico",
+    "controles": "Ventilação; isolamento",
+    "epi": "Vestimenta térmica",
+    "epc": "Ventilação",
+    "documentos": "Inventário; PGR"
+  },
+  {
+    "id": "RF0004",
+    "categoria": "Físico",
+    "perigo": "Frio",
+    "fonte": "Câmaras frias",
+    "consequencias": "Hipotermia",
+    "controles": "Limitar exposição",
+    "epi": "Vestimenta térmica",
+    "epc": "Cortina de ar",
+    "documentos": "Inventário; PGR"
+  },
+  {
+    "id": "RF0005",
+    "categoria": "Físico",
+    "perigo": "Vibração mãos e braços",
+    "fonte": "Esmerilhadeiras",
+    "consequencias": "Lesões osteomusculares",
+    "controles": "Ferramentas antivibração",
+    "epi": "Luvas antivibração",
+    "epc": "Base amortecedora",
+    "documentos": "Inventário; PGR"
+  },
+  {
+    "id": "RQ0001",
+    "categoria": "Químico",
+    "perigo": "Poeira de madeira",
+    "fonte": "Marcenaria",
+    "consequencias": "Doenças respiratórias",
+    "controles": "Exaustão localizada",
+    "epi": "PFF2",
+    "epc": "Exaustão",
+    "documentos": "Inventário; PGR"
+  },
+  {
+    "id": "RQ0002",
+    "categoria": "Químico",
+    "perigo": "Sílica",
+    "fonte": "Corte de concreto",
+    "consequencias": "Silicose",
+    "controles": "Umidificação",
+    "epi": "PFF2",
+    "epc": "Exaustão",
+    "documentos": "Inventário; PGR"
+  },
+  {
+    "id": "RQ0003",
+    "categoria": "Químico",
+    "perigo": "Fumos metálicos",
+    "fonte": "Soldagem",
+    "consequencias": "Intoxicação",
+    "controles": "Exaustão localizada",
+    "epi": "PFF2",
+    "epc": "Exaustão",
+    "documentos": "Inventário; APR; PGR"
+  },
+  {
+    "id": "RQ0004",
+    "categoria": "Químico",
+    "perigo": "Vapores de solventes",
+    "fonte": "Pintura",
+    "consequencias": "Intoxicação",
+    "controles": "Ventilação",
+    "epi": "Respirador químico",
+    "epc": "Cabine",
+    "documentos": "Inventário; PGR"
+  },
+  {
+    "id": "RB0001",
+    "categoria": "Biológico",
+    "perigo": "Bactérias",
+    "fonte": "Serviços de saúde",
+    "consequencias": "Infecção",
+    "controles": "Protocolos",
+    "epi": "Luvas",
+    "epc": "Lavador de mãos",
+    "documentos": "Inventário; PGR"
+  },
+  {
+    "id": "RB0002",
+    "categoria": "Biológico",
+    "perigo": "Vírus",
+    "fonte": "Atendimento clínico",
+    "consequencias": "Infecção",
+    "controles": "Isolamento",
+    "epi": "Máscara",
+    "epc": "Barreiras",
+    "documentos": "Inventário; PGR"
+  },
+  {
+    "id": "RE0001",
+    "categoria": "Ergonômico",
+    "perigo": "Movimentos repetitivos",
+    "fonte": "Linha de montagem",
+    "consequencias": "LER/DORT",
+    "controles": "Rodízio",
+    "epi": "-",
+    "epc": "Ajuste posto",
+    "documentos": "Inventário; Plano"
+  },
+  {
+    "id": "RE0002",
+    "categoria": "Ergonômico",
+    "perigo": "Levantamento de cargas",
+    "fonte": "Estoque",
+    "consequencias": "Lombalgia",
+    "controles": "Auxílio mecânico",
+    "epi": "Calçado",
+    "epc": "Paleteira",
+    "documentos": "Inventário; Plano"
+  },
+  {
+    "id": "RE0003",
+    "categoria": "Ergonômico",
+    "perigo": "Postura sentada",
+    "fonte": "Escritório",
+    "consequencias": "Dor lombar",
+    "controles": "Ergonomia",
+    "epi": "-",
+    "epc": "Mobiliário",
+    "documentos": "Inventário"
+  },
+  {
+    "id": "RA0001",
+    "categoria": "Acidente",
+    "perigo": "Queda mesmo nível",
+    "fonte": "Piso molhado",
+    "consequencias": "Fraturas",
+    "controles": "Organização",
+    "epi": "Calçado",
+    "epc": "Sinalização",
+    "documentos": "Inventário; Plano"
+  },
+  {
+    "id": "RA0002",
+    "categoria": "Acidente",
+    "perigo": "Queda de altura",
+    "fonte": "Coberturas",
+    "consequencias": "Óbito",
+    "controles": "Linha de vida",
+    "epi": "Cinturão",
+    "epc": "Guarda-corpo",
+    "documentos": "Inventário; APR; PGR"
+  },
+  {
+    "id": "RA0003",
+    "categoria": "Acidente",
+    "perigo": "Choque elétrico",
+    "fonte": "Painéis",
+    "consequencias": "Queimaduras",
+    "controles": "Bloqueio",
+    "epi": "Luva isolante",
+    "epc": "Barreira",
+    "documentos": "Inventário; APR"
+  },
+  {
+    "id": "RA0004",
+    "categoria": "Acidente",
+    "perigo": "Aprisionamento",
+    "fonte": "Prensas",
+    "consequencias": "Amputação",
+    "controles": "Proteções",
+    "epi": "-",
+    "epc": "Grade",
+    "documentos": "Inventário; Plano"
+  },
+  {
+    "id": "RA0005",
+    "categoria": "Acidente",
+    "perigo": "Incêndio",
+    "fonte": "GLP",
+    "consequencias": "Queimaduras",
+    "controles": "Plano emergência",
+    "epi": "-",
+    "epc": "Extintores",
+    "documentos": "Inventário; Plano"
+  },
+  {
+    "id": "RA0006",
+    "categoria": "Acidente",
+    "perigo": "Atropelamento",
+    "fonte": "Empilhadeiras",
+    "consequencias": "Traumas",
+    "controles": "Rotas",
+    "epi": "Colete",
+    "epc": "Sinalização",
+    "documentos": "Inventário"
+  }
+]

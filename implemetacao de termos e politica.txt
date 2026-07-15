@@ -1,0 +1,867 @@
+markdown
+
+# 📋 AION — Implementação de Política de Privacidade e Termos de Uso
+
+## Guia para DeepSeek Flash
+
+**Projeto:** AION — Agents Intelligence Orchestration Network
+**Proprietário:** Cristiano Arruda | Global Match Engenharia de Produção
+**Versão:** 6.2
+**Data:** 27/06/2026
+**LLM Core:** DeepSeek-V4-Flash
+
+---
+
+## 📋 ÍNDICE
+
+1. [Visão Geral da Implementação](#visão-geral)
+2. [Política de Privacidade (Código)](#política-de-privacidade-código)
+3. [Termos de Uso (Código)](#termos-de-uso-código)
+4. [API de Consentimento](#api-de-consentimento)
+5. [Frontend — Checkbox de Aceite](#frontend--checkbox-de-aceite)
+6. [E-mails Automáticos](#e-mails-automáticos)
+7. [Comandos de Implementação](#comandos-de-implementação)
+8. [Checklist de Validação](#checklist-de-validação)
+
+---
+
+## 1. VISÃO GERAL DA IMPLEMENTAÇÃO
+
+### O que o DeepSeek Flash deve implementar
+
+| Ordem | Componente | Prioridade | Prazo Estimado |
+|:---|:---|:---|:---|
+| 1 | Modelos de dados (Consentimento, Termos) | Alta | 1 dia |
+| 2 | API de Consentimento | Alta | 2 dias |
+| 3 | Middleware de verificação de aceite | Alta | 1 dia |
+| 4 | Frontend — Checkbox de aceite | Alta | 1 dia |
+| 5 | E-mails automáticos (confirmação, atualização) | Média | 1 dia |
+| 6 | Endpoint para download dos documentos | Média | 1 dia |
+
+---
+
+## 2. POLÍTICA DE PRIVACIDADE (CÓDIGO)
+
+### 2.1 Modelo de Dados
+
+```python
+# src/data/models/consent.py
+"""
+Modelos de dados para consentimento e privacidade
+"""
+
+from datetime import datetime
+from typing import Optional, List
+from pydantic import BaseModel, EmailStr, Field
+
+class PrivacyConsent(BaseModel):
+    """
+    Registro de consentimento do usuário
+    """
+    user_id: str
+    email: EmailStr
+    consent_given: bool
+    consent_version: str = "1.0"
+    ip_address: Optional[str] = None
+    user_agent: Optional[str] = None
+    timestamp: datetime = Field(default_factory=datetime.now)
+    
+    # Quais documentos foram aceitos
+    privacy_policy_accepted: bool = True
+    terms_of_service_accepted: bool = True
+    
+    # Histórico de alterações
+    previous_versions: List[dict] = Field(default_factory=list)
+
+class PrivacyRequest(BaseModel):
+    """
+    Requisição para exercer direitos LGPD
+    """
+    user_id: str
+    email: EmailStr
+    request_type: str  # "access", "correction", "deletion", "portability", "revoke_consent"
+    details: Optional[str] = None
+    timestamp: datetime = Field(default_factory=datetime.now)
+
+class PrivacyResponse(BaseModel):
+    """
+    Resposta para solicitação LGPD
+    """
+    request_id: str
+    user_id: str
+    status: str  # "pending", "processing", "completed", "rejected"
+    message: str
+    data: Optional[dict] = None
+    timestamp: datetime = Field(default_factory=datetime.now)
+
+2.2 API de Consentimento
+python
+
+# src/api/routes/privacy.py
+"""
+Rotas da API para Política de Privacidade e Termos de Uso
+"""
+
+from fastapi import APIRouter, HTTPException, Request, Depends
+from fastapi.responses import HTMLResponse, JSONResponse
+from typing import Dict, Any
+import uuid
+from datetime import datetime
+
+from src.data.models.consent import PrivacyConsent, PrivacyRequest, PrivacyResponse
+from src.database.supabase_client import supabase
+
+router = APIRouter(prefix="/api/privacy", tags=["Privacy"])
+
+# ============================================================
+# ENDPOINTS DE CONSENTIMENTO
+# ============================================================
+
+@router.post("/consent")
+async def register_consent(consent: PrivacyConsent):
+    """
+    Registra o consentimento do usuário para Política de Privacidade e Termos de Uso
+    """
+    # Verifica se usuário já existe
+    existing = supabase.table("consents")\
+        .select("*")\
+        .eq("user_id", consent.user_id)\
+        .execute()
+    
+    if existing.data:
+        # Atualiza consentimento existente
+        result = supabase.table("consents")\
+            .update({
+                "consent_given": consent.consent_given,
+                "consent_version": consent.consent_version,
+                "privacy_policy_accepted": consent.privacy_policy_accepted,
+                "terms_of_service_accepted": consent.terms_of_service_accepted,
+                "updated_at": datetime.now().isoformat()
+            })\
+            .eq("user_id", consent.user_id)\
+            .execute()
+    else:
+        # Cria novo consentimento
+        result = supabase.table("consents")\
+            .insert(consent.dict())\
+            .execute()
+    
+    return {
+        "status": "success",
+        "message": "Consentimento registrado com sucesso",
+        "user_id": consent.user_id,
+        "timestamp": datetime.now().isoformat()
+    }
+
+@router.get("/consent/{user_id}")
+async def get_consent(user_id: str):
+    """
+    Verifica se o usuário já consentiu
+    """
+    result = supabase.table("consents")\
+        .select("*")\
+        .eq("user_id", user_id)\
+        .execute()
+    
+    if not result.data:
+        return {
+            "consent_given": False,
+            "message": "Usuário ainda não consentiu"
+        }
+    
+    return {
+        "consent_given": result.data[0]["consent_given"],
+        "consent_version": result.data[0]["consent_version"],
+        "timestamp": result.data[0]["timestamp"]
+    }
+
+@router.post("/consent/revoke")
+async def revoke_consent(request: PrivacyRequest):
+    """
+    Revoga o consentimento do usuário (LGPD)
+    """
+    result = supabase.table("consents")\
+        .update({
+            "consent_given": False,
+            "updated_at": datetime.now().isoformat()
+        })\
+        .eq("user_id", request.user_id)\
+        .execute()
+    
+    # Registra a revogação
+    supabase.table("consent_history")\
+        .insert({
+            "user_id": request.user_id,
+            "action": "revoke",
+            "timestamp": datetime.now().isoformat()
+        })\
+        .execute()
+    
+    return {
+        "status": "success",
+        "message": "Consentimento revogado com sucesso",
+        "user_id": request.user_id
+    }
+
+# ============================================================
+# ENDPOINTS DE DIREITOS LGPD
+# ============================================================
+
+@router.post("/request/access")
+async def request_data_access(request: PrivacyRequest):
+    """
+    Solicita acesso aos dados pessoais (LGPD - Art. 18)
+    """
+    request_id = str(uuid.uuid4())
+    
+    # Busca dados do usuário
+    user_data = supabase.table("users")\
+        .select("*")\
+        .eq("email", request.email)\
+        .execute()
+    
+    # Busca histórico de consentimentos
+    consent_history = supabase.table("consents")\
+        .select("*")\
+        .eq("email", request.email)\
+        .execute()
+    
+    # Busca histórico de uso
+    usage_history = supabase.table("usage_logs")\
+        .select("*")\
+        .eq("user_id", request.user_id)\
+        .limit(100)\
+        .execute()
+    
+    # Registra solicitação
+    supabase.table("privacy_requests")\
+        .insert({
+            "request_id": request_id,
+            "user_id": request.user_id,
+            "email": request.email,
+            "request_type": request.request_type,
+            "status": "pending",
+            "timestamp": datetime.now().isoformat()
+        })\
+        .execute()
+    
+    return PrivacyResponse(
+        request_id=request_id,
+        user_id=request.user_id,
+        status="pending",
+        message="Solicitação de acesso recebida. Processamento em até 15 dias."
+    )
+
+@router.post("/request/deletion")
+async def request_data_deletion(request: PrivacyRequest):
+    """
+    Solicita exclusão de dados pessoais (LGPD - Art. 18)
+    """
+    request_id = str(uuid.uuid4())
+    
+    # Valida se o usuário pode excluir
+    # Alguns dados não podem ser excluídos por obrigação legal
+    can_delete = await _check_deletion_eligibility(request.user_id)
+    
+    if not can_delete:
+        return PrivacyResponse(
+            request_id=request_id,
+            user_id=request.user_id,
+            status="rejected",
+            message="Não é possível excluir todos os dados devido a obrigações legais (retenção fiscal, compliance)"
+        )
+    
+    # Registra solicitação
+    supabase.table("privacy_requests")\
+        .insert({
+            "request_id": request_id,
+            "user_id": request.user_id,
+            "email": request.email,
+            "request_type": request.request_type,
+            "status": "pending",
+            "timestamp": datetime.now().isoformat()
+        })\
+        .execute()
+    
+    return PrivacyResponse(
+        request_id=request_id,
+        user_id=request.user_id,
+        status="pending",
+        message="Solicitação de exclusão recebida. Processamento em até 15 dias."
+    )
+
+async def _check_deletion_eligibility(user_id: str) -> bool:
+    """
+    Verifica se o usuário pode solicitar exclusão total
+    """
+    # Verifica se há dados que precisam ser retidos por lei
+    # Ex: dados fiscais, históricos de contratos
+    return True  # Implementar validação
+
+# ============================================================
+# ENDPOINTS DE DOCUMENTOS
+# ============================================================
+
+@router.get("/policy", response_class=HTMLResponse)
+async def get_privacy_policy():
+    """
+    Retorna a Política de Privacidade em HTML
+    """
+    html_content = """
+    <!DOCTYPE html>
+    <html>
+    <head><title>Política de Privacidade — AION</title></head>
+    <body>
+    <h1>Política de Privacidade da AION</h1>
+    <p><strong>Última atualização:</strong> 27 de junho de 2026</p>
+    
+    <h2>1. Quem Somos</h2>
+    <p>A AION é uma plataforma de orquestração de agentes de IA desenvolvida pela Global Match Engenharia de Produção.</p>
+    
+    <h2>2. Dados que Coletamos</h2>
+    <ul>
+        <li><strong>Dados de Registro:</strong> Nome, e-mail, empresa</li>
+        <li><strong>Dados de Uso:</strong> Histórico de consultas e interações</li>
+        <li><strong>Dados de Entrada:</strong> Conteúdo fornecido aos agentes</li>
+        <li><strong>Dados de Comunicação:</strong> Registros de suporte</li>
+    </ul>
+    
+    <h2>3. Como Usamos Seus Dados</h2>
+    <ul>
+        <li>Operar, manter e aprimorar a plataforma</li>
+        <li>Processar e responder suas consultas</li>
+        <li>Garantir a segurança da plataforma</li>
+        <li>Cumprir com obrigações legais</li>
+    </ul>
+    
+    <h2>4. Seus Direitos (LGPD)</h2>
+    <ul>
+        <li>Confirmação da existência de tratamento</li>
+        <li>Acesso, correção e portabilidade dos dados</li>
+        <li>Revogação de consentimento</li>
+        <li>Eliminação de dados (com ressalvas legais)</li>
+    </ul>
+    
+    <h2>5. Contato do DPO</h2>
+    <p>E-mail: dpo@aion.global</p>
+    <p>Telefone: (11) 99479-8464</p>
+    </body>
+    </html>
+    """
+    return HTMLResponse(content=html_content)
+
+@router.get("/terms", response_class=HTMLResponse)
+async def get_terms_of_service():
+    """
+    Retorna os Termos de Uso em HTML
+    """
+    html_content = """
+    <!DOCTYPE html>
+    <html>
+    <head><title>Termos de Uso — AION</title></head>
+    <body>
+    <h1>Termos de Uso da AION</h1>
+    <p><strong>Última atualização:</strong> 27 de junho de 2026</p>
+    
+    <h2>1. Aceitação dos Termos</h2>
+    <p>Ao acessar ou usar a plataforma AION, você concorda com estes Termos de Uso.</p>
+    
+    <h2>2. Uso Aceitável</h2>
+    <p>É proibido:</p>
+    <ul>
+        <li>Usar a plataforma para fins ilegais ou maliciosos</li>
+        <li>Gerar conteúdo difamatório ou ofensivo</li>
+        <li>Tentar obter acesso não autorizado</li>
+        <li>Usar a plataforma para desenvolver produtos concorrentes</li>
+    </ul>
+    
+    <h2>3. Propriedade Intelectual</h2>
+    <ul>
+        <li><strong>Nossa Propriedade:</strong> Plataforma, código, agentes e interfaces</li>
+        <li><strong>Seu Conteúdo:</strong> Você mantém a propriedade dos dados fornecidos</li>
+    </ul>
+    
+    <h2>4. Limitação de Responsabilidade</h2>
+    <p>A AION fornece seus serviços "no estado em que se encontram". Não garantimos que o serviço será ininterrupto ou livre de erros.</p>
+    
+    <h2>5. Legislação</h2>
+    <p>Estes Termos são regidos pela legislação brasileira. Foro: São Paulo - SP.</p>
+    </body>
+    </html>
+    """
+    return HTMLResponse(content=html_content)
+
+2.3 Middleware de Verificação
+python
+
+# src/api/middleware/privacy.py
+"""
+Middleware para verificar consentimento do usuário
+"""
+
+from fastapi import Request, HTTPException
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.responses import JSONResponse
+import os
+
+from src.database.supabase_client import supabase
+
+# Rotas que não exigem consentimento
+PUBLIC_ROUTES = [
+    "/api/privacy/policy",
+    "/api/privacy/terms",
+    "/api/health",
+    "/api/auth/login",
+    "/api/auth/register"
+]
+
+class PrivacyConsentMiddleware(BaseHTTPMiddleware):
+    """
+    Middleware que verifica se o usuário consentiu com a Política de Privacidade
+    """
+    
+    async def dispatch(self, request: Request, call_next):
+        path = request.url.path
+        
+        # Rotas públicas não exigem consentimento
+        if any(path.startswith(route) for route in PUBLIC_ROUTES):
+            return await call_next(request)
+        
+        # Verifica token de autenticação
+        auth_header = request.headers.get("Authorization")
+        if not auth_header:
+            return JSONResponse(
+                status_code=401,
+                content={"error": "Authentication required"}
+            )
+        
+        # Extrai user_id do token
+        # (implementar validação do token)
+        user_id = await self._extract_user_id(auth_header)
+        
+        if not user_id:
+            return JSONResponse(
+                status_code=401,
+                content={"error": "Invalid token"}
+            )
+        
+        # Verifica consentimento
+        has_consent = await self._check_consent(user_id)
+        
+        if not has_consent:
+            return JSONResponse(
+                status_code=403,
+                content={
+                    "error": "Privacy consent required",
+                    "message": "Você precisa aceitar a Política de Privacidade e Termos de Uso",
+                    "policy_url": "/api/privacy/policy",
+                    "terms_url": "/api/privacy/terms"
+                }
+            )
+        
+        response = await call_next(request)
+        return response
+    
+    async def _extract_user_id(self, token: str) -> str:
+        """
+        Extrai user_id do token JWT
+        """
+        # Implementar validação JWT
+        return "user_123"
+    
+    async def _check_consent(self, user_id: str) -> bool:
+        """
+        Verifica se o usuário consentiu
+        """
+        result = supabase.table("consents")\
+            .select("consent_given")\
+            .eq("user_id", user_id)\
+            .execute()
+        
+        if not result.data:
+            return False
+        
+        return result.data[0].get("consent_given", False)
+
+3. FRONTEND — CHECKBOX DE ACEITE
+3.1 Componente React
+jsx
+
+// frontend/src/components/PrivacyConsent.jsx
+/**
+ * Componente de consentimento de privacidade
+ */
+
+import React, { useState } from 'react';
+import axios from 'axios';
+
+const PrivacyConsent = ({ user, onConsentGiven }) => {
+    const [accepted, setAccepted] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+    const [showPolicy, setShowPolicy] = useState(false);
+    const [showTerms, setShowTerms] = useState(false);
+    
+    const handleConsent = async () => {
+        if (!accepted) {
+            setError('Você precisa aceitar os termos para continuar');
+            return;
+        }
+        
+        setLoading(true);
+        setError(null);
+        
+        try {
+            const response = await axios.post('/api/privacy/consent', {
+                user_id: user.id,
+                email: user.email,
+                consent_given: true,
+                consent_version: '1.0',
+                privacy_policy_accepted: true,
+                terms_of_service_accepted: true,
+                ip_address: user.ip,
+                user_agent: navigator.userAgent
+            });
+            
+            onConsentGiven(true);
+            setLoading(false);
+        } catch (err) {
+            setError(err.response?.data?.message || 'Erro ao registrar consentimento');
+            setLoading(false);
+        }
+    };
+    
+    return (
+        <div className="privacy-consent">
+            <h2>Política de Privacidade e Termos de Uso</h2>
+            
+            <div className="consent-text">
+                <p>
+                    Para continuar usando a plataforma AION, você precisa aceitar nossa{' '}
+                    <button 
+                        className="link-button"
+                        onClick={() => setShowPolicy(true)}
+                    >
+                        Política de Privacidade
+                    </button>
+                    {' '}e{' '}
+                    <button 
+                        className="link-button"
+                        onClick={() => setShowTerms(true)}
+                    >
+                        Termos de Uso
+                    </button>
+                    .
+                </p>
+            </div>
+            
+            <div className="consent-checkbox">
+                <label>
+                    <input
+                        type="checkbox"
+                        checked={accepted}
+                        onChange={(e) => setAccepted(e.target.checked)}
+                    />
+                    Li e concordo com a Política de Privacidade e os Termos de Uso
+                </label>
+            </div>
+            
+            {error && (
+                <div className="error-message">
+                    {error}
+                </div>
+            )}
+            
+            <button 
+                className="btn btn-primary"
+                onClick={handleConsent}
+                disabled={loading}
+            >
+                {loading ? 'Processando...' : 'Continuar'}
+            </button>
+            
+            {/* Modal da Política de Privacidade */}
+            {showPolicy && (
+                <div className="modal" onClick={() => setShowPolicy(false)}>
+                    <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                        <button className="modal-close" onClick={() => setShowPolicy(false)}>×</button>
+                        <iframe 
+                            src="/api/privacy/policy"
+                            className="modal-iframe"
+                            title="Política de Privacidade"
+                        />
+                    </div>
+                </div>
+            )}
+            
+            {/* Modal dos Termos de Uso */}
+            {showTerms && (
+                <div className="modal" onClick={() => setShowTerms(false)}>
+                    <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                        <button className="modal-close" onClick={() => setShowTerms(false)}>×</button>
+                        <iframe 
+                            src="/api/privacy/terms"
+                            className="modal-iframe"
+                            title="Termos de Uso"
+                        />
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+};
+
+export default PrivacyConsent;
+
+3.2 CSS do Componente
+css
+
+/* frontend/src/styles/privacy.css */
+
+.privacy-consent {
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 30px;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.1);
+}
+
+.privacy-consent h2 {
+    font-size: 24px;
+    color: #0f172a;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.privacy-consent .consent-text {
+    margin-bottom: 20px;
+    color: #334155;
+    line-height: 1.6;
+}
+
+.privacy-consent .link-button {
+    background: none;
+    border: none;
+    color: #2563eb;
+    text-decoration: underline;
+    cursor: pointer;
+    font-size: inherit;
+    font-weight: 600;
+}
+
+.privacy-consent .link-button:hover {
+    color: #1d4ed8;
+}
+
+.privacy-consent .consent-checkbox {
+    margin: 20px 0;
+    padding: 15px;
+    background: #f8fafc;
+    border-radius: 8px;
+    border-left: 4px solid #2563eb;
+}
+
+.privacy-consent .consent-checkbox label {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    cursor: pointer;
+}
+
+.privacy-consent .consent-checkbox input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    margin-top: 2px;
+    accent-color: #2563eb;
+}
+
+.privacy-consent .error-message {
+    background: #fee2e2;
+    color: #dc2626;
+    padding: 12px;
+    border-radius: 8px;
+    margin: 10px 0;
+    font-size: 14px;
+}
+
+.privacy-consent .btn {
+    width: 100%;
+    padding: 14px;
+    background: #2563eb;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.privacy-consent .btn:hover {
+    background: #1d4ed8;
+}
+
+.privacy-consent .btn:disabled {
+    background: #94a3b8;
+    cursor: not-allowed;
+}
+
+/* Modal */
+.privacy-consent .modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.privacy-consent .modal-content {
+    background: #fff;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 800px;
+    max-height: 90vh;
+    position: relative;
+    overflow: hidden;
+}
+
+.privacy-consent .modal-close {
+    position: absolute;
+    top: 12px;
+    right: 16px;
+    background: none;
+    border: none;
+    font-size: 28px;
+    cursor: pointer;
+    color: #64748b;
+    z-index: 10;
+}
+
+.privacy-consent .modal-close:hover {
+    color: #0f172a;
+}
+
+.privacy-consent .modal-iframe {
+    width: 100%;
+    height: 80vh;
+    border: none;
+}
+
+4. E-MAILS AUTOMÁTICOS
+python
+
+# src/email/privacy.py
+"""
+E-mails automáticos para privacidade e consentimento
+"""
+
+import os
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail
+
+class PrivacyEmailService:
+    """
+    Serviço de e-mails para notificações de privacidade
+    """
+    
+    def __init__(self):
+        self.sendgrid_client = SendGridAPIClient(os.getenv("SENDGRID_API_KEY"))
+        self.from_email = os.getenv("EMAIL_FROM", "privacy@aion.global")
+    
+    def send_consent_confirmation(self, email: str, user_name: str):
+        """
+        Envia confirmação de consentimento
+        """
+        subject = "Confirmação de Consentimento — AION"
+        html_content = f"""
+        <h1>Confirmação de Consentimento</h1>
+        <p>Olá {user_name},</p>
+        <p>Registramos seu consentimento para a Política de Privacidade e Termos de Uso da AION.</p>
+        <p><strong>Data:</strong> {datetime.now().strftime('%d/%m/%Y %H:%M')}</p>
+        <p><strong>Versão:</strong> 1.0</p>
+        <p>Você pode revogar seu consentimento a qualquer momento acessando suas configurações.</p>
+        <p>Atenciosamente,<br>Equipe AION</p>
+        """
+        
+        message = Mail(
+            from_email=self.from_email,
+            to_emails=email,
+            subject=subject,
+            html_content=html_content
+        )
+        
+        try:
+            self.sendgrid_client.send(message)
+            return True
+        except Exception as e:
+            print(f"Erro ao enviar e-mail: {e}")
+            return False
+    
+    def send_consent_revoked(self, email: str, user_name: str):
+        """
+        Envia notificação de revogação de consentimento
+        """
+        subject = "Consentimento Revogado — AION"
+        html_content = f"""
+        <h1>Consentimento Revogado</h1>
+        <p>Olá {user_name},</p>
+        <p>Recebemos sua solicitação de revogação de consentimento.</p>
+        <p>Seus dados serão excluídos ou anonimizados conforme a LGPD.</p>
+        <p><strong>Data da revogação:</strong> {datetime.now().strftime('%d/%m/%Y %H:%M')}</p>
+        <p>Se você tiver dúvidas, entre em contato com nosso DPO: dpo@aion.global</p>
+        <p>Atenciosamente,<br>Equipe AION</p>
+        """
+        
+        message = Mail(
+            from_email=self.from_email,
+            to_emails=email,
+            subject=subject,
+            html_content=html_content
+        )
+        
+        try:
+            self.sendgrid_client.send(message)
+            return True
+        except Exception as e:
+            print(f"Erro ao enviar e-mail: {e}")
+            return False
+
+5. COMANDOS DE IMPLEMENTAÇÃO
+bash
+
+# 1. Criar tabelas no Supabase
+python scripts/create_privacy_tables.py
+
+# 2. Configurar variáveis de ambiente
+export SENDGRID_API_KEY="sua_chave"
+export EMAIL_FROM="privacy@aion.global"
+
+# 3. Testar API de consentimento
+curl -X POST http://localhost:8000/api/privacy/consent \
+  -H "Content-Type: application/json" \
+  -d '{"user_id":"123","email":"teste@email.com","consent_given":true}'
+
+# 4. Verificar consentimento
+curl http://localhost:8000/api/privacy/consent/123
+
+# 5. Testar middleware
+curl -X GET http://localhost:8000/api/agents \
+  -H "Authorization: Bearer token_valido"
+
+6. CHECKLIST DE VALIDAÇÃO
+#	Item	Status
+1	Modelos de dados criados	⬜
+2	API de consentimento implementada	⬜
+3	Middleware de verificação implementado	⬜
+4	Endpoints de documentos (HTML) implementados	⬜
+5	Componente React de consentimento criado	⬜
+6	E-mails automáticos configurados	⬜
+7	Tabelas no Supabase criadas	⬜
+8	Testes de API realizados	⬜
+9	Documentação atualizada

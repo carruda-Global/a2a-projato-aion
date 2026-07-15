@@ -1,0 +1,1240 @@
+markdown
+
+# 🔒 AION — Implementação de Segurança e Cybersecurity
+
+## Guia para DeepSeek Flash
+
+**Projeto:** AION — Agents Intelligence Orchestration Network
+**Proprietário:** Cristiano Arruda | Global Match Engenharia de Produção
+**Versão:** 6.1
+**Data:** 27/06/2026
+**LLM Core:** DeepSeek-V4-Flash
+
+---
+
+## 📋 ÍNDICE
+
+1. [Visão Geral da Segurança](#visão-geral)
+2. [Camada de Identidade (AIP)](#camada-de-identidade-aip)
+3. [Camada de Autorização (Abacus + ABAC)](#camada-de-autorização-abacus--abac)
+4. [Camada de Supervisão (Trust Agent + Sentinel)](#camada-de-supervisão-trust-agent--sentinel)
+5. [Camada de Auditoria (Merkle Chain)](#camada-de-auditoria-merkle-chain)
+6. [Camada de Proteção de Dados (DLP)](#camada-de-proteção-de-dados-dlp)
+7. [Camada de Detecção de Ameaças](#camada-de-detecção-de-ameaças)
+8. [Comandos de Implementação](#comandos-de-implementação)
+9. [Checklist de Validação](#checklist-de-validação)
+
+---
+
+## 1. VISÃO GERAL DA SEGURANÇA
+
+### Arquitetura de Segurança em 7 Camadas
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ SEGURANÇA AION — 7 CAMADAS │
+│ │
+│ ┌─────────────────────────────────────────────────────────────────────┐ │
+│ │ CAMADA 1: IDENTIDADE (AIP) │ │
+│ │ - Agent ID + par de chaves Ed25519 │ │
+│ │ - Registro no AIP Registry │ │
+│ │ - Agent Card com assinatura criptográfica │ │
+│ └─────────────────────────────────────────────────────────────────────┘ │
+│ │ │
+│ ┌─────────────────────────────────────────────────────────────────────┐ │
+│ │ CAMADA 2: AUTORIZAÇÃO (Abacus + ABAC) │ │
+│ │ - Políticas TOML por agente │ │
+│ │ - Avaliação no momento da requisição │ │
+│ │ - Efeitos: allow / ask (HITL) / deny │ │
+│ └─────────────────────────────────────────────────────────────────────┘ │
+│ │ │
+│ ┌─────────────────────────────────────────────────────────────────────┐ │
+│ │ CAMADA 3: SUPERVISÃO (Trust Agent + Sentinel) │ │
+│ │ - Arquitetura bifurcada (externa/interna) │ │
+│ │ - Detecção de ataques multietapa │ │
+│ │ - Belief state sobre intenções adversárias │ │
+│ └─────────────────────────────────────────────────────────────────────┘ │
+│ │ │
+│ ┌─────────────────────────────────────────────────────────────────────┐ │
+│ │ CAMADA 4: AUDITORIA (Merkle Chain) │ │
+│ │ - Actor Chain: quem delegou para quem │ │
+│ │ - Intent Chain: o que cada agente produziu │ │
+│ │ - Inference Chain: como foi computado │ │
+│ └─────────────────────────────────────────────────────────────────────┘ │
+│ │ │
+│ ┌─────────────────────────────────────────────────────────────────────┐ │
+│ │ CAMADA 5: PROTEÇÃO DE DADOS (DLP) │ │
+│ │ - Sanitização de entrada (injeção de prompt) │ │
+│ │ - Filtragem de saída (PII, dados sensíveis) │ │
+│ └─────────────────────────────────────────────────────────────────────┘ │
+│ │ │
+│ ┌─────────────────────────────────────────────────────────────────────┐ │
+│ │ CAMADA 6: DETECÇÃO DE AMEAÇAS │ │
+│ │ - Análise de comportamento anômalo │ │
+│ │ - Alertas em tempo real │ │
+│ └─────────────────────────────────────────────────────────────────────┘ │
+│ │ │
+│ ┌─────────────────────────────────────────────────────────────────────┐ │
+│ │ CAMADA 7: RESPOSTA A INCIDENTES │ │
+│ │ - Kill switch para agentes comprometidos │ │
+│ │ - Revogação de credenciais │ │
+│ └─────────────────────────────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────────────────────────────────┘
+text
+
+
+---
+
+## 2. CAMADA DE IDENTIDADE (AIP)
+
+### 2.1 AIP Registry
+
+```python
+# src/security/aip_registry.py
+"""
+Agent Identity Protocol (AIP) Registry
+Baseado no padrão IETF para identidade de agentes
+"""
+
+import json
+import hashlib
+from typing import Dict, Any, Optional
+from datetime import datetime
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.asymmetric import ed25519
+from cryptography.hazmat.primitives.serialization import Encoding, PublicFormat
+
+class AIPRegistry:
+    """
+    Registro de identidade de agentes com chaves Ed25519
+    """
+    
+    def __init__(self):
+        self.agents: Dict[str, Dict[str, Any]] = {}
+        self.revoked: set = set()
+    
+    def register_agent(
+        self,
+        agent_id: str,
+        agent_name: str,
+        principal: str,
+        public_key: bytes
+    ) -> Dict[str, Any]:
+        """
+        Registra um novo agente no AIP Registry
+        """
+        # Gera DID (Decentralized Identifier)
+        did = f"did:aip:{agent_id}"
+        
+        # Hash da chave pública para identificação
+        key_hash = hashlib.sha256(public_key).hexdigest()[:16]
+        
+        record = {
+            "agent_id": agent_id,
+            "agent_name": agent_name,
+            "principal": principal,
+            "did": did,
+            "public_key_hash": key_hash,
+            "public_key": public_key.hex(),
+            "status": "active",
+            "created_at": datetime.now().isoformat(),
+            "last_active": datetime.now().isoformat()
+        }
+        
+        self.agents[agent_id] = record
+        return record
+    
+    def verify_agent(self, agent_id: str, signature: bytes, message: bytes) -> bool:
+        """
+        Verifica assinatura de um agente
+        """
+        if agent_id in self.revoked:
+            return False
+        
+        agent = self.agents.get(agent_id)
+        if not agent:
+            return False
+        
+        try:
+            public_key = ed25519.Ed25519PublicKey.from_public_bytes(
+                bytes.fromhex(agent["public_key"])
+            )
+            public_key.verify(signature, message)
+            self.agents[agent_id]["last_active"] = datetime.now().isoformat()
+            return True
+        except Exception:
+            return False
+    
+    def revoke_agent(self, agent_id: str) -> bool:
+        """
+        Revoga um agente comprometido (kill switch)
+        """
+        if agent_id in self.agents:
+            self.revoked.add(agent_id)
+            self.agents[agent_id]["status"] = "revoked"
+            self.agents[agent_id]["revoked_at"] = datetime.now().isoformat()
+            return True
+        return False
+    
+    def get_agent_info(self, agent_id: str) -> Optional[Dict[str, Any]]:
+        """
+        Retorna informações de um agente
+        """
+        return self.agents.get(agent_id)
+    
+    def get_active_agents(self) -> list:
+        """
+        Retorna lista de agentes ativos
+        """
+        return [
+            agent for agent_id, agent in self.agents.items()
+            if agent_id not in self.revoked and agent["status"] == "active"
+        ]
+
+2.2 AIP Client (para agentes)
+python
+
+# src/security/aip_client.py
+"""
+AIP Client para agentes — assinatura de ações
+"""
+
+import json
+import hashlib
+from typing import Dict, Any, Optional
+from datetime import datetime
+from cryptography.hazmat.primitives.asymmetric import ed25519
+
+class AIPClient:
+    """
+    Cliente AIP para agentes assinarem suas ações
+    """
+    
+    def __init__(self, agent_id: str, private_key: ed25519.Ed25519PrivateKey):
+        self.agent_id = agent_id
+        self.private_key = private_key
+        self.public_key = private_key.public_key()
+    
+    @classmethod
+    def generate_keypair(cls) -> ed25519.Ed25519PrivateKey:
+        """
+        Gera par de chaves Ed25519
+        """
+        return ed25519.Ed25519PrivateKey.generate()
+    
+    def sign_action(self, action: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Assina uma ação com a chave privada do agente
+        """
+        # Cria mensagem canônica
+        canonical = json.dumps(action, sort_keys=True, separators=(',', ':'))
+        message = canonical.encode('utf-8')
+        
+        # Assina
+        signature = self.private_key.sign(message)
+        
+        return {
+            "action": action,
+            "signature": signature.hex(),
+            "agent_id": self.agent_id,
+            "timestamp": datetime.now().isoformat()
+        }
+    
+    def sign_challenge(self, challenge: bytes) -> bytes:
+        """
+        Assina um desafio para verificação de identidade
+        """
+        return self.private_key.sign(challenge)
+
+3. CAMADA DE AUTORIZAÇÃO (Abacus + ABAC)
+3.1 Abacus Policy Engine
+python
+
+# src/security/abacus_engine.py
+"""
+Abacus Core — Motor de Políticas para Agentes
+"""
+
+import tomllib
+from typing import Dict, Any, Optional, List
+from enum import Enum
+
+class Decision(Enum):
+    ALLOW = "allow"
+    ASK = "ask"      # Requer aprovação humana (HITL)
+    DENY = "deny"
+
+class AbacusEngine:
+    """
+    Motor de políticas baseado em Abacus Core
+    Políticas definidas em arquivos TOML
+    """
+    
+    def __init__(self, policy_path: str = "config/policies.toml"):
+        self.policy_path = policy_path
+        self.policies = self._load_policies()
+    
+    def _load_policies(self) -> Dict[str, Any]:
+        """
+        Carrega políticas de arquivo TOML
+        """
+        try:
+            with open(self.policy_path, "rb") as f:
+                return tomllib.load(f)
+        except FileNotFoundError:
+            return self._default_policies()
+    
+    def _default_policies(self) -> Dict[str, Any]:
+        """
+        Políticas padrão para todos os agentes
+        """
+        return {
+            "default": {
+                "tool_access": {
+                    "read": {"effect": "allow"},
+                    "write": {"effect": "ask"},
+                    "delete": {"effect": "deny"},
+                    "execute": {"effect": "ask"}
+                },
+                "data_access": {
+                    "public": {"effect": "allow"},
+                    "internal": {"effect": "allow"},
+                    "confidential": {"effect": "ask"},
+                    "restricted": {"effect": "deny"}
+                }
+            },
+            "agent_specific": {}
+        }
+    
+    def evaluate(
+        self,
+        agent_id: str,
+        action_type: str,
+        resource: str,
+        context: Dict[str, Any]
+    ) -> Decision:
+        """
+        Avalia uma ação contra as políticas
+        """
+        # 1. Verifica políticas específicas do agente
+        agent_policy = self.policies.get("agent_specific", {}).get(agent_id)
+        if agent_policy:
+            decision = self._check_policy(agent_policy, action_type, resource, context)
+            if decision != Decision.ALLOW:
+                return decision
+        
+        # 2. Verifica política padrão
+        default_policy = self.policies.get("default", {})
+        decision = self._check_policy(default_policy, action_type, resource, context)
+        return decision
+    
+    def _check_policy(
+        self,
+        policy: Dict[str, Any],
+        action_type: str,
+        resource: str,
+        context: Dict[str, Any]
+    ) -> Decision:
+        """
+        Verifica uma política específica
+        """
+        # Mapeia ação para categoria
+        category = self._map_action_to_category(action_type, resource)
+        
+        # Busca permissão na política
+        permissions = policy.get(category, {})
+        
+        for pattern, rule in permissions.items():
+            if self._matches_pattern(resource, pattern):
+                effect = rule.get("effect", "deny")
+                
+                # Verifica condições adicionais
+                conditions = rule.get("conditions", {})
+                if self._check_conditions(context, conditions):
+                    return Decision(effect)
+        
+        return Decision.DENY
+    
+    def _map_action_to_category(self, action_type: str, resource: str) -> str:
+        """
+        Mapeia ação para categoria de política
+        """
+        if "read" in action_type or "get" in action_type:
+            return "data_access"
+        elif "write" in action_type or "update" in action_type or "create" in action_type:
+            return "tool_access"
+        elif "delete" in action_type:
+            return "tool_access"
+        elif "execute" in action_type:
+            return "tool_access"
+        return "data_access"
+    
+    def _matches_pattern(self, resource: str, pattern: str) -> bool:
+        """
+        Verifica se recurso corresponde ao padrão
+        """
+        if pattern == "*":
+            return True
+        if pattern in resource:
+            return True
+        return False
+    
+    def _check_conditions(self, context: Dict[str, Any], conditions: Dict[str, Any]) -> bool:
+        """
+        Verifica condições adicionais para a regra
+        """
+        for key, value in conditions.items():
+            if key not in context:
+                return False
+            if context[key] != value:
+                return False
+        return True
+
+3.2 Políticas TOML (config/policies.toml)
+toml
+
+# config/policies.toml
+# Políticas de autorização para agentes AION
+
+[default]
+  [default.data_access]
+    "public" = { effect = "allow" }
+    "internal" = { effect = "allow" }
+    "confidential" = { effect = "ask" }
+    "restricted" = { effect = "deny" }
+
+  [default.tool_access]
+    "read" = { effect = "allow" }
+    "write" = { effect = "ask" }
+    "delete" = { effect = "deny" }
+    "execute" = { effect = "ask" }
+
+[agent_specific]
+  [agent_specific."#49"]
+    # Master Orchestrator tem permissão especial
+    [agent_specific."#49".tool_access]
+      "*" = { effect = "allow" }
+      "delete" = { effect = "ask" }
+      "system.*" = { effect = "ask" }
+
+  [agent_specific."#53"]
+    # Quality Critic tem permissão de leitura e escrita
+    [agent_specific."#53".data_access]
+      "*" = { effect = "allow" }
+      "restricted" = { effect = "ask" }
+
+  [agent_specific."#12"]
+    # Compliance Agent tem permissão restrita
+    [agent_specific."#12".data_access]
+      "pgrs.*" = { effect = "allow" }
+      "lgpd.*" = { effect = "allow" }
+      "*" = { effect = "deny" }
+
+  [agent_specific."#57"]
+    # Software Engineering Agent
+    [agent_specific."#57".tool_access]
+      "github.*" = { effect = "allow" }
+      "docker.*" = { effect = "ask" }
+      "delete.*" = { effect = "deny" }
+
+4. CAMADA DE SUPERVISÃO (Trust Agent + Sentinel)
+4.1 Stateful Trust Agent
+python
+
+# src/security/trust_agent.py
+"""
+Stateful Trust Agent — Detecção de ataques multietapa
+Baseado no MMA-RAG (Modular Trust Agent)
+"""
+
+import json
+from typing import Dict, Any, List, Optional
+from datetime import datetime
+from collections import deque
+
+class TrustAgent:
+    """
+    Agente de confiança com estado de crença (belief state)
+    Detecta ataques multietapa que parecem benignos isoladamente
+    """
+    
+    def __init__(self, window_size: int = 10):
+        self.belief_state: Dict[str, Dict[str, Any]] = {}
+        self.suspicious_history: Dict[str, deque] = {}
+        self.window_size = window_size
+    
+    def intercept(self, artifact: Dict[str, Any], stage: str) -> Dict[str, Any]:
+        """
+        Intercepta e inspeciona artefato em múltiplos pontos
+        """
+        agent_id = artifact.get("agent_id", "unknown")
+        
+        # 1. Atualiza estado de crença
+        self._update_belief(agent_id, artifact, stage)
+        
+        # 2. Detecta ataques multietapa
+        if self._detect_attack(agent_id, artifact, stage):
+            return self._block_request(artifact)
+        
+        # 3. Registra para auditoria
+        self._audit(agent_id, artifact, stage)
+        
+        return artifact
+    
+    def _update_belief(self, agent_id: str, artifact: Dict[str, Any], stage: str):
+        """
+        Atualiza estado de crença sobre intenções adversárias
+        """
+        if agent_id not in self.belief_state:
+            self.belief_state[agent_id] = {
+                "stage_history": [],
+                "pattern_score": 0,
+                "last_updated": datetime.now().isoformat()
+            }
+        
+        self.belief_state[agent_id]["stage_history"].append({
+            "stage": stage,
+            "artifact": artifact,
+            "timestamp": datetime.now().isoformat()
+        })
+        
+        # Mantém apenas últimas N ações
+        if len(self.belief_state[agent_id]["stage_history"]) > 100:
+            self.belief_state[agent_id]["stage_history"] = \
+                self.belief_state[agent_id]["stage_history"][-100:]
+        
+        # Atualiza score de padrão suspeito
+        self.belief_state[agent_id]["pattern_score"] = self._calculate_pattern_score(
+            agent_id, artifact
+        )
+    
+    def _detect_attack(self, agent_id: str, artifact: Dict[str, Any], stage: str) -> bool:
+        """
+        Detecta ataques multietapa
+        """
+        if agent_id not in self.belief_state:
+            return False
+        
+        # Verifica padrões de ataque conhecidos
+        patterns = [
+            self._detect_prompt_injection(artifact),
+            self._detect_tool_misuse(artifact),
+            self._detect_data_exfiltration(artifact),
+            self._detect_privilege_escalation(artifact)
+        ]
+        
+        # Se mais de 2 padrões detectados, considera ataque
+        if sum(patterns) >= 2:
+            self._record_suspicious(agent_id, artifact, "multi_stage_attack")
+            return True
+        
+        # Verifica score de padrão suspeito
+        if self.belief_state[agent_id]["pattern_score"] > 0.7:
+            self._record_suspicious(agent_id, artifact, "high_pattern_score")
+            return True
+        
+        return False
+    
+    def _detect_prompt_injection(self, artifact: Dict[str, Any]) -> bool:
+        """
+        Detecta tentativa de injeção de prompt
+        """
+        # Palavras-chave comuns em ataques de injeção
+        injection_patterns = [
+            "ignore previous instructions",
+            "new instructions",
+            "system prompt",
+            "override",
+            "you are now",
+            "forget all previous",
+            "change your role"
+        ]
+        
+        content = json.dumps(artifact).lower()
+        
+        for pattern in injection_patterns:
+            if pattern in content:
+                return True
+        return False
+    
+    def _detect_tool_misuse(self, artifact: Dict[str, Any]) -> bool:
+        """
+        Detecta uso indevido de ferramentas
+        """
+        tool_calls = artifact.get("tool_calls", [])
+        if len(tool_calls) > 100:
+            return True
+        
+        # Verifica ferramentas proibidas
+        forbidden_tools = ["delete", "drop", "truncate", "rm -rf", "format"]
+        for call in tool_calls:
+            tool_name = call.get("name", "").lower()
+            for forbidden in forbidden_tools:
+                if forbidden in tool_name:
+                    return True
+        return False
+    
+    def _detect_data_exfiltration(self, artifact: Dict[str, Any]) -> bool:
+        """
+        Detecta tentativa de exfiltração de dados
+        """
+        # Verifica padrões de saída suspeita
+        output = artifact.get("output", "")
+        suspicious_domains = ["evil.com", "malicious.net", "hacker.org"]
+        
+        for domain in suspicious_domains:
+            if domain in output:
+                return True
+        
+        return False
+    
+    def _detect_privilege_escalation(self, artifact: Dict[str, Any]) -> bool:
+        """
+        Detecta tentativa de escalação de privilégio
+        """
+        requested_permissions = artifact.get("requested_permissions", [])
+        dangerous_permissions = ["admin", "root", "sudo", "system", "delete_all"]
+        
+        for perm in requested_permissions:
+            for dangerous in dangerous_permissions:
+                if dangerous in perm.lower():
+                    return True
+        return False
+    
+    def _calculate_pattern_score(self, agent_id: str, artifact: Dict[str, Any]) -> float:
+        """
+        Calcula score de padrão suspeito
+        """
+        # Implementação baseada em histórico e padrões
+        return 0.0
+    
+    def _record_suspicious(self, agent_id: str, artifact: Dict[str, Any], reason: str):
+        """
+        Registra atividade suspeita
+        """
+        if agent_id not in self.suspicious_history:
+            self.suspicious_history[agent_id] = deque(maxlen=self.window_size)
+        
+        self.suspicious_history[agent_id].append({
+            "reason": reason,
+            "artifact": artifact,
+            "timestamp": datetime.now().isoformat()
+        })
+    
+    def _block_request(self, artifact: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Bloqueia requisição suspeita
+        """
+        return {
+            "status": "blocked",
+            "reason": "suspicious_activity_detected",
+            "timestamp": datetime.now().isoformat()
+        }
+    
+    def _audit(self, agent_id: str, artifact: Dict[str, Any], stage: str):
+        """
+        Registra ação para auditoria
+        """
+        # Implementação de logging
+        pass
+    
+    def get_suspicious_agents(self) -> List[Dict[str, Any]]:
+        """
+        Retorna lista de agentes com atividades suspeitas
+        """
+        suspicious = []
+        for agent_id, history in self.suspicious_history.items():
+            if len(history) > 0:
+                suspicious.append({
+                    "agent_id": agent_id,
+                    "suspicious_count": len(history),
+                    "last_suspicious": history[-1]["timestamp"]
+                })
+        return suspicious
+
+4.2 Sentinel — Agente de Supervisão
+python
+
+# src/agents/intelligence/quality_critic.py (atualizado)
+"""
+Quality Critic Agent (#53) com funcionalidades de Sentinel
+Supervisão de todos os agentes
+"""
+
+from src.agents.base import BaseAgent
+from src.security.trust_agent import TrustAgent
+from src.security.abacus_engine import AbacusEngine
+
+class QualityCriticAgent(BaseAgent):
+    """
+    Agente #53: Quality Critic + Sentinel
+    Supervisão, auditoria e detecção de ameaças
+    """
+    
+    def __init__(self):
+        super().__init__(
+            agent_id="#53",
+            name="Quality Critic / Sentinel",
+            description="Supervisão de qualidade e segurança dos agentes",
+            group="intelligence",
+            price_brl=1497,
+            price_usd=299,
+            tools=["audit_log", "trust_agent", "abacus_engine"],
+            llm="deepseek-v4-flash",
+            budget=150000
+        )
+        self.trust_agent = TrustAgent()
+        self.abacus = AbacusEngine()
+        self.audit_log = []
+    
+    async def execute(self, context: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Executa supervisão e detecção de ameaças
+        """
+        target_agent = context.get("target_agent")
+        action = context.get("action", {})
+        output = context.get("output", {})
+        
+        # 1. Intercepta ação (Trust Agent)
+        intercepted = self.trust_agent.intercept(action, "input")
+        if intercepted.get("status") == "blocked":
+            return {
+                "status": "blocked",
+                "reason": intercepted.get("reason"),
+                "suspicious_agent": target_agent
+            }
+        
+        # 2. Avalia política (Abacus)
+        decision = self.abacus.evaluate(
+            agent_id=target_agent,
+            action_type=action.get("type", "unknown"),
+            resource=action.get("resource", ""),
+            context={"agent_id": target_agent}
+        )
+        
+        if decision.value == "deny":
+            return {
+                "status": "denied",
+                "reason": "policy_violation",
+                "decision": decision.value
+            }
+        
+        if decision.value == "ask":
+            # Requer aprovação humana (HITL)
+            return {
+                "status": "pending",
+                "reason": "human_approval_required",
+                "decision": decision.value,
+                "action": action
+            }
+        
+        # 3. Registra em auditoria
+        self._audit(target_agent, action, output, decision.value)
+        
+        # 4. Verifica qualidade do output
+        quality_result = await self._check_quality(output)
+        
+        return {
+            "status": "approved",
+            "decision": "allow",
+            "quality": quality_result,
+            "audit_id": len(self.audit_log) - 1
+        }
+    
+    def _audit(self, agent_id: str, action: Dict[str, Any], output: Dict[str, Any], decision: str):
+        """
+        Registra ação para auditoria
+        """
+        self.audit_log.append({
+            "agent_id": agent_id,
+            "action": action,
+            "output": output,
+            "decision": decision,
+            "timestamp": datetime.now().isoformat()
+        })
+    
+    async def _check_quality(self, output: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Verifica qualidade do output
+        """
+        # Implementação de qualidade
+        return {"score": 1.0, "issues": []}
+    
+    def get_audit_log(self, limit: int = 100) -> List[Dict[str, Any]]:
+        """
+        Retorna logs de auditoria
+        """
+        return self.audit_log[-limit:]
+
+5. CAMADA DE AUDITORIA (Merkle Chain)
+python
+
+# src/security/audit.py
+"""
+Auditoria com Merkle Chain — Trilha imutável e verificável
+"""
+
+import json
+import hashlib
+from typing import Dict, Any, List, Optional
+from datetime import datetime
+from cryptography.hazmat.primitives.asymmetric import ed25519
+
+class AuditChain:
+    """
+    Merkle Chain para auditoria imutável de ações
+    """
+    
+    def __init__(self):
+        self.chain: List[Dict[str, Any]] = []
+        self.merkle_root = None
+    
+    def append(self, entry: Dict[str, Any]) -> str:
+        """
+        Adiciona entrada à cadeia de auditoria
+        """
+        # Calcula hash da entrada
+        entry_hash = hashlib.sha256(
+            json.dumps(entry, sort_keys=True).encode()
+        ).hexdigest()
+        
+        # Encadeia com entrada anterior
+        previous_hash = self.chain[-1]["hash"] if self.chain else "0000000000000000"
+        
+        # Cria bloco
+        block = {
+            "index": len(self.chain),
+            "timestamp": datetime.now().isoformat(),
+            "entry": entry,
+            "hash": entry_hash,
+            "previous_hash": previous_hash
+        }
+        
+        self.chain.append(block)
+        self._update_merkle_root()
+        return entry_hash
+    
+    def _update_merkle_root(self):
+        """
+        Atualiza Merkle Root
+        """
+        if not self.chain:
+            self.merkle_root = None
+            return
+        
+        # Calcula Merkle Root recursivamente
+        hashes = [block["hash"] for block in self.chain]
+        while len(hashes) > 1:
+            if len(hashes) % 2 != 0:
+                hashes.append(hashes[-1])
+            hashes = [
+                hashlib.sha256((h1 + h2).encode()).hexdigest()
+                for h1, h2 in zip(hashes[::2], hashes[1::2])
+            ]
+        
+        self.merkle_root = hashes[0]
+    
+    def verify(self) -> bool:
+        """
+        Verifica integridade da cadeia
+        """
+        if not self.chain:
+            return True
+        
+        # Verifica encadeamento
+        for i in range(1, len(self.chain)):
+            expected_hash = hashlib.sha256(
+                json.dumps(self.chain[i]["entry"], sort_keys=True).encode()
+            ).hexdigest()
+            
+            if self.chain[i]["hash"] != expected_hash:
+                return False
+            
+            if self.chain[i]["previous_hash"] != self.chain[i-1]["hash"]:
+                return False
+        
+        # Verifica Merkle Root
+        old_root = self.merkle_root
+        self._update_merkle_root()
+        return old_root == self.merkle_root
+    
+    def get_proof(self, index: int) -> Dict[str, Any]:
+        """
+        Gera prova de inclusão para uma entrada
+        """
+        if index >= len(self.chain):
+            return None
+        
+        block = self.chain[index]
+        return {
+            "entry": block["entry"],
+            "hash": block["hash"],
+            "previous_hash": block["previous_hash"],
+            "merkle_root": self.merkle_root,
+            "index": index,
+            "total_entries": len(self.chain)
+        }
+
+6. CAMADA DE PROTEÇÃO DE DADOS (DLP)
+python
+
+# src/security/dlp.py
+"""
+Data Loss Prevention (DLP) — Sanitização e filtragem de dados
+"""
+
+import re
+from typing import Dict, Any, List, Tuple
+
+class DLPEngine:
+    """
+    Motor de prevenção de perda de dados para agentes
+    """
+    
+    def __init__(self):
+        self.patterns = self._load_patterns()
+    
+    def _load_patterns(self) -> Dict[str, List[Tuple[str, str]]]:
+        """
+        Carrega padrões de dados sensíveis
+        """
+        return {
+            "pii": [
+                (r'\b\d{3}\.\d{3}\.\d{3}-\d{2}\b', 'CPF'),  # CPF
+                (r'\b\d{2}\.\d{3}\.\d{3}/\d{4}-\d{2}\b', 'CNPJ'),  # CNPJ
+                (r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b', 'EMAIL'),
+                (r'\b\d{5}-\d{3}\b', 'CEP'),
+                (r'\b\(\d{2}\) \d{4,5}-\d{4}\b', 'PHONE'),
+                (r'\b\d{11}\b', 'CPF_RAW')
+            ],
+            "financial": [
+                (r'\b\d{4}[- ]?\d{4}[- ]?\d{4}[- ]?\d{4}\b', 'CREDIT_CARD'),
+                (r'\b\d{1,3}(?:\.\d{3})*,\d{2}\b', 'MONETARY')
+            ],
+            "health": [
+                (r'\b[A-Z]{2}\d{1,4}\b', 'MEDICAL_CODE')
+            ]
+        }
+    
+    def sanitize_input(self, text: str) -> Tuple[str, List[Dict[str, str]]]:
+        """
+        Sanitiza entrada removendo PII
+        """
+        detected = []
+        sanitized = text
+        
+        for category, patterns in self.patterns.items():
+            for pattern, label in patterns:
+                matches = re.finditer(pattern, text)
+                for match in matches:
+                    detected.append({
+                        "type": label,
+                        "category": category,
+                        "value": match.group(),
+                        "position": match.span()
+                    })
+                    sanitized = sanitized.replace(match.group(), f"[REDACTED_{label}]")
+        
+        return sanitized, detected
+    
+    def filter_output(self, output: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Filtra saída para remover dados sensíveis
+        """
+        filtered = {}
+        
+        for key, value in output.items():
+            if isinstance(value, str):
+                filtered[key], _ = self.sanitize_input(value)
+            elif isinstance(value, dict):
+                filtered[key] = self.filter_output(value)
+            elif isinstance(value, list):
+                filtered[key] = [
+                    self.filter_output(item) if isinstance(item, dict)
+                    else item for item in value
+                ]
+            else:
+                filtered[key] = value
+        
+        return filtered
+    
+    def validate_headers(self, context: Dict[str, Any]) -> bool:
+        """
+        Valida headers de requisição
+        """
+        # Verifica headers básicos de segurança
+        required_headers = ["Authorization", "X-Agent-ID", "X-Request-ID"]
+        for header in required_headers:
+            if header not in context.get("headers", {}):
+                return False
+        return True
+    
+    def validate_rate_limit(self, agent_id: str) -> bool:
+        """
+        Valida rate limit por agente
+        """
+        # Implementação de rate limit
+        return True
+
+7. CAMADA DE DETECÇÃO DE AMEAÇAS
+python
+
+# src/security/threat_detection.py
+"""
+Detecção de ameaças e comportamento anômalo
+"""
+
+from typing import Dict, Any, List, Optional
+from collections import defaultdict
+from datetime import datetime, timedelta
+
+class ThreatDetector:
+    """
+    Detector de ameaças e anomalias em tempo real
+    """
+    
+    def __init__(self):
+        self.agent_activity: Dict[str, List[Dict[str, Any]]] = defaultdict(list)
+        self.anomaly_threshold = 5  # Número de desvios para considerar ataque
+    
+    def track_activity(self, agent_id: str, activity: Dict[str, Any]):
+        """
+        Rastreia atividade de um agente
+        """
+        self.agent_activity[agent_id].append({
+            "timestamp": datetime.now().isoformat(),
+            "activity": activity
+        })
+        
+        # Mantém apenas últimas 24 horas
+        cutoff = datetime.now() - timedelta(hours=24)
+        self.agent_activity[agent_id] = [
+            a for a in self.agent_activity[agent_id]
+            if datetime.fromisoformat(a["timestamp"]) > cutoff
+        ]
+    
+    def detect_anomalies(self) -> List[Dict[str, Any]]:
+        """
+        Detecta anomalias no comportamento dos agentes
+        """
+        anomalies = []
+        
+        for agent_id, activities in self.agent_activity.items():
+            # Verifica volume de atividade
+            if len(activities) > 100:  # Muitas ações em 24h
+                anomalies.append({
+                    "agent_id": agent_id,
+                    "type": "high_activity_volume",
+                    "count": len(activities),
+                    "severity": "high"
+                })
+            
+            # Verifica padrões temporais
+            timestamps = [
+                datetime.fromisoformat(a["timestamp"])
+                for a in activities
+            ]
+            
+            # Verifica picos de atividade
+            if len(timestamps) > 1:
+                intervals = [
+                    (timestamps[i+1] - timestamps[i]).total_seconds()
+                    for i in range(len(timestamps)-1)
+                ]
+                avg_interval = sum(intervals) / len(intervals) if intervals else 0
+                
+                # Muito rápido (possível ataque DDoS)
+                if avg_interval < 0.5:
+                    anomalies.append({
+                        "agent_id": agent_id,
+                        "type": "high_frequency_activity",
+                        "avg_interval": avg_interval,
+                        "severity": "medium"
+                    })
+        
+        return anomalies
+    
+    def get_agent_risk_score(self, agent_id: str) -> Dict[str, Any]:
+        """
+        Calcula score de risco de um agente
+        """
+        if agent_id not in self.agent_activity:
+            return {"score": 0, "level": "low"}
+        
+        activities = self.agent_activity[agent_id]
+        score = 0
+        
+        # Fatores de risco
+        if len(activities) > 50:
+            score += 20
+        if len(activities) > 100:
+            score += 30
+        
+        # Verifica padrões suspeitos
+        suspicious_actions = [
+            a for a in activities
+            if "delete" in str(a["activity"]).lower()
+            or "drop" in str(a["activity"]).lower()
+            or "rm" in str(a["activity"]).lower()
+        ]
+        
+        if suspicious_actions:
+            score += len(suspicious_actions) * 5
+        
+        # Classifica risco
+        if score < 20:
+            level = "low"
+        elif score < 50:
+            level = "medium"
+        elif score < 80:
+            level = "high"
+        else:
+            level = "critical"
+        
+        return {
+            "score": min(score, 100),
+            "level": level,
+            "activities_count": len(activities),
+            "suspicious_count": len(suspicious_actions)
+        }
+
+8. COMANDOS DE IMPLEMENTAÇÃO
+8.1 Instalação de Dependências
+bash
+
+# Criar ambiente virtual
+python -m venv venv
+source venv/bin/activate
+
+# Instalar dependências de segurança
+pip install cryptography
+pip install aip-identity
+pip install pydantic
+pip install python-jose  # JWT
+pip install passlib      # Hashing
+pip install python-dotenv
+
+# Instalar dependências adicionais
+pip install requests
+pip install fastapi
+pip install uvicorn
+
+8.2 Inicializar Segurança
+bash
+
+# Gerar chaves para agentes
+python scripts/generate_agent_keys.py
+
+# Inicializar AIP Registry
+python scripts/init_aip_registry.py
+
+# Carregar políticas padrão
+python scripts/load_policies.py
+
+# Iniciar serviço de auditoria
+python scripts/start_audit_service.py
+
+8.3 Scripts de Implementação
+python
+
+# scripts/generate_agent_keys.py
+"""
+Gera par de chaves para todos os agentes
+"""
+
+import os
+import json
+from cryptography.hazmat.primitives.asymmetric import ed25519
+from cryptography.hazmat.primitives.serialization import Encoding, PublicFormat
+
+def generate_keys_for_agents():
+    agents = [
+        "#1", "#2", "#3", "#4", "#5", "#6", "#7", "#8", "#9",
+        "#10", "#11", "#12", "#13", "#14", "#15", "#16", "#17",
+        "#18", "#19", "#20", "#21", "#22", "#23", "#24", "#25",
+        "#26", "#27", "#N1", "#N2", "#N3", "#31", "#32", "#33",
+        "#34", "#35", "#36", "#37", "#38", "#39", "#40", "#41",
+        "#42", "#43", "#44", "#45", "#46", "#47", "#48", "#49",
+        "#50", "#51", "#52", "#53", "#54", "#55", "#56", "#57",
+        "#58", "#59",
+        "M1", "M2", "M3", "M4", "M5", "M6", "M7", "M8", "M9",
+        "M10", "M11", "M12", "M13", "M14", "M15"
+    ]
+    
+    keys_dir = "credentials/agents"
+    os.makedirs(keys_dir, exist_ok=True)
+    
+    for agent_id in agents:
+        # Gera par de chaves
+        private_key = ed25519.Ed25519PrivateKey.generate()
+        public_key = private_key.public_key()
+        
+        # Salva chave privada (em produção, usar KMS)
+        with open(f"{keys_dir}/{agent_id}.key", "wb") as f:
+            f.write(private_key.private_bytes(
+                encoding=Encoding.Raw,
+                format=PrivateFormat.Raw
+            ))
+        
+        # Salva chave pública
+        with open(f"{keys_dir}/{agent_id}.pub", "wb") as f:
+            f.write(public_key.public_bytes(
+                encoding=Encoding.Raw,
+                format=PublicFormat.Raw
+            ))
+        
+        print(f"✅ Chaves geradas para agente {agent_id}")
+
+if __name__ == "__main__":
+    generate_keys_for_agents()
+
+9. CHECKLIST DE VALIDAÇÃO
+9.1 Identidade (AIP)
+#	Item	Status
+1	AIP Registry implementado	⬜
+2	Chaves Ed25519 geradas para todos os 71 agentes	⬜
+3	Registro de todos os agentes no Registry	⬜
+4	Verificação de assinatura funcionando	⬜
+5	Revogação de agentes testada	⬜
+9.2 Autorização (Abacus + ABAC)
+#	Item	Status
+1	Abacus Engine implementado	⬜
+2	Políticas TOML definidas	⬜
+3	Avaliação de políticas funcionando	⬜
+4	HITL (ask) implementado	⬜
+5	Deny efetivo	⬜
+9.3 Supervisão (Trust Agent)
+#	Item	Status
+1	Trust Agent implementado	⬜
+2	Belief state funcionando	⬜
+3	Detecção de prompt injection	⬜
+4	Detecção de tool misuse	⬜
+5	Detecção de data exfiltration	⬜
+9.4 Auditoria (Merkle Chain)
+#	Item	Status
+1	Audit Chain implementado	⬜
+2	Merkle Root calculado	⬜
+3	Verificação de integridade	⬜
+4	Prova de inclusão gerada	⬜
+9.5 DLP
+#	Item	Status
+1	DLP Engine implementado	⬜
+2	Sanitização de entrada (PII)	⬜
+3	Filtragem de saída	⬜
+4	Validação de headers	⬜
+9.6 Detecção de Ameaças
+#	Item	Status
+1	Threat Detector implementado	⬜
+2	Análise de comportamento anômalo	⬜
+3	Alertas em tempo real	⬜
+4	Score de risco por agente	⬜
+5	Kill switch funcional	⬜
+10. RESUMO DA SEGURANÇA IMPLEMENTADA
+Camada	Ferramenta	Função
+Identidade	AIP Registry	Registro e verificação de agentes
+Autenticação	Ed25519	Assinatura de ações
+Autorização	Abacus + ABAC	Políticas granulares por agente
+Supervisão	Trust Agent	Detecção de ataques multietapa
+Auditoria	Merkle Chain	Trilha imutável verificável
+DLP	Sanitização + Filtragem	Proteção de dados sensíveis
+Detecção	Threat Detector	Anomalias e alertas
+Resposta	Kill Switch	Revogação de agentes

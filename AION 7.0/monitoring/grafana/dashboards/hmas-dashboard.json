@@ -1,0 +1,42 @@
+{
+  "title": "H-MAS - 27 Agentes",
+  "uid": "hmas-main",
+  "version": 1,
+  "panels": [
+    {
+      "title": "Status dos Agentes",
+      "type": "stat",
+      "datasource": "Prometheus",
+      "targets": [{"expr": "count(hmas_response_time) by (cluster)"}],
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0}
+    },
+    {
+      "title": "Taxa de Sucesso Média",
+      "type": "gauge",
+      "datasource": "Prometheus",
+      "targets": [{"expr": "avg(hmas_success_rate)"}],
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0}
+    },
+    {
+      "title": "Tempo de Resposta (última hora)",
+      "type": "timeseries",
+      "datasource": "Prometheus",
+      "targets": [{"expr": "hmas_response_time"}],
+      "gridPos": {"h": 8, "w": 24, "x": 0, "y": 8}
+    },
+    {
+      "title": "Custo por Cluster",
+      "type": "barchart",
+      "datasource": "Prometheus",
+      "targets": [{"expr": "sum(hmas_cost) by (cluster)"}],
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 16}
+    },
+    {
+      "title": "Evolução por Geração",
+      "type": "stat",
+      "datasource": "Prometheus",
+      "targets": [{"expr": "max(hmas_evolution_generation)"}],
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 16}
+    }
+  ]
+}

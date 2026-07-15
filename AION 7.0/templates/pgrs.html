@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PGRS - EcoSystem AEC | Projato Engenharia</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: #f8fafc;
+            color: #0f172a;
+            line-height: 1.6;
+        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #fff;
+            padding: 60px 0 80px;
+        }
+        header h1 { font-size: 3rem; font-weight: 800; letter-spacing: -0.03em; }
+        header h1 span { color: #10b981; }
+        header p { font-size: 1.2rem; color: #94a3b8; margin-top: 12px; max-width: 600px; }
+        .badge {
+            display: inline-block; background: #10b981; color: #fff;
+            font-size: 0.75rem; font-weight: 600; padding: 4px 14px;
+            border-radius: 40px; letter-spacing: 0.3px; margin-bottom: 16px;
+        }
+
+        /* Steps */
+        .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin: -40px 0 60px; }
+        .step {
+            background: #fff; border-radius: 14px; padding: 24px; text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06); border: 1px solid #e5e7eb;
+        }
+        .step .num {
+            width: 40px; height: 40px; background: #10b981; color: #fff;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-weight: 700; margin: 0 auto 12px;
+        }
+        .step h3 { font-size: 1rem; font-weight: 600; }
+        .step p { font-size: 0.85rem; color: #64748b; margin-top: 4px; }
+
+        /* Form Section */
+        .form-section {
+            background: #fff; border-radius: 20px; padding: 48px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.04); border: 1px solid #e5e7eb;
+            margin-bottom: 60px;
+        }
+        .form-section h2 { font-size: 1.8rem; font-weight: 700; margin-bottom: 8px; }
+        .form-section > p { color: #64748b; margin-bottom: 32px; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .form-group { margin-bottom: 20px; }
+        .form-group.full { grid-column: 1 / -1; }
+        .form-group label { display: block; font-weight: 600; font-size: 0.9rem; margin-bottom: 6px; color: #1e293b; }
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%; padding: 12px 16px; border: 1.5px solid #d1d5db;
+            border-radius: 10px; font-size: 0.95rem; font-family: inherit;
+            transition: border-color 0.2s; background: #fff;
+        }
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+            outline: none; border-color: #10b981; box-shadow: 0 0 0 3px rgba(16,185,129,0.1);
+        }
+        .form-group textarea { min-height: 120px; resize: vertical; }
+        .btn-primary {
+            background: #10b981; color: #fff; border: none; padding: 14px 32px;
+            border-radius: 10px; font-size: 1rem; font-weight: 600; cursor: pointer;
+            transition: background 0.2s, transform 0.1s; font-family: inherit;
+        }
+        .btn-primary:hover { background: #059669; transform: translateY(-1px); }
+        .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+        .btn-whatsapp {
+            background: #25d366; color: #fff; border: none; padding: 14px 32px;
+            border-radius: 10px; font-size: 1rem; font-weight: 600; cursor: pointer;
+            text-decoration: none; display: inline-flex; align-items: center; gap: 8px;
+            transition: background 0.2s; font-family: inherit;
+        }
+        .btn-whatsapp:hover { background: #1da851; }
+        .actions { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; margin-top: 24px; }
+
+        /* Result */
+        #result { display: none; margin-top: 32px; padding: 24px; border-radius: 12px; }
+        #result.success { background: #f0fdf4; border: 1px solid #86efac; display: block; }
+        #result.error { background: #fef2f2; border: 1px solid #fca5a5; display: block; }
+        #result h3 { margin-bottom: 8px; }
+        #result pre { white-space: pre-wrap; font-size: 0.85rem; margin-top: 8px; }
+
+        /* Features */
+        .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; margin-bottom: 60px; }
+        .feature {
+            background: #fff; border-radius: 14px; padding: 28px; border: 1px solid #e5e7eb;
+        }
+        .feature .icon { font-size: 2rem; margin-bottom: 12px; }
+        .feature h3 { font-size: 1.1rem; font-weight: 600; margin-bottom: 6px; }
+        .feature p { font-size: 0.9rem; color: #64748b; }
+
+        /* Footer */
+        footer {
+            background: #0f172a; color: #94a3b8; text-align: center;
+            padding: 32px 0; font-size: 0.9rem;
+        }
+        footer strong { color: #fff; }
+
+        @media (max-width: 768px) {
+            header h1 { font-size: 2rem; }
+            .form-grid { grid-template-columns: 1fr; }
+            .form-section { padding: 24px; }
+            .steps { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="container">
+        <div class="badge">CREA-SP | EcoSystem AEC</div>
+        <h1>PGRS <span>Inteligente</span></h1>
+        <p>Programa de Gerenciamento de Resíduos Sólidos gerado por IA. Documento completo + ART em até 48h.</p>
+    </div>
+</header>
+
+<div class="container">
+    <div class="steps">
+        <div class="step">
+            <div class="num">1</div>
+            <h3>Solicite Orçamento</h3>
+            <p>Formulário rápido ou WhatsApp</p>
+        </div>
+        <div class="step">
+            <div class="num">2</div>
+            <h3>IA Analisa</h3>
+            <p>Documentos + classificação de resíduos</p>
+        </div>
+        <div class="step">
+            <div class="num">3</div>
+            <h3>Validamos</h3>
+            <p>Engenheiro revisa + emite ART CREA-SP</p>
+        </div>
+        <div class="step">
+            <div class="num">4</div>
+            <h3>Documento Final</h3>
+            <p>PGRS/PGRSS em PDF + renovação anual</p>
+        </div>
+    </div>
+
+    <div class="form-section">
+        <h2>Solicitar Orçamento</h2>
+        <p>Preencha os dados da sua empresa e receba uma proposta em até 24h.</p>
+        <form id="pgrsForm">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Nome da Empresa</label>
+                    <input type="text" name="empresa" placeholder="Ex: Construtora ABC Ltda" required>
+                </div>
+                <div class="form-group">
+                    <label>CNPJ</label>
+                    <input type="text" name="cnpj" placeholder="00.000.000/0001-00">
+                </div>
+                <div class="form-group">
+                    <label>Responsável Técnico</label>
+                    <input type="text" name="responsavel" placeholder="Nome do engenheiro responsável">
+                </div>
+                <div class="form-group">
+                    <label>CREA</label>
+                    <input type="text" name="crea" placeholder="CREA-SP 000.000.000-0">
+                </div>
+                <div class="form-group full">
+                    <label>Tipos de Resíduos Gerados</label>
+                    <textarea name="residuos" placeholder="Descreva os principais resíduos gerados pela empresa (ex: entulho, madeira, metal, papel, resíduos perigosos, etc.)" required></textarea>
+                </div>
+                <div class="form-group full">
+                    <label>Estimativa de Geração (kg/mês)</label>
+                    <input type="text" name="estimativa" placeholder="Ex: 5.000 kg/mês">
+                </div>
+                <div class="form-group full">
+                    <label>Informações Adicionais</label>
+                    <textarea name="observacoes" placeholder="Tipo de obra/atividade, endereço, normas específicas a atender..."></textarea>
+                </div>
+            </div>
+            <div class="actions">
+                <button type="submit" class="btn-primary" id="btnSubmit">Solicitar Orçamento Grátis</button>
+                <a href="https://wa.me/5511999999999?text=Ol%C3%A1%2C%20quero%20um%20or%C3%A7amento%20de%20PGRS" target="_blank" class="btn-whatsapp">
+                    &#x1F4AC; Fale pelo WhatsApp
+                </a>
+            </div>
+        </form>
+        <div id="result"></div>
+    </div>
+
+    <h2 style="font-size:1.6rem; font-weight:700; margin-bottom:24px;">Por que usar IA para PGRS?</h2>
+    <div class="features">
+        <div class="feature">
+            <div class="icon">&#x1F3ED;</div>
+            <h3>Redução de 80% no tempo</h3>
+            <p>O que levaria dias, nossos agentes de IA fazem em minutos. Você só revisa e aprova.</p>
+        </div>
+        <div class="feature">
+            <div class="icon">&#x2696;&#xFE0F;</div>
+            <h3>Conformidade Garantida</h3>
+            <p>Baseado em NBR-10004, Resoluções CONAMA e legislação municipal vigente.</p>
+        </div>
+        <div class="feature">
+            <div class="icon">&#x1F4CB;</div>
+            <h3>ART CREA-SP Inclusa</h3>
+            <p>Documento revisado por engenheiro, com emissão de Anotação de Responsabilidade Técnica.</p>
+        </div>
+        <div class="feature">
+            <div class="icon">&#x1F504;</div>
+            <h3>Renovação Automática</h3>
+            <p>Monitoramento anual com alertas de vencimento e atualização do documento.</p>
+        </div>
+        <div class="feature">
+            <div class="icon">&#x1F4E6;</div>
+            <h3>Entrega em PDF</h3>
+            <p>Documento final formatado, pronto para apresentação a órgãos ambientais.</p>
+        </div>
+        <div class="feature">
+            <div class="icon">&#x1F30D;</div>
+            <h3>Atende Todo o Brasil</h3>
+            <p>Adaptável a legislações estaduais e municipais de cada região.</p>
+        </div>
+    </div>
+</div>
+
+<footer>
+    <div class="container">
+        <strong>EcoSystem AEC</strong> — Projato Engenharia<br>
+        CREA-SP: 000.000.000-0 | <a href="mailto:contato@projato.com.br" style="color:#10b981;">contato@projato.com.br</a>
+    </div>
+</footer>
+
+<script>
+document.getElementById('pgrsForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = document.getElementById('btnSubmit');
+    const resultDiv = document.getElementById('result');
+    btn.disabled = true;
+    btn.textContent = 'Enviando...';
+
+    const formData = new FormData(e.target);
+    const data = Object.fromEntries(formData.entries());
+
+    try {
+        const res = await fetch('/api/v1/pgrs/orcamento', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data),
+        });
+        const json = await res.json();
+        if (res.ok) {
+            resultDiv.className = 'success';
+            resultDiv.innerHTML = '<h3>&#x2705; Orçamento solicitado com sucesso!</h3>' +
+                '<p>Receberá uma proposta em até 24h no WhatsApp/email cadastrado.</p>' +
+                '<pre>' + JSON.stringify(json, null, 2) + '</pre>';
+        } else {
+            resultDiv.className = 'error';
+            resultDiv.innerHTML = '<h3>&#x274C; Erro ao solicitar orçamento</h3><pre>' + JSON.stringify(json, null, 2) + '</pre>';
+        }
+    } catch (err) {
+        resultDiv.className = 'error';
+        resultDiv.innerHTML = '<h3>&#x274C; Erro de conexão</h3><p>' + err.message + '</p>';
+    } finally {
+        btn.disabled = false;
+        btn.textContent = 'Solicitar Orçamento Grátis';
+    }
+});
+</script>
+
+</body>
+</html>

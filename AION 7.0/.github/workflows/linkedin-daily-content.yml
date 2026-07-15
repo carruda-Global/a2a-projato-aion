@@ -1,0 +1,19 @@
+name: LinkedIn daily content job
+
+on:
+  schedule:
+    # 12:00 UTC = 09:00 America/Sao_Paulo — one text post per day (carousel
+    # removed 2026-07-12: 0 engagement across every carousel published in
+    # the 2026-07-06/12 analytics window)
+    - cron: "0 12 * * *"
+  workflow_dispatch: {}
+
+jobs:
+  run-daily-job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger daily LinkedIn text post
+        run: |
+          curl -sS -X POST "https://engenheiro-producao-ai.onrender.com/api/linkedin-content/run-daily-job" \
+            -H "X-Admin-Secret: ${{ secrets.MARKETPLACE_ADMIN_SECRET }}" \
+            --fail-with-body

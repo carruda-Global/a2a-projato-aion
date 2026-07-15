@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label>EcoSystem Event</label>
+    <pluralLabel>EcoSystem Events</pluralLabel>
+    <nameField>
+        <label>EcoSystem Event ID</label>
+        <type>AutoNumber</type>
+    </nameField>
+    <fields>
+        <fullName>Agent_ID__c</fullName>
+        <label>Agent ID</label>
+        <type>Text</type>
+        <length>100</length>
+        <required>true</required>
+    </fields>
+    <fields>
+        <fullName>Action__c</fullName>
+        <label>Action</label>
+        <type>Text</type>
+        <length>100</length>
+    </fields>
+    <fields>
+        <fullName>Payload__c</fullName>
+        <label>Payload</label>
+        <type>LongTextArea</type>
+        <length>131072</length>
+    </fields>
+    <fields>
+        <fullName>Status__c</fullName>
+        <label>Status</label>
+        <type>Text</type>
+        <length>50</length>
+    </fields>
+    <eventType>HighVolume</eventType>
+    <isEvent>true</isEvent>
+    <sharingModel>ControlledByParent</sharingModel>
+</CustomObject>

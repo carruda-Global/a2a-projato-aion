@@ -1,0 +1,988 @@
+{
+  "id": "ecosystem-aion-71-agentes",
+  "name": "AION - 74 Agentes de IA",
+  "version": "6.1",
+  "marketplaces": {
+    "microsoft": {
+      "plans": [
+        {
+          "id": "compliance_essencial",
+          "name": "Compliance Essencial - NR-1 + LGPD",
+          "prices_brl": 59000,
+          "prices_usd": 14900
+        },
+        {
+          "id": "regulatory_pro",
+          "name": "Regulatory Pro - 5 Agentes",
+          "prices_brl": 149000,
+          "prices_usd": 37900
+        },
+        {
+          "id": "esg_carbono",
+          "name": "ESG + Carbono",
+          "prices_brl": 249000,
+          "prices_usd": 62900
+        },
+        {
+          "id": "microsoft_pack",
+          "name": "Microsoft Pack - 6 Agentes",
+          "prices_brl": 448200,
+          "prices_usd": 112900
+        },
+        {
+          "id": "dynamics_pack",
+          "name": "Dynamics 365 Pack",
+          "prices_brl": 399000,
+          "prices_usd": 99900
+        },
+        {
+          "id": "agentforce_pack",
+          "name": "Agentforce Pack",
+          "prices_brl": 369000,
+          "prices_usd": 92900
+        },
+        {
+          "id": "oracle_pack",
+          "name": "Oracle Fusion Pack",
+          "prices_brl": 399000,
+          "prices_usd": 99900
+        },
+        {
+          "id": "sap_pack",
+          "name": "SAP Integration Pack",
+          "prices_brl": 429000,
+          "prices_usd": 107900
+        },
+        {
+          "id": "erp_full_bridge",
+          "name": "ERP Full Bridge",
+          "prices_brl": 1299000,
+          "prices_usd": 329900
+        },
+        {
+          "id": "tech_starter",
+          "name": "Tech Starter",
+          "prices_brl": 199700,
+          "prices_usd": 49900
+        },
+        {
+          "id": "tech_enterprise",
+          "name": "Tech Enterprise",
+          "prices_brl": 599700,
+          "prices_usd": 149900
+        },
+        {
+          "id": "full_suite",
+          "name": "Full Suite - 71 Agentes",
+          "prices_brl": 1999700,
+          "prices_usd": 499900
+        },
+        {
+          "id": "cross_sell_pack",
+          "name": "Cross-Sell Pack",
+          "prices_brl": 29700,
+          "prices_usd": 7900
+        },
+        {
+          "id": "governance_starter",
+          "name": "Governance Starter",
+          "price_brl": 199700,
+          "price_usd": 49900,
+          "agents": [
+            "#60"
+          ]
+        },
+        {
+          "id": "governance_pro",
+          "name": "Governance Pro",
+          "price_brl": 597000,
+          "price_usd": 149000,
+          "agents": [
+            "#60"
+          ]
+        },
+        {
+          "id": "governance_enterprise",
+          "name": "Governance Enterprise",
+          "price_brl": 999700,
+          "price_usd": 249900,
+          "agents": [
+            "#60"
+          ]
+        },
+        {
+          "id": "bridge_starter",
+          "name": "Bridge Starter",
+          "price_brl": 196000,
+          "price_usd": 49000,
+          "agents": [
+            "#61"
+          ]
+        },
+        {
+          "id": "bridge_pro",
+          "name": "Bridge Pro",
+          "price_brl": 597000,
+          "price_usd": 149000,
+          "agents": [
+            "#61"
+          ]
+        },
+        {
+          "id": "bridge_enterprise",
+          "name": "Bridge Enterprise",
+          "price_brl": 797000,
+          "price_usd": 199000,
+          "agents": [
+            "#61"
+          ]
+        },
+        {
+          "id": "reviewer_starter",
+          "name": "Reviewer Starter",
+          "price_brl": 39600,
+          "price_usd": 9900,
+          "agents": [
+            "#62"
+          ]
+        },
+        {
+          "id": "reviewer_pro",
+          "name": "Reviewer Pro",
+          "price_brl": 119700,
+          "price_usd": 29900,
+          "agents": [
+            "#62"
+          ]
+        },
+        {
+          "id": "reviewer_enterprise",
+          "name": "Reviewer Enterprise",
+          "price_brl": 199700,
+          "price_usd": 49900,
+          "agents": [
+            "#62"
+          ]
+        },
+        {
+          "id": "enterprise_full",
+          "name": "Enterprise Full Suite",
+          "price_brl": 1597000,
+          "price_usd": 399900,
+          "agents": [
+            "#60",
+            "#61",
+            "#62"
+          ]
+        }
+      ],
+      "fulfillment_url": "https://engenheiro-producao-ai.onrender.com/microsoft/fulfill",
+      "webhook_url": "https://engenheiro-producao-ai.onrender.com/microsoft/webhook"
+    },
+    "google": {
+      "plans": [
+        {
+          "id": "compliance_essencial",
+          "name": "Compliance Essencial - NR-1 + LGPD",
+          "price_usd": 14900
+        },
+        {
+          "id": "regulatory_pro",
+          "name": "Regulatory Pro - 5 Agentes",
+          "price_usd": 37900
+        },
+        {
+          "id": "esg_carbono",
+          "name": "ESG + Carbono",
+          "price_usd": 62900
+        },
+        {
+          "id": "microsoft_pack",
+          "name": "Microsoft Pack - 6 Agentes",
+          "price_usd": 112900
+        },
+        {
+          "id": "dynamics_pack",
+          "name": "Dynamics 365 Pack",
+          "price_usd": 99900
+        },
+        {
+          "id": "agentforce_pack",
+          "name": "Agentforce Pack",
+          "price_usd": 92900
+        },
+        {
+          "id": "oracle_pack",
+          "name": "Oracle Fusion Pack",
+          "price_usd": 99900
+        },
+        {
+          "id": "sap_pack",
+          "name": "SAP Integration Pack",
+          "price_usd": 107900
+        },
+        {
+          "id": "erp_full_bridge",
+          "name": "ERP Full Bridge",
+          "price_usd": 329900
+        },
+        {
+          "id": "tech_starter",
+          "name": "Tech Starter",
+          "price_usd": 49900
+        },
+        {
+          "id": "tech_enterprise",
+          "name": "Tech Enterprise",
+          "price_usd": 149900
+        },
+        {
+          "id": "full_suite",
+          "name": "Full Suite - 71 Agentes",
+          "price_usd": 499900
+        },
+        {
+          "id": "cross_sell_pack",
+          "name": "Cross-Sell Pack",
+          "price_usd": 7900
+        },
+        {
+          "id": "governance_starter",
+          "name": "Governance Starter",
+          "price_brl": 199700,
+          "price_usd": 49900,
+          "agents": [
+            "#60"
+          ]
+        },
+        {
+          "id": "governance_pro",
+          "name": "Governance Pro",
+          "price_brl": 597000,
+          "price_usd": 149000,
+          "agents": [
+            "#60"
+          ]
+        },
+        {
+          "id": "governance_enterprise",
+          "name": "Governance Enterprise",
+          "price_brl": 999700,
+          "price_usd": 249900,
+          "agents": [
+            "#60"
+          ]
+        },
+        {
+          "id": "bridge_starter",
+          "name": "Bridge Starter",
+          "price_brl": 196000,
+          "price_usd": 49000,
+          "agents": [
+            "#61"
+          ]
+        },
+        {
+          "id": "bridge_pro",
+          "name": "Bridge Pro",
+          "price_brl": 597000,
+          "price_usd": 149000,
+          "agents": [
+            "#61"
+          ]
+        },
+        {
+          "id": "bridge_enterprise",
+          "name": "Bridge Enterprise",
+          "price_brl": 797000,
+          "price_usd": 199000,
+          "agents": [
+            "#61"
+          ]
+        },
+        {
+          "id": "reviewer_starter",
+          "name": "Reviewer Starter",
+          "price_brl": 39600,
+          "price_usd": 9900,
+          "agents": [
+            "#62"
+          ]
+        },
+        {
+          "id": "reviewer_pro",
+          "name": "Reviewer Pro",
+          "price_brl": 119700,
+          "price_usd": 29900,
+          "agents": [
+            "#62"
+          ]
+        },
+        {
+          "id": "reviewer_enterprise",
+          "name": "Reviewer Enterprise",
+          "price_brl": 199700,
+          "price_usd": 49900,
+          "agents": [
+            "#62"
+          ]
+        },
+        {
+          "id": "enterprise_full",
+          "name": "Enterprise Full Suite",
+          "price_brl": 1597000,
+          "price_usd": 399900,
+          "agents": [
+            "#60",
+            "#61",
+            "#62"
+          ]
+        }
+      ]
+    },
+    "salesforce": {
+      "plans": [
+        {
+          "id": "compliance_essencial",
+          "name": "Compliance Essencial - NR-1 + LGPD",
+          "price_usd": 14900
+        },
+        {
+          "id": "regulatory_pro",
+          "name": "Regulatory Pro - 5 Agentes",
+          "price_usd": 37900
+        },
+        {
+          "id": "esg_carbono",
+          "name": "ESG + Carbono",
+          "price_usd": 62900
+        },
+        {
+          "id": "microsoft_pack",
+          "name": "Microsoft Pack - 6 Agentes",
+          "price_usd": 112900
+        },
+        {
+          "id": "dynamics_pack",
+          "name": "Dynamics 365 Pack",
+          "price_usd": 99900
+        },
+        {
+          "id": "agentforce_pack",
+          "name": "Agentforce Pack",
+          "price_usd": 92900
+        },
+        {
+          "id": "oracle_pack",
+          "name": "Oracle Fusion Pack",
+          "price_usd": 99900
+        },
+        {
+          "id": "sap_pack",
+          "name": "SAP Integration Pack",
+          "price_usd": 107900
+        },
+        {
+          "id": "erp_full_bridge",
+          "name": "ERP Full Bridge",
+          "price_usd": 329900
+        },
+        {
+          "id": "tech_starter",
+          "name": "Tech Starter",
+          "price_usd": 49900
+        },
+        {
+          "id": "tech_enterprise",
+          "name": "Tech Enterprise",
+          "price_usd": 149900
+        },
+        {
+          "id": "full_suite",
+          "name": "Full Suite - 71 Agentes",
+          "price_usd": 499900
+        },
+        {
+          "id": "cross_sell_pack",
+          "name": "Cross-Sell Pack",
+          "price_usd": 7900
+        },
+        {
+          "id": "governance_starter",
+          "name": "Governance Starter",
+          "price_brl": 199700,
+          "price_usd": 49900,
+          "agents": [
+            "#60"
+          ]
+        },
+        {
+          "id": "governance_pro",
+          "name": "Governance Pro",
+          "price_brl": 597000,
+          "price_usd": 149000,
+          "agents": [
+            "#60"
+          ]
+        },
+        {
+          "id": "governance_enterprise",
+          "name": "Governance Enterprise",
+          "price_brl": 999700,
+          "price_usd": 249900,
+          "agents": [
+            "#60"
+          ]
+        },
+        {
+          "id": "bridge_starter",
+          "name": "Bridge Starter",
+          "price_brl": 196000,
+          "price_usd": 49000,
+          "agents": [
+            "#61"
+          ]
+        },
+        {
+          "id": "bridge_pro",
+          "name": "Bridge Pro",
+          "price_brl": 597000,
+          "price_usd": 149000,
+          "agents": [
+            "#61"
+          ]
+        },
+        {
+          "id": "bridge_enterprise",
+          "name": "Bridge Enterprise",
+          "price_brl": 797000,
+          "price_usd": 199000,
+          "agents": [
+            "#61"
+          ]
+        },
+        {
+          "id": "reviewer_starter",
+          "name": "Reviewer Starter",
+          "price_brl": 39600,
+          "price_usd": 9900,
+          "agents": [
+            "#62"
+          ]
+        },
+        {
+          "id": "reviewer_pro",
+          "name": "Reviewer Pro",
+          "price_brl": 119700,
+          "price_usd": 29900,
+          "agents": [
+            "#62"
+          ]
+        },
+        {
+          "id": "reviewer_enterprise",
+          "name": "Reviewer Enterprise",
+          "price_brl": 199700,
+          "price_usd": 49900,
+          "agents": [
+            "#62"
+          ]
+        },
+        {
+          "id": "enterprise_full",
+          "name": "Enterprise Full Suite",
+          "price_brl": 1597000,
+          "price_usd": 399900,
+          "agents": [
+            "#60",
+            "#61",
+            "#62"
+          ]
+        }
+      ]
+    },
+    "aws": {
+      "plans": [
+        {
+          "id": "compliance_essencial",
+          "name": "Compliance Essencial - NR-1 + LGPD",
+          "price_usd": 14900
+        },
+        {
+          "id": "regulatory_pro",
+          "name": "Regulatory Pro - 5 Agentes",
+          "price_usd": 37900
+        },
+        {
+          "id": "esg_carbono",
+          "name": "ESG + Carbono",
+          "price_usd": 62900
+        },
+        {
+          "id": "microsoft_pack",
+          "name": "Microsoft Pack - 6 Agentes",
+          "price_usd": 112900
+        },
+        {
+          "id": "dynamics_pack",
+          "name": "Dynamics 365 Pack",
+          "price_usd": 99900
+        },
+        {
+          "id": "agentforce_pack",
+          "name": "Agentforce Pack",
+          "price_usd": 92900
+        },
+        {
+          "id": "oracle_pack",
+          "name": "Oracle Fusion Pack",
+          "price_usd": 99900
+        },
+        {
+          "id": "sap_pack",
+          "name": "SAP Integration Pack",
+          "price_usd": 107900
+        },
+        {
+          "id": "erp_full_bridge",
+          "name": "ERP Full Bridge",
+          "price_usd": 329900
+        },
+        {
+          "id": "tech_starter",
+          "name": "Tech Starter",
+          "price_usd": 49900
+        },
+        {
+          "id": "tech_enterprise",
+          "name": "Tech Enterprise",
+          "price_usd": 149900
+        },
+        {
+          "id": "full_suite",
+          "name": "Full Suite - 71 Agentes",
+          "price_usd": 499900
+        },
+        {
+          "id": "cross_sell_pack",
+          "name": "Cross-Sell Pack",
+          "price_usd": 7900
+        },
+        {
+          "id": "governance_starter",
+          "name": "Governance Starter",
+          "price_brl": 199700,
+          "price_usd": 49900,
+          "agents": [
+            "#60"
+          ]
+        },
+        {
+          "id": "governance_pro",
+          "name": "Governance Pro",
+          "price_brl": 597000,
+          "price_usd": 149000,
+          "agents": [
+            "#60"
+          ]
+        },
+        {
+          "id": "governance_enterprise",
+          "name": "Governance Enterprise",
+          "price_brl": 999700,
+          "price_usd": 249900,
+          "agents": [
+            "#60"
+          ]
+        },
+        {
+          "id": "bridge_starter",
+          "name": "Bridge Starter",
+          "price_brl": 196000,
+          "price_usd": 49000,
+          "agents": [
+            "#61"
+          ]
+        },
+        {
+          "id": "bridge_pro",
+          "name": "Bridge Pro",
+          "price_brl": 597000,
+          "price_usd": 149000,
+          "agents": [
+            "#61"
+          ]
+        },
+        {
+          "id": "bridge_enterprise",
+          "name": "Bridge Enterprise",
+          "price_brl": 797000,
+          "price_usd": 199000,
+          "agents": [
+            "#61"
+          ]
+        },
+        {
+          "id": "reviewer_starter",
+          "name": "Reviewer Starter",
+          "price_brl": 39600,
+          "price_usd": 9900,
+          "agents": [
+            "#62"
+          ]
+        },
+        {
+          "id": "reviewer_pro",
+          "name": "Reviewer Pro",
+          "price_brl": 119700,
+          "price_usd": 29900,
+          "agents": [
+            "#62"
+          ]
+        },
+        {
+          "id": "reviewer_enterprise",
+          "name": "Reviewer Enterprise",
+          "price_brl": 199700,
+          "price_usd": 49900,
+          "agents": [
+            "#62"
+          ]
+        },
+        {
+          "id": "enterprise_full",
+          "name": "Enterprise Full Suite",
+          "price_brl": 1597000,
+          "price_usd": 399900,
+          "agents": [
+            "#60",
+            "#61",
+            "#62"
+          ]
+        }
+      ]
+    },
+    "oracle": {
+      "plans": [
+        {
+          "id": "compliance_essencial",
+          "name": "Compliance Essencial - NR-1 + LGPD",
+          "price_usd": 14900
+        },
+        {
+          "id": "regulatory_pro",
+          "name": "Regulatory Pro - 5 Agentes",
+          "price_usd": 37900
+        },
+        {
+          "id": "esg_carbono",
+          "name": "ESG + Carbono",
+          "price_usd": 62900
+        },
+        {
+          "id": "microsoft_pack",
+          "name": "Microsoft Pack - 6 Agentes",
+          "price_usd": 112900
+        },
+        {
+          "id": "dynamics_pack",
+          "name": "Dynamics 365 Pack",
+          "price_usd": 99900
+        },
+        {
+          "id": "agentforce_pack",
+          "name": "Agentforce Pack",
+          "price_usd": 92900
+        },
+        {
+          "id": "oracle_pack",
+          "name": "Oracle Fusion Pack",
+          "price_usd": 99900
+        },
+        {
+          "id": "sap_pack",
+          "name": "SAP Integration Pack",
+          "price_usd": 107900
+        },
+        {
+          "id": "erp_full_bridge",
+          "name": "ERP Full Bridge",
+          "price_usd": 329900
+        },
+        {
+          "id": "tech_starter",
+          "name": "Tech Starter",
+          "price_usd": 49900
+        },
+        {
+          "id": "tech_enterprise",
+          "name": "Tech Enterprise",
+          "price_usd": 149900
+        },
+        {
+          "id": "full_suite",
+          "name": "Full Suite - 71 Agentes",
+          "price_usd": 499900
+        },
+        {
+          "id": "cross_sell_pack",
+          "name": "Cross-Sell Pack",
+          "price_usd": 7900
+        },
+        {
+          "id": "governance_starter",
+          "name": "Governance Starter",
+          "price_brl": 199700,
+          "price_usd": 49900,
+          "agents": [
+            "#60"
+          ]
+        },
+        {
+          "id": "governance_pro",
+          "name": "Governance Pro",
+          "price_brl": 597000,
+          "price_usd": 149000,
+          "agents": [
+            "#60"
+          ]
+        },
+        {
+          "id": "governance_enterprise",
+          "name": "Governance Enterprise",
+          "price_brl": 999700,
+          "price_usd": 249900,
+          "agents": [
+            "#60"
+          ]
+        },
+        {
+          "id": "bridge_starter",
+          "name": "Bridge Starter",
+          "price_brl": 196000,
+          "price_usd": 49000,
+          "agents": [
+            "#61"
+          ]
+        },
+        {
+          "id": "bridge_pro",
+          "name": "Bridge Pro",
+          "price_brl": 597000,
+          "price_usd": 149000,
+          "agents": [
+            "#61"
+          ]
+        },
+        {
+          "id": "bridge_enterprise",
+          "name": "Bridge Enterprise",
+          "price_brl": 797000,
+          "price_usd": 199000,
+          "agents": [
+            "#61"
+          ]
+        },
+        {
+          "id": "reviewer_starter",
+          "name": "Reviewer Starter",
+          "price_brl": 39600,
+          "price_usd": 9900,
+          "agents": [
+            "#62"
+          ]
+        },
+        {
+          "id": "reviewer_pro",
+          "name": "Reviewer Pro",
+          "price_brl": 119700,
+          "price_usd": 29900,
+          "agents": [
+            "#62"
+          ]
+        },
+        {
+          "id": "reviewer_enterprise",
+          "name": "Reviewer Enterprise",
+          "price_brl": 199700,
+          "price_usd": 49900,
+          "agents": [
+            "#62"
+          ]
+        },
+        {
+          "id": "enterprise_full",
+          "name": "Enterprise Full Suite",
+          "price_brl": 1597000,
+          "price_usd": 399900,
+          "agents": [
+            "#60",
+            "#61",
+            "#62"
+          ]
+        }
+      ]
+    },
+    "sap": {
+      "plans": [
+        {
+          "id": "compliance_essencial",
+          "name": "Compliance Essencial - NR-1 + LGPD",
+          "price_usd": 14900
+        },
+        {
+          "id": "regulatory_pro",
+          "name": "Regulatory Pro - 5 Agentes",
+          "price_usd": 37900
+        },
+        {
+          "id": "esg_carbono",
+          "name": "ESG + Carbono",
+          "price_usd": 62900
+        },
+        {
+          "id": "microsoft_pack",
+          "name": "Microsoft Pack - 6 Agentes",
+          "price_usd": 112900
+        },
+        {
+          "id": "dynamics_pack",
+          "name": "Dynamics 365 Pack",
+          "price_usd": 99900
+        },
+        {
+          "id": "agentforce_pack",
+          "name": "Agentforce Pack",
+          "price_usd": 92900
+        },
+        {
+          "id": "oracle_pack",
+          "name": "Oracle Fusion Pack",
+          "price_usd": 99900
+        },
+        {
+          "id": "sap_pack",
+          "name": "SAP Integration Pack",
+          "price_usd": 107900
+        },
+        {
+          "id": "erp_full_bridge",
+          "name": "ERP Full Bridge",
+          "price_usd": 329900
+        },
+        {
+          "id": "tech_starter",
+          "name": "Tech Starter",
+          "price_usd": 49900
+        },
+        {
+          "id": "tech_enterprise",
+          "name": "Tech Enterprise",
+          "price_usd": 149900
+        },
+        {
+          "id": "full_suite",
+          "name": "Full Suite - 71 Agentes",
+          "price_usd": 499900
+        },
+        {
+          "id": "cross_sell_pack",
+          "name": "Cross-Sell Pack",
+          "price_usd": 7900
+        },
+        {
+          "id": "governance_starter",
+          "name": "Governance Starter",
+          "price_brl": 199700,
+          "price_usd": 49900,
+          "agents": [
+            "#60"
+          ]
+        },
+        {
+          "id": "governance_pro",
+          "name": "Governance Pro",
+          "price_brl": 597000,
+          "price_usd": 149000,
+          "agents": [
+            "#60"
+          ]
+        },
+        {
+          "id": "governance_enterprise",
+          "name": "Governance Enterprise",
+          "price_brl": 999700,
+          "price_usd": 249900,
+          "agents": [
+            "#60"
+          ]
+        },
+        {
+          "id": "bridge_starter",
+          "name": "Bridge Starter",
+          "price_brl": 196000,
+          "price_usd": 49000,
+          "agents": [
+            "#61"
+          ]
+        },
+        {
+          "id": "bridge_pro",
+          "name": "Bridge Pro",
+          "price_brl": 597000,
+          "price_usd": 149000,
+          "agents": [
+            "#61"
+          ]
+        },
+        {
+          "id": "bridge_enterprise",
+          "name": "Bridge Enterprise",
+          "price_brl": 797000,
+          "price_usd": 199000,
+          "agents": [
+            "#61"
+          ]
+        },
+        {
+          "id": "reviewer_starter",
+          "name": "Reviewer Starter",
+          "price_brl": 39600,
+          "price_usd": 9900,
+          "agents": [
+            "#62"
+          ]
+        },
+        {
+          "id": "reviewer_pro",
+          "name": "Reviewer Pro",
+          "price_brl": 119700,
+          "price_usd": 29900,
+          "agents": [
+            "#62"
+          ]
+        },
+        {
+          "id": "reviewer_enterprise",
+          "name": "Reviewer Enterprise",
+          "price_brl": 199700,
+          "price_usd": 49900,
+          "agents": [
+            "#62"
+          ]
+        },
+        {
+          "id": "enterprise_full",
+          "name": "Enterprise Full Suite",
+          "price_brl": 1597000,
+          "price_usd": 399900,
+          "agents": [
+            "#60",
+            "#61",
+            "#62"
+          ]
+        }
+      ]
+    }
+  }
+}

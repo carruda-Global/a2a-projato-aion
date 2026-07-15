@@ -1,0 +1,662 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: aion-agent-registry
+  namespace: aion
+  labels:
+    app.kubernetes.io/name: aion
+    app.kubernetes.io/component: agent-registry
+  annotations:
+    apphub.cloud.google.com/functional-type: "AGENT_REGISTRY"
+    aion.registry/version: "7.0.0"
+    aion.registry/total-agents: "78"
+data:
+  registry.yaml: |
+    # AION Agent Registry - 78 agents
+    # AppHub descobre automaticamente via annotation apphub.cloud.google.com/functional-type
+    version: "7.0.0"
+    agents:
+      # ===== AEC CORE (5) =====
+      - id: spec_analyst
+        name: "Analista de Especificações"
+        cluster: aec_core
+        description: "Análise de especificações técnicas, extração de requisitos, sinalização de contradições"
+        llm: deepseek-chat
+        status: active
+        service: aion-orchestrator:8000
+      - id: procurement
+        name: "Agente de Compras"
+        cluster: aec_core
+        description: "Processamento de pedidos de compra, comparação de cotações"
+        llm: deepseek-chat
+        status: active
+        service: aion-orchestrator:8000
+      - id: inventory
+        name: "Gestão de Estoque"
+        cluster: aec_core
+        description: "Monitoramento de estoque de obras, identificação de escassez"
+        llm: deepseek-chat
+        status: active
+        service: aion-orchestrator:8000
+      - id: logistics
+        name: "Logística e Rastreamento"
+        cluster: aec_core
+        description: "Acompanhamento de envios, alertas de atraso"
+        llm: deepseek-chat
+        status: active
+        service: aion-orchestrator:8000
+      - id: field_execution
+        name: "Execução em Campo"
+        cluster: aec_core
+        description: "Tradução de BIM em instruções de campo"
+        llm: deepseek-chat
+        status: active
+        service: aion-orchestrator:8000
+
+      # ===== AEC SPECIALIZED (4) =====
+      - id: bim_coordinator
+        name: "Coordenador BIM"
+        cluster: aec_specialized
+        description: "Criação de elementos 3D, clash detection"
+        llm: deepseek-chat
+        status: active
+        service: aion-orchestrator:8000
+      - id: requirements_analyst
+        name: "Análise de Requisitos"
+        cluster: aec_specialized
+        description: "Avaliação de requisitos contra padrões"
+        llm: deepseek-chat
+        status: active
+        service: aion-orchestrator:8000
+      - id: engineering_assistant
+        name: "Assistente de Engenharia"
+        cluster: aec_specialized
+        description: "Busca semântica e sumarização"
+        llm: deepseek-chat
+        status: active
+        service: aion-orchestrator:8000
+      - id: work_synopsis
+        name: "Resumo de Tarefas"
+        cluster: aec_specialized
+        description: "Resumos estruturados de tarefas e defeitos"
+        llm: deepseek-chat
+        status: active
+        service: aion-orchestrator:8000
+
+      # ===== AEC COMPLIANCE (3) =====
+      - id: photo_intelligence
+        name: "Inteligência Visual de Obras"
+        cluster: aec_compliance
+        description: "Análise visual de fotos de obras"
+        llm: deepseek-chat
+        status: active
+        service: aion-orchestrator:8000
+      - id: rfi_creation
+        name: "Criação de RFIs"
+        cluster: aec_compliance
+        description: "Geração profissional de RFIs"
+        llm: deepseek-chat
+        status: active
+        service: aion-orchestrator:8000
+      - id: compliance
+        name: "Conformidade PGRS/PGRSS"
+        cluster: aec_compliance
+        description: "Gestão de conformidade legal e ambiental"
+        llm: deepseek-chat
+        status: active
+        service: aion-orchestrator:8000
+
+      # ===== REGULATORY (9) =====
+      - id: nr1_psicossocial
+        name: "NR-1 Riscos Psicossociais"
+        cluster: regulatory
+        description: "Inventário de riscos psicossociais (FRPRT) - Portaria MTE 1.419/2024"
+        llm: gemini-pro
+        status: active
+        service: aion-orchestrator:8000
+      - id: tributario_cbs_ibs
+        name: "Tributário CBS/IBS"
+        cluster: regulatory
+        description: "Conformidade com LC 214/2025"
+        llm: deepseek-chat
+        status: scheduled_q4_2026
+        service: aion-orchestrator:8000
+      - id: lgpd_operacional
+        name: "LGPD Operacional"
+        cluster: regulatory
+        description: "Mapeamento de dados e RoPA conforme ANPD"
+        llm: gemini-pro
+        status: active
+        service: aion-orchestrator:8000
+      - id: esg_ifrs
+        name: "ESG IFRS S1/S2"
+        cluster: regulatory
+        description: "Relatórios ESG conforme Res. CVM 193/2023"
+        llm: deepseek-chat
+        status: scheduled_q1_2027
+        service: aion-orchestrator:8000
+      - id: inventario_carbono
+        name: "Inventário de Carbono"
+        cluster: regulatory
+        description: "Cálculo de emissões GEE - Lei 15.042/2024"
+        llm: deepseek-chat
+        status: scheduled_q1_2027
+        service: aion-orchestrator:8000
+      - id: escopo3_fornecedores
+        name: "Escopo 3 Fornecedores"
+        cluster: regulatory
+        description: "Rastreamento de emissões na cadeia"
+        llm: deepseek-chat
+        status: scheduled_q1_2027
+        service: aion-orchestrator:8000
+      - id: canal_denuncias
+        name: "Canal de Denúncias"
+        cluster: regulatory
+        description: "Canal omnichannel anônimo - Lei 14.457/2022"
+        llm: gemini-pro
+        status: active
+        service: aion-orchestrator:8000
+      - id: igualdade_salarial
+        name: "Igualdade Salarial"
+        cluster: regulatory
+        description: "Análise de equidade - Lei 14.611/2023"
+        llm: deepseek-chat
+        status: active
+        service: aion-orchestrator:8000
+      - id: compliance_anticorrupcao
+        name: "Compliance Anticorrupção"
+        cluster: regulatory
+        description: "Programa de integridade - Lei 12.846/2013"
+        llm: deepseek-chat
+        status: scheduled_q4_2026
+        service: aion-orchestrator:8000
+
+      # ===== MICROSOFT M365 (6) =====
+      - id: regulatory_analyst
+        name: "Regulatory Analyst"
+        cluster: microsoft
+        description: "Análise de contratos via SharePoint/OneDrive"
+        llm: deepseek-chat
+        status: co-sell
+        service: aion-orchestrator:8000
+      - id: compliance_pm
+        name: "Compliance PM"
+        cluster: microsoft
+        description: "Gestão de projetos de compliance no Planner"
+        llm: deepseek-chat
+        status: co-sell
+        service: aion-orchestrator:8000
+      - id: channel_agent
+        name: "Channel Agent Regulatório"
+        cluster: microsoft
+        description: "Monitoramento de canais Teams"
+        llm: deepseek-chat
+        status: co-sell
+        service: aion-orchestrator:8000
+      - id: knowledge_agent
+        name: "Knowledge Agent"
+        cluster: microsoft
+        description: "Indexação de documentos SharePoint com RAG"
+        llm: deepseek-chat
+        status: co-sell
+        service: aion-orchestrator:8000
+      - id: facilitator_agent
+        name: "Facilitator Agent"
+        cluster: microsoft
+        description: "Facilitação de reuniões de compliance"
+        llm: deepseek-chat
+        status: co-sell
+        service: aion-orchestrator:8000
+      - id: dev_experience
+        name: "Dev Experience Agent"
+        cluster: microsoft
+        description: "Automação de PRs e code reviews"
+        llm: deepseek-chat
+        status: co-sell
+        service: aion-orchestrator:8000
+
+      # ===== CROSS-SELL (3) =====
+      - id: onboarding_funcionarios
+        name: "Onboarding de Funcionários"
+        cluster: cross_sell
+        description: "Automação de admissão e eSocial"
+        llm: deepseek-chat
+        status: active
+        service: aion-orchestrator:8000
+      - id: atendimento_cliente_ptbr
+        name: "Atendimento ao Cliente PT-BR"
+        cluster: cross_sell
+        description: "Tickets L1 via WhatsApp e Teams"
+        llm: deepseek-chat
+        status: active
+        service: aion-orchestrator:8000
+      - id: conciliacao_financeira
+        name: "Conciliação Financeira"
+        cluster: cross_sell
+        description: "Automação de fechamento mensal"
+        llm: deepseek-chat
+        status: active
+        service: aion-orchestrator:8000
+
+      # ===== DYNAMICS 365 (6) =====
+      - id: dynamics_sales
+        name: "Dynamics Sales Compliance"
+        cluster: dynamics
+        description: "Pipeline de vendas com alertas regulatórios"
+        llm: deepseek-chat
+        status: scheduled_q4_2026
+        service: aion-orchestrator:8000
+      - id: dynamics_finance
+        name: "Dynamics Finance Regulatory"
+        cluster: dynamics
+        description: "Conformidade fiscal no Dynamics 365 Finance"
+        llm: deepseek-chat
+        status: scheduled_q4_2026
+        service: aion-orchestrator:8000
+      - id: dynamics_supply_chain
+        name: "Dynamics Supply Chain ESG"
+        cluster: dynamics
+        description: "Rastreamento ESG na cadeia"
+        llm: deepseek-chat
+        status: scheduled_q4_2026
+        service: aion-orchestrator:8000
+      - id: dynamics_hr
+        name: "Dynamics HR Compliance"
+        cluster: dynamics
+        description: "Conformidade trabalhista e NR-1"
+        llm: deepseek-chat
+        status: scheduled_q4_2026
+        service: aion-orchestrator:8000
+      - id: dynamics_customer_service
+        name: "Dynamics Customer Service"
+        cluster: dynamics
+        description: "Automação de atendimento regulatório"
+        llm: deepseek-chat
+        status: scheduled_q4_2026
+        service: aion-orchestrator:8000
+      - id: power_bi_compliance
+        name: "Power BI Compliance"
+        cluster: dynamics
+        description: "Dashboards de compliance no Power BI"
+        llm: deepseek-chat
+        status: scheduled_q4_2026
+        service: aion-orchestrator:8000
+
+      # ===== AGENTFORCE (5) =====
+      - id: agentforce_sdr
+        name: "Agentforce SDR"
+        cluster: agentforce
+        description: "Prospecção BANT via Salesforce"
+        llm: deepseek-chat
+        status: scheduled_q4_2026
+        service: aion-orchestrator:8000
+      - id: agentforce_field_service
+        name: "Agentforce Field Service"
+        cluster: agentforce
+        description: "Gestão de serviços de campo"
+        llm: deepseek-chat
+        status: scheduled_q4_2026
+        service: aion-orchestrator:8000
+      - id: agentforce_contract_intelligence
+        name: "Agentforce Contract Intelligence"
+        cluster: agentforce
+        description: "Análise inteligente de contratos"
+        llm: deepseek-chat
+        status: scheduled_q4_2026
+        service: aion-orchestrator:8000
+      - id: agentforce_revenue_intelligence
+        name: "Agentforce Revenue Intelligence"
+        cluster: agentforce
+        description: "Forecasting e oportunidades"
+        llm: deepseek-chat
+        status: scheduled_q4_2026
+        service: aion-orchestrator:8000
+      - id: agentforce_sustainability
+        name: "Agentforce Sustainability"
+        cluster: agentforce
+        description: "Metas ESG via Net Zero Cloud"
+        llm: deepseek-chat
+        status: scheduled_q4_2026
+        service: aion-orchestrator:8000
+
+      # ===== ORACLE (4) =====
+      - id: oracle_erp_compliance
+        name: "Oracle ERP Compliance"
+        cluster: oracle
+        description: "Conformidade fiscal no Oracle Fusion ERP"
+        llm: deepseek-chat
+        status: scheduled_q1_2027
+        service: aion-orchestrator:8000
+      - id: oracle_hcm_regulatory
+        name: "Oracle HCM Regulatory"
+        cluster: oracle
+        description: "Conformidade trabalhista Oracle Fusion HCM"
+        llm: deepseek-chat
+        status: scheduled_q1_2027
+        service: aion-orchestrator:8000
+      - id: oracle_supply_chain_esg
+        name: "Oracle Supply Chain ESG"
+        cluster: oracle
+        description: "ESG no Oracle Fusion SCM"
+        llm: deepseek-chat
+        status: scheduled_q1_2027
+        service: aion-orchestrator:8000
+      - id: oracle_cx_sales
+        name: "Oracle CX Sales"
+        cluster: oracle
+        description: "Vendas com conformidade no Oracle CX"
+        llm: deepseek-chat
+        status: scheduled_q1_2027
+        service: aion-orchestrator:8000
+
+      # ===== SAP (3) =====
+      - id: sap_joule_compliance
+        name: "SAP Joule Compliance Bridge"
+        cluster: sap
+        description: "Ponte de compliance SAP S/4HANA + Joule"
+        llm: deepseek-chat
+        status: scheduled_q1_2027
+        service: aion-orchestrator:8000
+      - id: sap_predictive_maintenance
+        name: "SAP Predictive Maintenance"
+        cluster: sap
+        description: "Manutenção preditiva SAP PM"
+        llm: deepseek-chat
+        status: scheduled_q1_2027
+        service: aion-orchestrator:8000
+      - id: sap_cbam_export
+        name: "SAP CBAM Export"
+        cluster: sap
+        description: "CBAM para exportadores UE via SAP GTS"
+        llm: deepseek-chat
+        status: scheduled_q1_2027
+        service: aion-orchestrator:8000
+
+      # ===== COORDINATION (2) =====
+      - id: master_orchestrator
+        name: "Master Orchestrator"
+        cluster: coordination
+        description: "Orquestrador central de 78 agentes"
+        llm: claude-api
+        status: active
+        service: aion-orchestrator:8000
+      - id: cross_platform_bridge
+        name: "Cross-Platform Bridge"
+        cluster: coordination
+        description: "Ponte Google, Microsoft, Salesforce, Oracle, SAP"
+        llm: deepseek-chat
+        status: active
+        service: aion-orchestrator:8000
+
+      # ===== INTELLIGENCE (3) =====
+      - id: regulatory_watch
+        name: "Regulatory Watch"
+        cluster: intelligence
+        description: "Monitoramento 24/7 de mudanças regulatórias"
+        llm: gemini-pro
+        status: active
+        service: aion-orchestrator:8000
+      - id: client_intelligence
+        name: "Client Intelligence"
+        cluster: intelligence
+        description: "Recomendações personalizadas"
+        llm: deepseek-chat
+        status: active
+        service: aion-orchestrator:8000
+      - id: quality_critic
+        name: "Quality Critic"
+        cluster: intelligence
+        description: "Revisor crítico de qualidade"
+        llm: claude-api
+        status: active
+        service: aion-orchestrator:8000
+
+      # ===== TECH (3) =====
+      - id: software_engineering
+        name: "Software Engineering Agent"
+        cluster: tech
+        description: "Arquitetura, code review, documentação"
+        llm: claude-api
+        status: active
+        service: aion-orchestrator:8000
+      - id: sales_agent
+        name: "Sales Agent"
+        cluster: tech
+        description: "Vendedor autônomo do EcoSystem"
+        llm: deepseek-chat
+        status: active
+        service: aion-orchestrator:8000
+      - id: workforce_orchestrator
+        name: "Workforce Orchestrator"
+        cluster: tech
+        description: "Coordenação de RH multi-plataforma"
+        llm: claude-api
+        status: active
+        service: aion-orchestrator:8000
+
+      # ===== SELF-IMPROVEMENT (3) =====
+      - id: meta_learning
+        name: "Meta-Learning Agent"
+        cluster: self_improvement
+        description: "Auto-aprendizado por interações"
+        llm: claude-api
+        status: scheduled_q1_2027
+        service: aion-orchestrator:8000
+      - id: ecosystem_evolution
+        name: "Ecosystem Evolution"
+        cluster: self_improvement
+        description: "Evolução autônoma do ecossistema"
+        llm: claude-api
+        status: scheduled_q1_2027
+        service: aion-orchestrator:8000
+      - id: federated_knowledge
+        name: "Federated Knowledge"
+        cluster: self_improvement
+        description: "Compartilhamento federado de conhecimento"
+        llm: deepseek-chat
+        status: scheduled_q1_2027
+        service: aion-orchestrator:8000
+
+      # ===== ENTERPRISE CONNECTORS (3) =====
+      - id: universal_governance_layer
+        name: "Universal Governance Layer"
+        cluster: enterprise_connectors
+        description: "Governança universal cross-plataforma"
+        llm: claude-api
+        status: scheduled_q1_2027
+        service: aion-orchestrator:8000
+      - id: antigravity_bridge
+        name: "Antigravity Bridge"
+        cluster: enterprise_connectors
+        description: "Ponte Google <-> Microsoft"
+        llm: deepseek-chat
+        status: scheduled_q1_2027
+        service: aion-orchestrator:8000
+      - id: mai_code_reviewer
+        name: "MAI Code Reviewer"
+        cluster: enterprise_connectors
+        description: "Revisor de código multi-plataforma"
+        llm: claude-api
+        status: scheduled_q1_2027
+        service: aion-orchestrator:8000
+
+      # ===== PHYSICAL AI (1) =====
+      - id: physical_ai_connector
+        name: "Physical AI Connector"
+        cluster: physical_ai
+        description: "NVIDIA Omniverse + Azure Foundry + GKE"
+        llm: deepseek-chat
+        status: scheduled_q1_2027
+        service: aion-orchestrator:8000
+
+      # ===== MICRO-AGENTES (15) =====
+      - id: nr1_diagnostico_rapido
+        name: "Diagnóstico Rápido NR-1"
+        cluster: micro
+        description: "M1 - Diagnóstico inicial de riscos psicossociais"
+        llm: gemini-pro
+        status: active
+        service: aion-orchestrator:8000
+      - id: lgpd_scanner
+        name: "LGPD Scanner"
+        cluster: micro
+        description: "M2 - Varredura de sistemas"
+        llm: gemini-pro
+        status: active
+        service: aion-orchestrator:8000
+      - id: folha_equidade
+        name: "Folha Equidade"
+        cluster: micro
+        description: "M3 - Gap salarial por gênero"
+        llm: gemini-pro
+        status: active
+        service: aion-orchestrator:8000
+      - id: contrato_review
+        name: "Contract Review"
+        cluster: micro
+        description: "M4 - Revisão individual de contratos"
+        llm: gemini-pro
+        status: co-sell
+        service: aion-orchestrator:8000
+      - id: teams_risk_monitor
+        name: "Teams Risk Monitor"
+        cluster: micro
+        description: "M5 - Monitoramento de canais Teams"
+        llm: deepseek-chat
+        status: co-sell
+        service: aion-orchestrator:8000
+      - id: meeting_minutes
+        name: "Meeting Minutes"
+        cluster: micro
+        description: "M6 - Ata e tarefas no Planner"
+        llm: deepseek-chat
+        status: co-sell
+        service: aion-orchestrator:8000
+      - id: pr_lgpd_checker
+        name: "PR LGPD Checker"
+        cluster: micro
+        description: "M7 - PII em Pull Requests"
+        llm: claude-api
+        status: co-sell
+        service: aion-orchestrator:8000
+      - id: admissao_checklist
+        name: "Admissão Checklist"
+        cluster: micro
+        description: "M8 - Checklist de admissão"
+        llm: gemini-pro
+        status: active
+        service: aion-orchestrator:8000
+      - id: sales_pipeline_checker
+        name: "Sales Pipeline Checker"
+        cluster: micro
+        description: "M9 - Deals em risco"
+        llm: deepseek-chat
+        status: scheduled_q4_2026
+        service: aion-orchestrator:8000
+      - id: expense_anomaly
+        name: "Expense Anomaly"
+        cluster: micro
+        description: "M10 - Anomalias em despesas"
+        llm: deepseek-chat
+        status: scheduled_q4_2026
+        service: aion-orchestrator:8000
+      - id: compliance_score
+        name: "Compliance Score"
+        cluster: micro
+        description: "M11 - Score de compliance 0-100"
+        llm: deepseek-chat
+        status: active
+        service: aion-orchestrator:8000
+      - id: lead_qualifier
+        name: "Lead Qualifier"
+        cluster: micro
+        description: "M12 - Qualificação de leads"
+        llm: deepseek-chat
+        status: active
+        service: aion-orchestrator:8000
+      - id: code_reviewer
+        name: "Code Reviewer"
+        cluster: micro
+        description: "M13 - Code review de PRs"
+        llm: claude-api
+        status: active
+        service: aion-orchestrator:8000
+      - id: headcount_alert
+        name: "Headcount Alert"
+        cluster: micro
+        description: "M14 - Alerta de sobrecarga"
+        llm: claude-api
+        status: active
+        service: aion-orchestrator:8000
+      - id: regulatory_alert
+        name: "Regulatory Alert"
+        cluster: micro
+        description: "M15 - Alerta de mudança de norma"
+        llm: gemini-pro
+        status: active
+        service: aion-orchestrator:8000
+
+    mcp_servers:
+      - id: regulatory
+        name: "Regulatory MCP"
+        service: aion-mcp-regulatory:8010
+        tools: [nr1_psicossocial, lgpd_operacional, tributario_cbs_ibs, canal_denuncias, igualdade_salarial, compliance_anticorrupcao, onboarding_funcionarios, conciliacao_financeira]
+      - id: esg
+        name: "ESG MCP"
+        service: aion-mcp-esg:8011
+        tools: [esg_ifrs_diagnostico, inventario_carbono, escopo3_fornecedores, cbam_certificate]
+      - id: erp
+        name: "ERP MCP"
+        service: aion-mcp-erp:8012
+        tools: [dynamics_sales, dynamics_finance, dynamics_hr, agentforce_sdr, oracle_erp_compliance, sap_cbam_export]
+      - id: microsoft
+        name: "Microsoft MCP"
+        service: aion-mcp-microsoft:8013
+        tools: [regulatory_analyst, compliance_pm, channel_agent, knowledge_agent, facilitator_agent, dev_experience]
+
+    clusters:
+      - name: aec_core
+        agents: [spec_analyst, procurement, inventory, logistics, field_execution]
+        channel: google
+      - name: aec_specialized
+        agents: [bim_coordinator, requirements_analyst, engineering_assistant, work_synopsis]
+        channel: google
+      - name: aec_compliance
+        agents: [photo_intelligence, rfi_creation, compliance]
+        channel: google
+      - name: regulatory
+        agents: [nr1_psicossocial, tributario_cbs_ibs, lgpd_operacional, esg_ifrs, inventario_carbono, escopo3_fornecedores, canal_denuncias, igualdade_salarial, compliance_anticorrupcao]
+        channel: google,salesforce,microsoft
+      - name: microsoft
+        agents: [regulatory_analyst, compliance_pm, channel_agent, knowledge_agent, facilitator_agent, dev_experience]
+        channel: microsoft
+      - name: cross_sell
+        agents: [onboarding_funcionarios, atendimento_cliente_ptbr, conciliacao_financeira]
+        channel: microsoft,salesforce
+      - name: dynamics
+        agents: [dynamics_sales, dynamics_finance, dynamics_supply_chain, dynamics_hr, dynamics_customer_service, power_bi_compliance]
+        channel: microsoft,google
+      - name: agentforce
+        agents: [agentforce_sdr, agentforce_field_service, agentforce_contract_intelligence, agentforce_revenue_intelligence, agentforce_sustainability]
+        channel: salesforce,microsoft
+      - name: oracle
+        agents: [oracle_erp_compliance, oracle_hcm_regulatory, oracle_supply_chain_esg, oracle_cx_sales]
+        channel: oracle,google
+      - name: sap
+        agents: [sap_joule_compliance, sap_predictive_maintenance, sap_cbam_export]
+        channel: sap,oracle
+      - name: coordination
+        agents: [master_orchestrator, cross_platform_bridge]
+        channel: all
+      - name: intelligence
+        agents: [regulatory_watch, client_intelligence, quality_critic]
+        channel: all
+      - name: tech
+        agents: [software_engineering, sales_agent, workforce_orchestrator]
+        channel: microsoft,salesforce
+      - name: self_improvement
+        agents: [meta_learning, ecosystem_evolution, federated_knowledge]
+        channel: internal
+      - name: micro
+        agents: [nr1_diagnostico_rapido, lgpd_scanner, folha_equidade, contrato_review, teams_risk_monitor, meeting_minutes, pr_lgpd_checker, admissao_checklist, sales_pipeline_checker, expense_anomaly, compliance_score, lead_qualifier, code_reviewer, headcount_alert, regulatory_alert]
+        channel: microsoft

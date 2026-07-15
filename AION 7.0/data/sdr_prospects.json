@@ -1,0 +1,142 @@
+[
+  {
+    "empresa": "Odebrecht Realty",
+    "cidade": "São Paulo",
+    "cargo": "DPO ou Gestor de Compliance",
+    "motivo": "Grandes obras com dados de milhares de funcionários e fornecedores",
+    "msg": "Odebrecht Realty: evite multas LGPD. Podemos conversar?"
+  },
+  {
+    "empresa": "MRV Engenharia",
+    "cidade": "São Paulo",
+    "cargo": "Diretor Jurídico",
+    "motivo": "Alto volume de dados de clientes e colaboradores em todo Brasil",
+    "msg": "MRV: adequação NR-1/LGPD urgente. Podemos ajudar?"
+  },
+  {
+    "empresa": "Cyrela Brazil Realty",
+    "cidade": "São Paulo",
+    "cargo": "Compliance ou RH",
+    "motivo": "Gestão massiva de dados em incorporadoras residenciais",
+    "msg": "Cyrela: multas LGDP podem chegar a 50mi. Vamos falar?"
+  },
+  {
+    "empresa": "Gafisa",
+    "cidade": "São Paulo",
+    "cargo": "Gestor de Compliance",
+    "motivo": "Histórico de processos e necessidade de adequação estrutural",
+    "msg": "Gafisa: NR-1 e LGPD em dia? Proteja sua empresa!"
+  },
+  {
+    "empresa": "Tecnisa",
+    "cidade": "Rio de Janeiro",
+    "cargo": "DPO",
+    "motivo": "LGPD obrigatória para incorporadoras com grande volume de dados de clientes",
+    "msg": "DPO Tecnisa? Precisamos conversar sobre LGPD."
+  },
+  {
+    "empresa": "Cyrela Brazil Realty",
+    "cidade": "Rio de Janeiro",
+    "cargo": "Encarregado de Dados",
+    "motivo": "NR-1 exige gestão de segurança e saúde; LGPD para proteção de dados",
+    "msg": "Cyrela precisa de DPO? Entre em contato."
+  },
+  {
+    "empresa": "MRV Engenharia",
+    "cidade": "Rio de Janeiro",
+    "cargo": "DPO",
+    "motivo": "Obrigação LGPD e compliance trabalhista NR-1",
+    "msg": "MRV: DPO e segurança do trabalho?"
+  },
+  {
+    "empresa": "Construtora Tenda",
+    "cidade": "Rio de Janeiro",
+    "cargo": "Encarregado de Dados",
+    "motivo": "Gestão de riscos NR-1 e conformidade LGPD",
+    "msg": "Tenda precisa de DPO? Fale comigo."
+  },
+  {
+    "empresa": "Mendes Júnior",
+    "cidade": "Juiz de Fora",
+    "cargo": "DPO",
+    "motivo": "Grandes obras, dados de funcionários e terceiros",
+    "msg": "Olá! Precisa de LGPD para obras?"
+  },
+  {
+    "empresa": "Construtora Tenda",
+    "cidade": "Belo Horizonte",
+    "cargo": "Gestor de Compliance",
+    "motivo": "Dados de clientes, funcionários e fornecedores",
+    "msg": "Tenda, vamos adequar sua LGPD?"
+  },
+  {
+    "empresa": "Construtora Andrade Gutierrez",
+    "cidade": "Belo Horizonte",
+    "cargo": "Encarregado de Dados",
+    "motivo": "Volume massivo de dados pessoais em obras",
+    "msg": "Andrade Gutierrez, LGPD para construção?"
+  },
+  {
+    "empresa": "Construtora Direcional",
+    "cidade": "Belo Horizonte",
+    "cargo": "Analista de Segurança da Informação",
+    "motivo": "Dados de compradores, funcionários e parceiros",
+    "msg": "Direcional, sua LGPD está ok?"
+  },
+  {
+    "empresa": "Construtora Queiroz Galvão",
+    "cidade": "Curitiba",
+    "cargo": "Gerente de RH",
+    "motivo": "Grande porte, processamento massivo de dados de funcionários e terceirizados",
+    "msg": "Precisa de NR-1/LGPD? Posso ajudar."
+  },
+  {
+    "empresa": "Construtora OAS",
+    "cidade": "Maringá",
+    "cargo": "Diretor Administrativo",
+    "motivo": "Recuperação judicial exige compliance rigoroso em proteção de dados",
+    "msg": "LGPD e NR-1 em dia? Vamos conversar."
+  },
+  {
+    "empresa": "Construtora Andrade Gutierrez",
+    "cidade": "Londrina",
+    "cargo": "Coordenador de SST",
+    "motivo": "Obras públicas exigem adequação às normas regulamentadoras e LGPD",
+    "msg": "Adequação NR-1/LGPD rápida e eficiente."
+  },
+  {
+    "empresa": "Construtora Camargo Corrêa",
+    "cidade": "Ponta Grossa",
+    "cargo": "Gerente de Compliance",
+    "motivo": "Multinacional com obrigações legais estritas em saúde e privacidade",
+    "msg": "Compliance NR-1/LGPD para sua obra."
+  },
+  {
+    "empresa": "Arcadis Brasil",
+    "cidade": "São Paulo",
+    "cargo": "Gerente de Compliance",
+    "motivo": "Gestão de dados de funcionários e clientes em projetos de infraestrutura",
+    "msg": "Olá! Precisa adequar sua LGPD/NR-1? Podemos ajudar."
+  },
+  {
+    "empresa": "AECOM Brasil",
+    "cidade": "Rio de Janeiro",
+    "cargo": "Diretor de RH",
+    "motivo": "Tratamento de dados sensíveis de equipes multidisciplinares",
+    "msg": "Sua engenharia está 100% na LGPD? Vamos conversar."
+  },
+  {
+    "empresa": "WSP Brasil",
+    "cidade": "São Paulo",
+    "cargo": "Coordenador de SST",
+    "motivo": "NR-1 para gestão de riscos ocupacionais em obras",
+    "msg": "NR-1 e LGPD em dia? Temos solução rápida."
+  },
+  {
+    "empresa": "Tetra Tech",
+    "cidade": "Curitiba",
+    "cargo": "Gerente Jurídico",
+    "motivo": "Compliance ambiental com proteção de dados de comunidades",
+    "msg": "LGPD para engenharia ambiental? Fale conosco."
+  }
+]

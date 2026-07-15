@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: aion-config
+  namespace: aion
+  labels:
+    app.kubernetes.io/name: aion
+data:
+  config.yaml: |
+    app:
+      version: "7.0.0"
+      environment: production
+      log_level: INFO
+    llm_routing:
+      default: deepseek
+      sensitive_llm: gemini
+      reasoning_llm: claude-api
+    monitoring:
+      metrics:
+        prometheus_port: 9091
+    orchestrator:
+      max_parallel_agents: 10
+      task_timeout_seconds: 30
+      retry_attempts: 3

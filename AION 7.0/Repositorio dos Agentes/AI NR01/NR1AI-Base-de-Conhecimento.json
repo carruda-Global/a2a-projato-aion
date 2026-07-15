@@ -1,0 +1,47 @@
+[
+  {
+    "id": "R0001",
+    "categoria": "Físico",
+    "perigo": "Ruído contínuo",
+    "agente": "Ruído",
+    "atividade": "Operação de serra, compressor, prensa",
+    "consequencia": "PAIR",
+    "epi": "Protetor auricular",
+    "epc": "Barreira acústica",
+    "docs": [
+      "Inventário",
+      "Plano de Ação",
+      "PGR"
+    ]
+  },
+  {
+    "id": "R0002",
+    "categoria": "Químico",
+    "perigo": "Fumos metálicos",
+    "agente": "Fumos",
+    "atividade": "Soldagem",
+    "consequencia": "Doença respiratória",
+    "epi": "Respirador PFF2",
+    "epc": "Exaustão localizada",
+    "docs": [
+      "Inventário",
+      "APR",
+      "PGR"
+    ]
+  },
+  {
+    "id": "R0003",
+    "categoria": "Ergonômico",
+    "perigo": "Movimentação manual de cargas",
+    "agente": "Esforço físico",
+    "atividade": "Estoque",
+    "consequencia": "Lombalgias",
+    "epi": "Conforme análise",
+    "epc": "Auxílio mecânico",
+    "docs": [
+      "Inventário",
+      "Plano de Ação",
+      "PGR"
+    ]
+  }
+]

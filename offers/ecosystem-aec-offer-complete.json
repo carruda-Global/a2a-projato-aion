@@ -1,0 +1,93 @@
+{
+  "$schema": "https://schema.mp.azure.com/schema/2024-03-01/offer.json",
+  "id": "ecosystem_aec_regulatory",
+  "name": "EcoSystem AEC + Regulatory - 27 Agentes de IA",
+  "alias": "ecosystem-aec-regulatory",
+  "description": "27 Agentes de IA para Engenharia de Producao, Arquitetura, Engenharia e Construcao (AEC), Conformidade Regulatoria Brasileira e Integracao Microsoft 365. Sistema completo com 5 agentes AEC (Spec Analyst, Procurement, Inventory, Logistics, Field Execution), 4 especializados (BIM Coordinator, Requirements Analyst, Engineering Assistant, Work Synopsis), 3 de conformidade AEC (Photo Intelligence, RFI Creation, Compliance), 9 regulatorios (NR-1 Psicossocial, Tributario CBS/IBS, LGPD, ESG IFRS, Inventario de Carbono, Escopo 3, Canal de Denuncias, Igualdade Salarial, Compliance Anticorrupcao) e 6 de integracao Microsoft (Regulatory Analyst, Compliance PM, Channel Agent, Knowledge Agent, Facilitator Agent, Dev Experience).",
+  "publisher": {
+    "id": "projeto-engenharia",
+    "name": "Projato Engenharia"
+  },
+  "kind": "SaaS",
+  "categories": [
+    "AI + Machine Learning",
+    "Developer Tools"
+  ],
+  "industries": [
+    "Engineering and Construction",
+    "Architecture",
+    "Professional Services"
+  ],
+  "plans": [
+    {
+      "id": "starter",
+      "name": "Starter - Spec Analyst",
+      "description": "1 agente de IA: Spec Analyst para analise de especificacoes tecnicas, extracao de requisitos e sinalizacao de nao-conformidades.",
+      "pricing": { "type": "recurring", "interval": "month", "price_usd": 166.17, "currency": "USD" },
+      "hidden": false
+    },
+    {
+      "id": "professional",
+      "name": "Professional - 3 Agentes",
+      "description": "3 agentes: Spec Analyst + Procurement + Inventory. Analise, compras e estoque automatizados.",
+      "pricing": { "type": "recurring", "interval": "month", "price_usd": 398.50, "currency": "USD" },
+      "hidden": false
+    },
+    {
+      "id": "enterprise",
+      "name": "Enterprise - 5 Agentes AEC",
+      "description": "5 agentes: Spec Analyst, Procurement, Inventory, Logistics, Field Execution. Nucleo completo AEC com logistica e campo.",
+      "pricing": { "type": "recurring", "interval": "month", "price_usd": 780.83, "currency": "USD" },
+      "hidden": false
+    },
+    {
+      "id": "full_suite",
+      "name": "Full Suite - 27 Agentes",
+      "description": "Todos os 27 agentes de IA: AEC, especializados, conformidade, regulatorios e Microsoft. Pacote completo.",
+      "pricing": { "type": "recurring", "interval": "month", "price_usd": 1582.83, "currency": "USD" },
+      "hidden": false
+    },
+    {
+      "id": "compliance_pack",
+      "name": "Compliance Pack - PGRS/PGRSS",
+      "description": "3 agentes: Photo Intelligence, RFI Creation, Compliance Agent. Gestao de conformidade AEC.",
+      "pricing": { "type": "recurring", "interval": "month", "price_usd": 398.50, "currency": "USD" },
+      "hidden": false
+    },
+    {
+      "id": "regulatory_starter",
+      "name": "Regulatory Starter - NR-1 + LGPD",
+      "description": "2 agentes regulatorios: NR-1 Psicossocial + LGPD Operacional. Inventario de riscos e conformidade ANPD.",
+      "pricing": { "type": "recurring", "interval": "month", "price_usd": 98.33, "currency": "USD" },
+      "hidden": false
+    },
+    {
+      "id": "regulatory_professional",
+      "name": "Regulatory Professional - 5 Agentes",
+      "description": "5 agentes: NR-1, LGPD, Canal de Denuncias, Igualdade Salarial, Compliance Anticorrupcao.",
+      "pricing": { "type": "recurring", "interval": "month", "price_usd": 248.33, "currency": "USD" },
+      "hidden": false
+    },
+    {
+      "id": "regulatory_full",
+      "name": "Regulatory Full - 9 Agentes",
+      "description": "Todos os 9 agentes regulatorios: NR-1, Tributario, LGPD, ESG, Carbono, Escopo 3, Denuncias, Igualdade, Anticorrupcao.",
+      "pricing": { "type": "recurring", "interval": "month", "price_usd": 581.67, "currency": "USD" },
+      "hidden": false
+    },
+    {
+      "id": "esg_carbon_pack",
+      "name": "ESG + Carbono",
+      "description": "3 agentes: ESG IFRS S1/S2, Inventario de Carbono, Escopo 3 Fornecedores. Sustentabilidade e GHG Protocol.",
+      "pricing": { "type": "recurring", "interval": "month", "price_usd": 415.00, "currency": "USD" },
+      "hidden": false
+    },
+    {
+      "id": "microsoft_pack",
+      "name": "Microsoft Pack - 6 Agentes",
+      "description": "6 agentes de integracao Microsoft 365: Regulatory Analyst, Compliance PM, Channel Agent, Knowledge Agent, Facilitator Agent, Dev Experience. SharePoint, Teams, Planner, Graph API.",
+      "pricing": { "type": "recurring", "interval": "month", "price_usd": 747.00, "currency": "USD" },
+      "hidden": false
+    }
+  ]
+}

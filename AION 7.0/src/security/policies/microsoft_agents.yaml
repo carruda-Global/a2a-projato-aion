@@ -1,0 +1,73 @@
+agents:
+  - agent_id: "did:aip:regulatory_analyst_001"
+    agent_name: "Regulatory Analyst"
+    principal: "Cristiano Arruda (CREA-SP 5071200171)"
+    permissions:
+      deepseek_chat: { allowed: true }
+      sharepoint_read: { allowed: true, constraints: [{ max_documents: 200 }] }
+      graph_api: { allowed: true, constraints: [{ read_only: true }, { scopes: ["Files.Read.All", "Sites.Read.All"] }] }
+      supabase_read: { allowed: true }
+      supabase_insert: { allowed: false }
+    dlp_rules:
+      - { pattern: "CPF|\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}", action: "mask" }
+      - { pattern: "CNPJ|\\d{2}\\.\\d{3}\\.\\d{3}/\\d{4}-\\d{2}", action: "mask" }
+
+  - agent_id: "did:aip:compliance_pm_001"
+    agent_name: "Compliance PM"
+    principal: "Cristiano Arruda (CREA-SP 5071200171)"
+    permissions:
+      deepseek_chat: { allowed: true }
+      graph_api: { allowed: true, constraints: [{ scopes: ["Tasks.ReadWrite", "Files.Read"] }] }
+      sharepoint_read: { allowed: true, constraints: [{ max_documents: 100 }] }
+      sharepoint_write: { allowed: true }
+      planner_api: { allowed: true }
+      supabase_read: { allowed: true }
+      supabase_insert: { allowed: true }
+      supabase_delete: { allowed: false }
+
+  - agent_id: "did:aip:channel_agent_001"
+    agent_name: "Channel Agent"
+    principal: "Cristiano Arruda (CREA-SP 5071200171)"
+    permissions:
+      deepseek_chat: { allowed: true }
+      teams_api: { allowed: true, constraints: [{ read_only: false }, { scopes: ["ChannelMessage.Read.All", "ChannelMessage.Send"] }] }
+      graph_api: { allowed: true, constraints: [{ read_only: true }] }
+      supabase_read: { allowed: true }
+      supabase_insert: { allowed: true }
+    dlp_rules:
+      - { pattern: "CPF|\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}", action: "mask" }
+      - { pattern: "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}", action: "mask" }
+
+  - agent_id: "did:aip:knowledge_agent_001"
+    agent_name: "Knowledge Agent"
+    principal: "Cristiano Arruda (CREA-SP 5071200171)"
+    permissions:
+      deepseek_chat: { allowed: true }
+      sharepoint_read: { allowed: true, constraints: [{ max_documents: 500 }] }
+      sharepoint_write: { allowed: false }
+      graph_api: { allowed: true, constraints: [{ read_only: true }] }
+      supabase_read: { allowed: true }
+      supabase_insert: { allowed: true }
+      supabase_delete: { allowed: false }
+    constraints:
+      - index_only: true
+
+  - agent_id: "did:aip:facilitator_agent_001"
+    agent_name: "Facilitator Agent"
+    principal: "Cristiano Arruda (CREA-SP 5071200171)"
+    permissions:
+      deepseek_chat: { allowed: true }
+      graph_api: { allowed: true, constraints: [{ scopes: ["OnlineMeetings.ReadWrite", "Tasks.ReadWrite"] }] }
+      teams_api: { allowed: true }
+      supabase_read: { allowed: true }
+      supabase_insert: { allowed: true }
+      supabase_delete: { allowed: false }
+
+  - agent_id: "did:aip:dev_experience_001"
+    agent_name: "Dev Experience Agent"
+    principal: "Cristiano Arruda (CREA-SP 5071200171)"
+    permissions:
+      deepseek_chat: { allowed: true }
+      github_api: { allowed: true, constraints: [{ read_only: true }, { scopes: ["repo:read"] }] }
+      supabase_read: { allowed: true }
+      supabase_insert: { allowed: true }

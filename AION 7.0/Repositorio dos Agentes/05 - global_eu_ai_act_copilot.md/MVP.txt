@@ -1,0 +1,111 @@
+# Global EU AI Act Copilot
+
+## Objetivo
+
+Avaliar sistemas de IA conforme EU AI Act.
+
+---
+
+# Problema
+
+Empresas precisam demonstrar conformidade antes de vender para Europa.
+
+---
+
+# Público
+
+- Empresas IA
+- SaaS
+- HealthTech
+- HR Tech
+- GovTech
+
+---
+
+# MVP
+
+Entrada
+
+Descrição do sistema
+
+Documentação
+
+Arquitetura
+
+Políticas
+
+---
+
+# Saída
+
+Classificação de risco
+
+Obrigatoriedades
+
+Checklist
+
+Plano de ação
+
+---
+
+# Fluxo
+
+Upload
+
+↓
+
+Classificação
+
+↓
+
+Mapeamento AI Act
+
+↓
+
+Relatório
+
+---
+
+# Classificação
+
+Minimal Risk
+
+Limited Risk
+
+High Risk
+
+Prohibited
+
+---
+
+# Conhecimento
+
+EU AI Act
+
+ISO42001
+
+NIST AI RMF
+
+---
+
+# Resultado
+
+Compliance Report
+
+Risk Score
+
+Gap Analysis
+
+Checklist
+
+---
+
+# Evolução
+
+Monitoramento
+
+Auditoria contínua
+
+Integração Jira
+
+Dashboard

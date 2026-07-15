@@ -1,0 +1,58 @@
+"""Real topic catalog for LinkedIn content generation — one entry per product/
+regulation the platform actually sells. Combined with the 10 hook styles in
+hooks.py (20 x 10 = 200 distinct post variations) so content never repeats
+without needing 200 hand-written texts."""
+
+TOPICS = [
+    {"id": "nr1", "produto": "NR-1 Psychosocial", "lei": "Portaria MTE 1.419/2024",
+     "fato": "82% dos times de RH ainda nao fizeram o inventario FRPRT exigido", "preco": "R$ 99/mes", "utm": "nr1"},
+    {"id": "lgpd", "produto": "LGPD Operacional", "lei": "Lei 13.709/2018",
+     "fato": "a ANPD ja multou mais de 50 empresas em 2025 por falta de RoPA", "preco": "R$ 590/mes", "utm": "lgpd"},
+    {"id": "cbsibs", "produto": "CBS/IBS Tax", "lei": "LC 214/2025",
+     "fato": "toda empresa precisa reclassificar NCM antes da transicao 2026-2033", "preco": "R$ 390/mes", "utm": "cbsibs"},
+    {"id": "esg", "produto": "ESG IFRS S1/S2", "lei": "IFRS S1/S2",
+     "fato": "fornecedores europeus ja exigem relatorio de carbono auditavel", "preco": "R$ 2.490/mes", "utm": "esg"},
+    {"id": "soc2", "produto": "SOC 2 Readiness", "lei": "AICPA TSC 2017",
+     "fato": "empresas sem SOC2 perdem contratos enterprise por falha em due diligence", "preco": "$149/mo", "utm": "soc2"},
+    {"id": "iso27001", "produto": "ISO 27001 Gap Analysis", "lei": "ISO/IEC 27001:2022",
+     "fato": "93 controles do Annex A sao checados manualmente por a maioria das empresas ainda hoje", "preco": "$149/mo", "utm": "iso27001"},
+    {"id": "euaiact", "produto": "EU AI Act Readiness", "lei": "Regulation (EU) 2024/1689",
+     "fato": "multas de ate 7% do faturamento global ja estao em vigor desde fev/2025", "preco": "$149/mo", "utm": "euaiact"},
+    {"id": "contractrisk", "produto": "Contract Risk", "lei": "GDPR Art. 28(3) / UNCITRAL",
+     "fato": "contratos comerciais tem em media 4 de 15 clausulas criticas ausentes", "preco": "$149/mo", "utm": "contractrisk"},
+    {"id": "vendorrisk", "produto": "Vendor Risk", "lei": "NIST SP 800-161",
+     "fato": "violacao por terceiro custa em media US$ 4.91 milhoes e leva 267 dias pra detectar", "preco": "$149/mo", "utm": "vendorrisk"},
+    {"id": "payequity", "produto": "Pay Equity", "lei": "Lei 14.611/2023",
+     "fato": "empresas com 100+ funcionarios sao obrigadas a publicar relatorio semestral de equidade", "preco": "R$ 129/mes", "utm": "payequity"},
+    {"id": "anticorrupcao", "produto": "Anti-Corruption", "lei": "Lei 12.846/2013",
+     "fato": "empresas que licitam com o poder publico precisam de programa de integridade formal", "preco": "R$ 99/mes", "utm": "anticorrupcao"},
+    {"id": "csrd", "produto": "CSRD Double Materiality", "lei": "Regulamento Delegado (UE) 2023/2772",
+     "fato": "empresas de grande porte na UE ja reportam sob 11 topicos ESRS obrigatorios", "preco": "$629/mo", "utm": "csrd"},
+    {"id": "carbono", "produto": "Carbon Inventory", "lei": "GHG Protocol",
+     "fato": "a maioria das empresas nao tem inventario completo de Escopo 1 e 2", "preco": "$629/mo", "utm": "carbono"},
+    {"id": "escopo3", "produto": "Scope 3 Suppliers", "lei": "CBAM + IFRS S2",
+     "fato": "quem importa aco, cimento ou aluminio da UE ja precisa declarar CBAM trimestralmente", "preco": "$629/mo", "utm": "escopo3"},
+    {"id": "whistleblower", "produto": "Whistleblower Channel", "lei": "Directive (EU) 2019/1937",
+     "fato": "empresas com 50+ funcionarios na UE sao obrigadas a ter canal de denuncias", "preco": "$149/mo", "utm": "whistleblower"},
+    {"id": "engenharia", "produto": "Engineering Copilot", "lei": "CREA / ABNT",
+     "fato": "memorial descritivo, data book e as-built ainda sao feitos manualmente na maioria das obras", "preco": "$249/mo", "utm": "engenharia"},
+    {"id": "procurement", "produto": "Procurement Copilot", "lei": "boas praticas de suprimentos",
+     "fato": "pedidos de compra em obra ainda sao conciliados manualmente contra o orcamento", "preco": "$149/mo", "utm": "procurement"},
+    {"id": "dora", "produto": "DORA Compliance", "lei": "Regulation (EU) 2022/2554",
+     "fato": "instituicoes financeiras na UE precisam provar resiliencia operacional digital", "preco": "sob consulta", "utm": "dora"},
+    {"id": "nis2", "produto": "NIS2 Compliance", "lei": "Directive (EU) 2022/2555",
+     "fato": "infraestrutura critica na UE tem novas obrigacoes de seguranca de rede", "preco": "sob consulta", "utm": "nis2"},
+    {"id": "mna", "produto": "M&A Due Diligence", "lei": "boas praticas de compliance",
+     "fato": "due diligence de compliance em fusoes ainda leva semanas quando feita manualmente", "preco": "sob consulta", "utm": "mna"},
+
+    # Angulo de portfolio/consultoria -- atrair projetos de desenvolvimento
+    # personalizado de agentes de IA, nao so vender assinatura dos produtos.
+    {"id": "consultoria-ia", "produto": "Desenvolvimento de Agentes de IA sob medida", "lei": "arquitetura multiagente (LangGraph, DeepSeek-V4-Flash)",
+     "fato": "empresas gastam meses tentando construir agentes de IA sozinhas e travam na integracao com sistemas reais", "preco": "sob consulta", "utm": "consultoria-ia"},
+    {"id": "case-voicereceptionist", "produto": "AION Voice Receptionist", "lei": "produto real em producao, com RAG e auditoria de compliance automatizados",
+     "fato": "pequenas empresas perdem receita real com ligacoes nao atendidas", "preco": "case real, ja em producao", "utm": "case-voice"},
+    {"id": "case-nr1agent", "produto": "Agente NR-1 automatizado", "lei": "Portaria MTE 1.419/2024",
+     "fato": "o agente gera o inventario FRPRT e o PGR completo em horas, testado ponta a ponta", "preco": "case real, ja em producao", "utm": "case-nr1"},
+    {"id": "dev-personalizado", "produto": "Time de Engenharia de IA sob demanda", "lei": "LangGraph, DeepSeek-V4-Flash e Claude Code",
+     "fato": "sua empresa pode ter um agente de IA rodando em producao em semanas, nao meses", "preco": "sob consulta", "utm": "dev-personalizado"},
+]

@@ -1,0 +1,42 @@
+name: "Captura de Leads do Site"
+description: "Recebe leads do site e integra ao funil de vendas"
+
+webhook:
+  endpoint: "/webhook/site-lead"
+  method: "POST"
+  fields:
+    - name: "nome"
+      required: true
+    - name: "email"
+      required: true
+    - name: "empresa"
+      required: false
+    - name: "telefone"
+      required: false
+    - name: "interesse"
+      required: false
+
+actions:
+  - id: save_lead
+    agent: "site_webhook"
+    action: receive_lead
+    params:
+      source: "site"
+
+  - id: score_lead
+    agent: "lead_qualifier"
+    action: score_lead
+    params:
+      auto: true
+
+  - id: send_confirmation
+    agent: "site_webhook"
+    action: send_email
+    params:
+      template: "lead_recebido"
+
+  - id: start_drip
+    agent: "site_webhook"
+    action: start_drip_campaign
+    params:
+      campaign: "welcome"

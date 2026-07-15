@@ -1,0 +1,184 @@
+﻿services:
+  - type: web
+    name: hmas-orchestrator
+    env: docker
+    repo: https://github.com/carruda-Global/engenheiro-producao-ai.git
+    branch: main
+    dockerfilePath: ./Dockerfile
+    dockerCommand: uvicorn app.main:app --host 0.0.0.0 --port 8000
+    buildFilter:
+      paths:
+        - app/**
+        - src/**
+        - offers/**
+        - config.yaml
+        - requirements.txt
+        - Dockerfile
+        - .env.render
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: LOG_LEVEL
+        value: INFO
+      - key: A2A_ENABLED
+        value: "true"
+      - key: A2A_BASE_URL
+        value: https://engenheiro-producao-ai.onrender.com
+      - key: DEEPSEEK_API_KEY
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: CLAUDE_API_KEY
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_API_KEY
+        sync: false
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_PUBLISHABLE_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET_PRODUCTION
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET_TEST
+        sync: false
+      - key: ABACATEPAY_API_KEY
+        sync: false
+      - key: ABACATEPAY_WEBHOOK_SECRET
+        sync: false
+      - key: ABACATEPAY_SANDBOX_MODE
+        value: "true"
+      - key: DATABASE_URL
+        sync: false
+      - key: KAFKA_BOOTSTRAP_SERVERS
+        sync: false
+      - key: AZURE_TENANT_ID
+        sync: false
+      - key: AZURE_CLIENT_ID
+        sync: false
+      - key: AZURE_CLIENT_SECRET
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
+      - key: DEVTO_API_KEY
+        sync: false
+      - key: GSC_CLIENT_ID
+        sync: false
+      - key: GSC_CLIENT_SECRET
+        sync: false
+      - key: GSC_REFRESH_TOKEN
+        sync: false
+      - key: GSC_SITE_URL
+        value: "https://www.global-engenharia.com/"
+    healthCheckPath: /
+    numInstances: 1
+
+  - type: web
+    name: hmas-mcp-regulatory
+    env: docker
+    repo: https://github.com/carruda-Global/engenheiro-producao-ai.git
+    branch: main
+    dockerfilePath: ./Dockerfile
+    dockerCommand: uvicorn src.mcp.regulatory_server:regulatory_app --host 0.0.0.0 --port 8010
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: DEEPSEEK_API_KEY
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+    healthCheckPath: /health
+    numInstances: 1
+
+  - type: web
+    name: hmas-mcp-esg
+    env: docker
+    repo: https://github.com/carruda-Global/engenheiro-producao-ai.git
+    branch: main
+    dockerfilePath: ./Dockerfile
+    dockerCommand: uvicorn src.mcp.esg_server:esg_app --host 0.0.0.0 --port 8011
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: DEEPSEEK_API_KEY
+        sync: false
+    healthCheckPath: /health
+    numInstances: 1
+
+  - type: web
+    name: hmas-mcp-erp
+    env: docker
+    repo: https://github.com/carruda-Global/engenheiro-producao-ai.git
+    branch: main
+    dockerfilePath: ./Dockerfile
+    dockerCommand: uvicorn src.mcp.erp_server:erp_app --host 0.0.0.0 --port 8012
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: DEEPSEEK_API_KEY
+        sync: false
+      - key: DYNAMICS_CLIENT_ID
+        sync: false
+      - key: DYNAMICS_CLIENT_SECRET
+        sync: false
+      - key: DYNAMICS_TENANT_ID
+        sync: false
+      - key: ORACLE_TENANT_ID
+        sync: false
+      - key: SAP_BTP_CLIENT_ID
+        sync: false
+      - key: SAP_BTP_CLIENT_SECRET
+        sync: false
+    healthCheckPath: /health
+    numInstances: 1
+
+  - type: web
+    name: hmas-mcp-microsoft
+    env: docker
+    repo: https://github.com/carruda-Global/engenheiro-producao-ai.git
+    branch: main
+    dockerfilePath: ./Dockerfile
+    dockerCommand: uvicorn src.mcp.microsoft_server:microsoft_app --host 0.0.0.0 --port 8013
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: DEEPSEEK_API_KEY
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: CLAUDE_API_KEY
+        sync: false
+    healthCheckPath: /tools
+    numInstances: 1
+
+  - type: worker
+    name: aion-linkedin-agent
+    env: docker
+    repo: https://github.com/carruda-Global/engenheiro-producao-ai.git
+    branch: main
+    dockerfilePath: ./Dockerfile.worker
+    envVars:
+      - key: LINKEDIN_CLIENT_ID
+        sync: false
+      - key: LINKEDIN_CLIENT_SECRET
+        sync: false
+      - key: LINKEDIN_REDIRECT_URI
+        value: "http://127.0.0.1:9876/callback"
+      - key: PYTHONUNBUFFERED
+        value: "1"
+      - key: SALES_DB_URL
+        value: "sqlite:///sales_pipeline.db"
+      - key: MARKETPLACE_ADMIN_SECRET
+        sync: false
+      - key: AION_BACKEND_URL
+        value: "https://engenheiro-producao-ai.onrender.com"
+
+databases:
+  - name: hmas-database
+    plan: starter
+    databaseName: hmas
+    user: hmas_user
+    region: ohio
+

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SDR AION — WhatsApp Links</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:Arial,sans-serif;background:#0C1322;color:#e2e8f0;padding:20px}
+h1{color:#00C36B;margin-bottom:10px}
+.sub{color:#64748b;font-size:14px;margin-bottom:20px}
+.card{background:#1a2332;border-radius:8px;padding:16px;margin-bottom:12px;border-left:4px solid #00C36B}
+.card h3{font-size:16px;margin-bottom:4px}
+.card .info{font-size:13px;color:#94a3b8;margin-bottom:8px}
+.card .msg{font-size:14px;background:#0C1322;padding:10px;border-radius:6px;margin:8px 0;line-height:1.4}
+.btn{display:inline-block;background:#25D366;color:#fff;padding:10px 20px;border-radius:6px;text-decoration:none;font-size:14px;font-weight:bold;margin-right:8px;margin-top:4px}
+.btn:hover{background:#1fb954}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(400px,1fr));gap:12px}
+.sent{opacity:0.4;border-left-color:#64748b}
+</style>
+</head>
+<body>
+<h1>SDR AION — Links WhatsApp</h1>
+<p class="sub">18 leads em 6 setores. Clique no botao verde para abrir o WhatsApp Web.</p>
+<div class="grid" id="grid"></div>
+<script>
+const leads = [
+  {"e":"Construtora Tenda","c":"Gerente de Compliance","m":"Oi, tudo bem? Vi que na Tenda voces estao lidando com exigencias regulatorias crescentes. Acho que o combo NR-1 (riscos psicossociais) e Spec Analyst (analise de projetos BIM) pode ajudar. Se fizer sentido, bora trocar ideia? global-engenharia.com/ecosystem"},
+  {"e":"Ecoville Construtora","c":"Diretor de Legal e Compliance","m":"Oi, tudo bem? Pra garantir a conformidade com as normas atualizadas, acho que a combinacao de NR-1 e Spec Analyst seria ideal pra voces. Se fizer sentido, bora trocar ideia? global-engenharia.com/ecosystem"},
+  {"e":"Construtora Pascon","c":"Coordenador de Compliance","m":"Oi, tudo bem? Pra atender essa demanda de transparencia e seguranca juridica, acho que o combo NR-1 + Spec Analyst pode resolver. Se fizer sentido, bora trocar ideia? global-engenharia.com/ecosystem"},
+  {"e":"ArcelorMittal","c":"Gerente de Sustentabilidade","m":"Oi, tudo bem? Vi que a ArcelorMittal ta precisando se adequar as exigencias regulatorias e calcular inventario de carbono. Acho que o combo NR-1 + Inventario Carbono pode ajudar. Se fizer sentido, bora trocar ideia? global-engenharia.com/ecosystem"},
+  {"e":"Petrobras","c":"Coordenador de Saude e Meio Ambiente","m":"Oi, tudo certo? Pra Petrobras, acho que o combo NR-1 (obrigacao trabalhista) e Inventario Carbono (ESG IFRS) resolve as exigencias de compliance e carbono. Se fizer sentido, bora trocar ideia? global-engenharia.com/ecosystem"},
+  {"e":"Vale","c":"Analista de Seguranca","m":"Oi, tudo bem? Pra Vale, acho que a combinacao do NR-1 com o Inventario Carbono pode dar uma boa ajuda. Se fizer sentido, bora trocar ideia? global-engenharia.com/ecosystem"},
+  {"e":"Movile","c":"Diretor de Tecnologia","m":"Oi, tudo bem? Vi que a Movile ta precisando se adequar a LGPD e auditoria de seguranca de dados. Acho que o combo LGPD + Code Review pode ajudar. Se fizer sentido, bora trocar ideia? global-engenharia.com/ecosystem"},
+  {"e":"PagSeguro","c":"Gerente de Compliance","m":"Oi, tudo bem? Vi que a PagSeguro ta lidando com dados financeiros sensiveis. Acho que a combinacao de LGPD com Code Review automatico resolve. Se fizer sentido, bora trocar ideia? global-engenharia.com/ecosystem"},
+  {"e":"TOTVS","c":"Gerente de Seguranca","m":"Oi, tudo bem? Vi que na TOTVS voces lidam com dados pessoais de clientes e a LGPD e uma preocupacao. Acho que o combo LGPD + Software Engineering resolve. Se fizer sentido, bora trocar ideia? global-engenharia.com/ecosystem"},
+  {"e":"Magazine Luiza","c":"Diretor de Compliance","m":"Oi, tudo bem? Vi que no Magazine Luiza voces precisam cuidar dos dados dos clientes e da conformidade regulatoria. Acho que o combo LGPD + Compliance Score resolve. Se fizer sentido, bora trocar ideia? global-engenharia.com/ecosystem"},
+  {"e":"Lojas Americanas","c":"Gerente de Seguranca","m":"Oi, tudo certo? Pra Lojas Americanas, acho que a combinacao de LGPD e Compliance Score pode ajudar com as exigencias regulatorias. Se fizer sentido, bora trocar ideia? global-engenharia.com/ecosystem"},
+  {"e":"Grupo Pao de Acucar","c":"Responsavel Dados","m":"Oi, tudo certo? Vi que voces estao precisando de compliance e protecao de dados. Acho que o combo LGPD + Compliance Score cai bem. Se fizer sentido, bora trocar ideia? global-engenharia.com/ecosystem"},
+  {"e":"Hospital das Clinicas","c":"Diretor de TI","m":"Oi, tudo bem? Pra garantir a protecao dos dados dos pacientes e a conformidade com NR-1, acho que o combo NR-1 + LGPD pode ajudar. Se fizer sentido, bora trocar ideia? global-engenharia.com/ecosystem"},
+  {"e":"Amil","c":"Gestor de Compliance","m":"Oi, tudo bem? Vi que na Amil voces estao focados em adequacao regulatoria. Acho que o combo NR-1 (riscos hospitalares) e LGPD (dados sensiveis) resolve. Se fizer sentido, bora trocar ideia? global-engenharia.com/ecosystem"},
+  {"e":"Hospital de Cancer de Barretos","c":"Diretor Administrativo","m":"Oi, tudo bem? Pra proteger as informacoes sensiveis dos pacientes e garantir conformidade, acho que o combo NR-1 + LGPD pode ajudar. Se fizer sentido, bora trocar ideia? global-engenharia.com/ecosystem"},
+  {"e":"Energisa","c":"Diretor de Sustentabilidade","m":"Oi, tudo bem? Vi que a Energisa ta buscando melhorar as metas de carbono e relatorios ESG. Acho que o combo Inventario Carbono + ESG IFRS resolve. Se fizer sentido, bora trocar ideia? global-engenharia.com/ecosystem"},
+  {"e":"SABESP","c":"Gerente de Sustentabilidade","m":"Oi, tudo bem? Vi que a SABESP ta precisando de uma ajuda com o inventario de carbono e compliance ESG. Acho que o combo Carbono + ESG IFRS resolve. Se fizer sentido, bora trocar ideia? global-engenharia.com/ecosystem"},
+  {"e":"Enel Brasil","c":"Diretor de Compliance","m":"Oi, tudo bem? Vi que a Enel ta focada em transparencia e responsabilidade socioambiental. Acho que o combo Inventario Carbono + ESG IFRS ajuda. Se fizer sentido, bora trocar ideia? global-engenharia.com/ecosystem"},
+];
+
+const grid = document.getElementById("grid");
+leads.forEach((l, i) => {
+  const msg = encodeURIComponent(l.m);
+  const link = `https://wa.me/5511994798464?text=${msg}`;
+  const card = document.createElement("div");
+  card.className = "card";
+  card.id = `card${i}`;
+  card.innerHTML = `
+    <h3>${i+1}. ${l.e}</h3>
+    <div class="info">${l.c}</div>
+    <div class="msg">${l.m.substring(0,150)}...</div>
+    <a href="${link}" target="_blank" class="btn" onclick="markSent(${i})">Enviar WhatsApp</a>
+    <small style="color:#64748b">wa.me/5511994798464</small>
+  `;
+  grid.appendChild(card);
+});
+
+function markSent(i) {
+  const card = document.getElementById(`card${i}`);
+  card.classList.add("sent");
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,126 @@
+{
+  "name": "projects/global-engenharia-498823/providers/global-engenharia-498823/offers/aion-marketplace",
+  "displayName": "AION - 78 Agentes de IA para Engenharia e Compliance",
+  "description": "AION - Agents Intelligence Orchestration Network. 78 agentes de IA para Arquitetura, Engenharia, Construcao, Conformidade Regulatoria (NR-1, LGPD, ESG), Microsoft Dynamics 365, Salesforce Agentforce, Oracle Fusion e SAP S/4HANA.\n\nAgentes AEC: Spec Analyst, Procurement, Inventory, Logistics, Field Execution, BIM Coordinator, Requirements Analyst, Engineering Assistant, Work Synopsis, Photo Intelligence, RFI Creation, Compliance PGRS/PGRSS.\n\nAgentes Regulatorios: NR-1 Psicossocial, Tributario CBS/IBS, LGPD Operacional, ESG IFRS S1/S2, Inventario de Carbono, Escopo 3 Fornecedores, Canal de Denuncias, Igualdade Salarial, Compliance Anticorrupcao.\n\nAgentes Microsoft: Regulatory Analyst, Compliance PM, Channel Agent, Knowledge Agent, Facilitator Agent, Dev Experience.",
+  "category": "AI_AGENTS_AND_TOOLS",
+  "productType": "SAAS",
+  "fulfillmentUrl": "https://engenheiro-producao-ai.onrender.com",
+  "termsOfService": "https://engenheiro-producao-ai.onrender.com/terms",
+  "privacyPolicy": "https://engenheiro-producao-ai.onrender.com/privacy",
+  "supportEmail": "cristiano@globalengenharia.com.br",
+  "webhooks": [
+    {
+      "name": "Entitlement Events",
+      "uri": "https://engenheiro-producao-ai.onrender.com/google/webhook",
+      "eventTypes": [
+        "ENTITLEMENT_CREATED",
+        "ENTITLEMENT_ACTIVATED",
+        "ENTITLEMENT_CANCELLED",
+        "ENTITLEMENT_SUSPENDED",
+        "ENTITLEMENT_RENEWED"
+      ]
+    }
+  ],
+  "plans": [
+    {
+      "planId": "compliance_essencial",
+      "displayName": "Compliance Essencial - NR-1 + LGPD",
+      "pricingModel": "SUBSCRIPTION",
+      "pricingPeriod": "MONTHLY",
+      "price": {
+        "amountMicros": 119000000,
+        "currencyCode": "USD"
+      }
+    },
+    {
+      "planId": "regulatory_pro",
+      "displayName": "Regulatory Pro - 6 Agentes",
+      "pricingModel": "SUBSCRIPTION",
+      "pricingPeriod": "MONTHLY",
+      "price": {
+        "amountMicros": 299000000,
+        "currencyCode": "USD"
+      }
+    },
+    {
+      "planId": "esg_carbono",
+      "displayName": "ESG + Carbono",
+      "pricingModel": "SUBSCRIPTION",
+      "pricingPeriod": "MONTHLY",
+      "price": {
+        "amountMicros": 499000000,
+        "currencyCode": "USD"
+      }
+    },
+    {
+      "planId": "microsoft_pack",
+      "displayName": "Microsoft Pack - 6 Agentes M365",
+      "pricingModel": "SUBSCRIPTION",
+      "pricingPeriod": "MONTHLY",
+      "price": {
+        "amountMicros": 899000000,
+        "currencyCode": "USD"
+      }
+    },
+    {
+      "planId": "dynamics_pack",
+      "displayName": "Dynamics 365 Pack - 6 Agentes",
+      "pricingModel": "SUBSCRIPTION",
+      "pricingPeriod": "MONTHLY",
+      "price": {
+        "amountMicros": 999000000,
+        "currencyCode": "USD"
+      }
+    },
+    {
+      "planId": "agentforce_pack",
+      "displayName": "Agentforce Pack - 5 Agentes",
+      "pricingModel": "SUBSCRIPTION",
+      "pricingPeriod": "MONTHLY",
+      "price": {
+        "amountMicros": 929000000,
+        "currencyCode": "USD"
+      }
+    },
+    {
+      "planId": "oracle_pack",
+      "displayName": "Oracle Fusion Pack - 4 Agentes",
+      "pricingModel": "SUBSCRIPTION",
+      "pricingPeriod": "MONTHLY",
+      "price": {
+        "amountMicros": 999000000,
+        "currencyCode": "USD"
+      }
+    },
+    {
+      "planId": "sap_pack",
+      "displayName": "SAP Integration Pack - 3 Agentes",
+      "pricingModel": "SUBSCRIPTION",
+      "pricingPeriod": "MONTHLY",
+      "price": {
+        "amountMicros": 1079000000,
+        "currencyCode": "USD"
+      }
+    },
+    {
+      "planId": "erp_full_bridge",
+      "displayName": "ERP Full Bridge - 18 Agentes",
+      "pricingModel": "SUBSCRIPTION",
+      "pricingPeriod": "MONTHLY",
+      "price": {
+        "amountMicros": 3299000000,
+        "currencyCode": "USD"
+      }
+    },
+    {
+      "planId": "full_suite",
+      "displayName": "Full Suite - Todos os 78 Agentes",
+      "pricingModel": "SUBSCRIPTION",
+      "pricingPeriod": "MONTHLY",
+      "price": {
+        "amountMicros": 4999000000,
+        "currencyCode": "USD"
+      }
+    }
+  ]
+}

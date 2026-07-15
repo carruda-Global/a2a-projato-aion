@@ -1,0 +1,36 @@
+{
+  "name": "n8n-nodes-aion-compliance",
+  "version": "1.0.0",
+  "description": "n8n node for the AION Compliance Copilot platform — SOC2, ISO27001, EU AI Act, Contract Risk, Vendor Risk, and more",
+  "keywords": ["n8n-community-node-package", "aion", "compliance", "soc2", "iso27001", "eu-ai-act"],
+  "license": "MIT",
+  "homepage": "https://global-engenharia.com/ecosystem",
+  "author": {
+    "name": "Cristiano Arruda",
+    "email": "cristiano.arruda@global-engenharia.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "github.com/carruda-Global/engenheiro-producao-ai"
+  },
+  "scripts": {
+    "build": "tsc && cp package.json dist/",
+    "dev": "tsc --watch",
+    "lint": "eslint . --ext .ts",
+    "lintfix": "eslint . --ext .ts --fix"
+  },
+  "files": ["dist/"],
+  "n8n": {
+    "n8nNodesApiVersion": 1,
+    "nodes": ["dist/AionCompliance.node.js"],
+    "credentials": ["dist/AionApi.credentials.js"]
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0",
+    "eslint": "^8.0.0"
+  },
+  "dependencies": {
+    "n8n-workflow": "^1.0.0"
+  }
+}

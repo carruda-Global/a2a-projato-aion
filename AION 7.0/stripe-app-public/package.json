@@ -1,0 +1,13 @@
+{
+  "name": "ecosystem-compliance",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "stripe apps start",
+    "upload": "stripe apps upload",
+    "submit": "stripe apps submit"
+  },
+  "dependencies": {
+    "@stripe/ui-extension-sdk": "^9.1.0"
+  }
+}

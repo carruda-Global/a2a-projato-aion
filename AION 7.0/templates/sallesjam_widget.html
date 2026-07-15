@@ -1,0 +1,72 @@
+<div id="sallesjam-chat-widget"></div>
+<script>
+(function(){
+  const lang = navigator.language || 'pt-BR';
+  let market = 'BR';
+  if(lang.startsWith('en')) market = 'US';
+  if(lang === 'es-MX') market = 'MX';
+  if(lang === 'es-CO') market = 'CO';
+  if(lang === 'es-AR') market = 'AR';
+
+  const labels = {
+    BR: {title: 'SallesJam — online agora', placeholder: 'Pergunte sobre NR-1, LGPD...'},
+    US: {title: 'SallesJam — online now', placeholder: 'Ask about EU AI Act...'},
+    MX: {title: 'SallesJam — en línea', placeholder: 'Pregunta sobre LFPDPPP...'},
+    CO: {title: 'SallesJam — en línea', placeholder: 'Pregunta sobre Ley 1581...'},
+    AR: {title: 'SallesJam — en línea', placeholder: 'Pregunta sobre automatización...'}
+  };
+  const t = labels[market];
+
+  const widget = document.createElement('div');
+  widget.innerHTML = `
+    <div id="chat-bubble" style="position:fixed;bottom:24px;right:24px;
+      width:60px;height:60px;border-radius:50%;background:#00C36B;
+      display:flex;align-items:center;justify-content:center;
+      cursor:pointer;box-shadow:0 8px 24px rgba(0,195,107,.4);z-index:9999">
+      <span style="font-size:28px">💬</span>
+    </div>
+    <div id="chat-window" style="display:none;position:fixed;bottom:96px;
+      right:24px;width:340px;height:480px;background:#0C1322;
+      border-radius:16px;box-shadow:0 16px 48px rgba(0,0,0,.4);
+      z-index:9999;flex-direction:column;overflow:hidden">
+      <div style="background:#00C36B;padding:16px;color:#fff;font-weight:600">
+        ${t.title}
+      </div>
+      <div id="chat-messages" style="flex:1;padding:16px;overflow-y:auto;
+        color:#e2e8f0;font-size:13px"></div>
+      <div style="padding:12px;display:flex;gap:8px;border-top:1px solid #1A2540">
+        <input id="chat-input" placeholder="${t.placeholder}"
+          style="flex:1;background:#1A2540;border:none;border-radius:8px;
+          padding:10px;color:#fff;font-size:13px">
+        <button id="chat-send" style="background:#00C36B;border:none;
+          border-radius:8px;padding:10px 14px;color:#fff;cursor:pointer">→</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(widget);
+  document.getElementById('chat-bubble').onclick = () => {
+    const w = document.getElementById('chat-window');
+    w.style.display = w.style.display === 'none' ? 'flex' : 'none';
+  };
+  document.getElementById('chat-send').onclick = async () => {
+    const input = document.getElementById('chat-input');
+    const msgBox = document.getElementById('chat-messages');
+    const msg = input.value;
+    if(!msg) return;
+    msgBox.innerHTML += `<div style="margin-bottom:8px;text-align:right">
+      <span style="background:#00C36B;padding:8px 12px;border-radius:12px;
+      display:inline-block">${msg}</span></div>`;
+    input.value = '';
+    const resp = await fetch('https://engenheiro-producao-ai.onrender.com/api/sales-agent/chat', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({message: msg, page: window.location.pathname, market: market})
+    });
+    const data = await resp.json();
+    msgBox.innerHTML += `<div style="margin-bottom:8px">
+      <span style="background:#1A2540;padding:8px 12px;border-radius:12px;
+      display:inline-block">${data.response}</span></div>`;
+    msgBox.scrollTop = msgBox.scrollHeight;
+  };
+})();
+</script>

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head><meta charset="UTF-8"><title>Google Add-on SallesJam</title></head>
+<body style="background:#0C1322;color:#e2e8f0;font-family:monospace;padding:40px">
+  <h2 style="color:#00C36B">Google Workspace Add-on — SallesJam</h2>
+  
+  <h3 style="color:#00C36B">1. Code.gs (copiar e colar no script.google.com)</h3>
+  <pre id="codegs" style="background:#1A2540;padding:24px;border-radius:12px;white-space:pre-wrap;word-break:break-word;font-size:12px;line-height:1.5">
+function onHomepage(e) {
+  return buildCard();
+}
+function buildCard() {
+  var card = CardService.newCardBuilder();
+  var header = CardService.newCardHeader()
+    .setTitle('SallesJam Compliance')
+    .setSubtitle('Agentes de IA para compliance regulatorio');
+  var section = CardService.newCardSection();
+  var textInput = CardService.newTextInput()
+    .setFieldName('userMessage')
+    .setTitle('Pergunte sobre NR-1, LGPD...');
+  section.addWidget(textInput);
+  var button = CardService.newTextButton()
+    .setText('Enviar')
+    .setOnClickAction(CardService.newAction().setFunctionName('sendToAgent'));
+  section.addWidget(button);
+  card.setHeader(header).addSection(section);
+  return card.build();
+}
+function sendToAgent(e) {
+  var message = e.formInput.userMessage;
+  var response = UrlFetchApp.fetch(
+    'https://engenheiro-producao-ai.onrender.com/api/sales-agent/chat',
+    {method: 'post', contentType: 'application/json',
+     payload: JSON.stringify({message: message, page: '/google-addon', market: 'BR'})}
+  );
+  var data = JSON.parse(response.getContentText());
+  var card = CardService.newCardBuilder();
+  card.addSection(CardService.newCardSection().addWidget(
+    CardService.newTextParagraph().setText(data.response)));
+  return CardService.newActionResponseBuilder()
+    .setNavigation(CardService.newNavigation().pushCard(card.build())).build();
+}
+function onGmailMessageOpen(e) {
+  var messageId = e.gmail.messageId;
+  var accessToken = e.gmail.accessToken;
+  GmailApp.setCurrentMessageAccessToken(accessToken);
+  var message = GmailApp.getMessageById(messageId);
+  var body = message.getPlainBody();
+  var card = CardService.newCardBuilder();
+  card.setHeader(CardService.newCardHeader().setTitle('SallesJam - Analise LGPD'));
+  var button = CardService.newTextButton()
+    .setText('Verificar conformidade LGPD deste email')
+    .setOnClickAction(CardService.newAction()
+      .setFunctionName('analyzeEmailLGPD')
+      .setParameters({body: body.substring(0, 2000)}));
+  card.addSection(CardService.newCardSection().addWidget(button));
+  return card.build();
+}
+function analyzeEmailLGPD(e) {
+  var body = e.parameters.body;
+  var response = UrlFetchApp.fetch(
+    'https://engenheiro-producao-ai.onrender.com/api/sales-agent/chat',
+    {method: 'post', contentType: 'application/json',
+     payload: JSON.stringify({message: 'Este email contem dados pessoais que violam LGPD? ' + body, page: '/gmail-addon', market: 'BR'})}
+  );
+  var data = JSON.parse(response.getContentText());
+  var card = CardService.newCardBuilder();
+  card.addSection(CardService.newCardSection().addWidget(
+    CardService.newTextParagraph().setText(data.response)));
+  return CardService.newActionResponseBuilder()
+    .setNavigation(CardService.newNavigation().pushCard(card.build())).build();
+}
+  </pre>
+  <button onclick="copyGs()" style="background:#00C36B;border:none;padding:12px 28px;border-radius:8px;color:#fff;font-size:14px;cursor:pointer;margin-top:16px">📋 COPIAR Code.gs</button>
+
+  <h3 style="color:#00C36B;margin-top:32px">2. appsscript.json (criar arquivo no projeto)</h3>
+  <pre id="appsscript" style="background:#1A2540;padding:24px;border-radius:12px;white-space:pre-wrap;word-break:break-word;font-size:12px;line-height:1.5">
+{
+  "timeZone": "America/Sao_Paulo",
+  "addOns": {
+    "common": {
+      "name": "SallesJam Compliance",
+      "logoUrl": "https://engenheiro-producao-ai.onrender.com/static/icons/icon-80.png",
+      "homepageTrigger": {"runFunction": "onHomepage"}
+    },
+    "gmail": {
+      "contextualTriggers": [{
+        "unconditional": {},
+        "onTriggerFunction": "onGmailMessageOpen"
+      }]
+    }
+  },
+  "oauthScopes": [
+    "https://www.googleapis.com/auth/gmail.addons.execute",
+    "https://www.googleapis.com/auth/gmail.readonly",
+    "https://www.googleapis.com/auth/script.external_request"
+  ]
+}
+  </pre>
+  <button onclick="copyJson()" style="background:#00C36B;border:none;padding:12px 28px;border-radius:8px;color:#fff;font-size:14px;cursor:pointer;margin-top:16px">📋 COPIAR appsscript.json</button>
+
+  <h3 style="color:#00C36B;margin-top:32px">Passo a passo</h3>
+  <ol style="color:#94a3b8;font-size:13px;line-height:1.8">
+    <li>Acesse <strong>script.google.com</strong> e clique em "Novo projeto"</li>
+    <li>Na aba "Editor", cole o <strong>Code.gs</strong> no arquivo principal</li>
+    <li>Clique em "Adicionar arquivo" (ao lado de "Arquivos") → renomeie como <strong>appsscript.json</strong></li>
+    <li>Cole o JSON no arquivo</li>
+    <li>Vá em "Implantar" → "Nova implantação" → "Add-on"</li>
+    <li>Teste primeiro em "Test deployments"</li>
+    <li>Depois publique no Google Workspace Marketplace</li>
+  </ol>
+
+  <script>
+    function copyGs() {
+      const el = document.getElementById('codegs');
+      const range = document.createRange();
+      range.selectNodeContents(el);
+      const sel = window.getSelection();
+      sel.removeAllRanges(); sel.addRange(range);
+      document.execCommand('copy'); sel.removeAllRanges();
+      document.querySelectorAll('button')[0].textContent = '✅ COPIADO!';
+    }
+    function copyJson() {
+      const el = document.getElementById('appsscript');
+      const range = document.createRange();
+      range.selectNodeContents(el);
+      const sel = window.getSelection();
+      sel.removeAllRanges(); sel.addRange(range);
+      document.execCommand('copy'); sel.removeAllRanges();
+      document.querySelectorAll('button')[1].textContent = '✅ COPIADO!';
+    }
+  </script>
+</body>
+</html>

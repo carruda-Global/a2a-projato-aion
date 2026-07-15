@@ -1,0 +1,18 @@
+{
+  "packageDirectories": [
+    {
+      "path": "force-app",
+      "default": true,
+      "package": "EcoSystemAEC",
+      "versionNumber": "1.0.0.NEXT",
+      "versionDescription": "27 agentes de IA para Engenharia de Producao - EcoSystem AEC + Regulatory"
+    }
+  ],
+  "name": "ecosystem-aec",
+  "namespace": "EcoSysAEC",
+  "sfdcLoginUrl": "https://login.salesforce.com",
+  "sourceApiVersion": "66.0",
+  "packageAliases": {
+    "EcoSystemAEC": "0HoXX0000000001"
+  }
+}

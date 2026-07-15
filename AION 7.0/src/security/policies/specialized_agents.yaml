@@ -1,0 +1,34 @@
+agents:
+  - agent_id: "did:aip:bim_coordinator_001"
+    agent_name: "BIM Coordinator"
+    principal: "Cristiano Arruda (CREA-SP 5071200171)"
+    permissions:
+      deepseek_chat: { allowed: true, constraints: [{ max_tokens: 8192 }] }
+      bim_api_read: { allowed: true }
+      bim_api_write: { allowed: true }
+      supabase_read: { allowed: true }
+
+  - agent_id: "did:aip:requirements_analyst_001"
+    agent_name: "Requirements Analyst"
+    principal: "Cristiano Arruda (CREA-SP 5071200171)"
+    permissions:
+      deepseek_chat: { allowed: true }
+      document_read: { allowed: true, constraints: [{ max_documents: 100 }] }
+      supabase_read: { allowed: true }
+      supabase_insert: { allowed: true }
+
+  - agent_id: "did:aip:engineering_assistant_001"
+    agent_name: "Engineering Assistant"
+    principal: "Cristiano Arruda (CREA-SP 5071200171)"
+    permissions:
+      deepseek_chat: { allowed: true }
+      document_read: { allowed: true }
+      supabase_read: { allowed: true }
+
+  - agent_id: "did:aip:work_synopsis_001"
+    agent_name: "Work Synopsis"
+    principal: "Cristiano Arruda (CREA-SP 5071200171)"
+    permissions:
+      deepseek_chat: { allowed: true }
+      document_read: { allowed: true }
+      supabase_read: { allowed: true }

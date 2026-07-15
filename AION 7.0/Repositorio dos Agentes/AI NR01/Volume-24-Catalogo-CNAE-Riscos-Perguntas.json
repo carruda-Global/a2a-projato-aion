@@ -1,0 +1,81 @@
+[
+  {
+    "cnae": "6201-5/01",
+    "atividade": "Desenvolvimento de software",
+    "setores": [
+      "Escritório"
+    ],
+    "funcoes": [
+      "Desenvolvedor",
+      "Analista"
+    ],
+    "riscos": [
+      "RE0003",
+      "RA0005"
+    ],
+    "perguntas": [
+      "Há trabalho predominantemente sentado?",
+      "Há uso contínuo de computador?"
+    ],
+    "documentos": [
+      "Inventário",
+      "PGR"
+    ]
+  },
+  {
+    "cnae": "2511-0/00",
+    "atividade": "Fabricação de estruturas metálicas",
+    "setores": [
+      "Produção",
+      "Soldagem"
+    ],
+    "funcoes": [
+      "Soldador",
+      "Operador"
+    ],
+    "riscos": [
+      "RQ0003",
+      "RF0001",
+      "RA0004"
+    ],
+    "perguntas": [
+      "Existe soldagem?",
+      "Existe exaustão localizada?",
+      "Há movimentação de cargas?"
+    ],
+    "documentos": [
+      "Inventário",
+      "Plano de Ação",
+      "PGR",
+      "APR"
+    ]
+  },
+  {
+    "cnae": "8610-1/01",
+    "atividade": "Hospital",
+    "setores": [
+      "Enfermagem",
+      "Centro Cirúrgico",
+      "Limpeza"
+    ],
+    "funcoes": [
+      "Enfermeiro",
+      "Médico",
+      "Auxiliar"
+    ],
+    "riscos": [
+      "RB0001",
+      "RB0002",
+      "RE0002",
+      "RA0001"
+    ],
+    "perguntas": [
+      "Há contato com material biológico?",
+      "Há perfurocortantes?"
+    ],
+    "documentos": [
+      "Inventário",
+      "PGR"
+    ]
+  }
+]

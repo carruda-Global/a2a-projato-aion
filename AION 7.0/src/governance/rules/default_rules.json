@@ -1,0 +1,78 @@
+{
+  "rules": [
+    {
+      "id": "analysis_not_empty",
+      "agents": ["spec_analyst"],
+      "field": "analysis",
+      "type": "string",
+      "required": true,
+      "min_length": 20,
+      "severity": "high",
+      "description": "Analise do Spec Analyst deve conter conteudo significativo"
+    },
+    {
+      "id": "analysis_has_recommendations",
+      "agents": ["spec_analyst"],
+      "field": "analysis",
+      "type": "string",
+      "forbidden_keywords": ["erro", "falha", "indisponivel"],
+      "severity": "medium",
+      "description": "Analise nao deve conter indicacao de falha do sistema"
+    },
+    {
+      "id": "order_plan_not_empty",
+      "agents": ["procurement"],
+      "field": "order_plan",
+      "type": "string",
+      "required": true,
+      "min_length": 20,
+      "severity": "high"
+    },
+    {
+      "id": "stock_analysis_not_empty",
+      "agents": ["inventory"],
+      "field": "stock_analysis",
+      "type": "string",
+      "required": true,
+      "min_length": 10,
+      "severity": "high"
+    },
+    {
+      "id": "compliance_report_not_empty",
+      "agents": ["compliance"],
+      "field": "compliance_report",
+      "type": "string",
+      "required": true,
+      "min_length": 50,
+      "severity": "high",
+      "description": "Relatorio de conformidade deve ser detalhado"
+    },
+    {
+      "id": "rfi_has_description",
+      "agents": ["rfi_creation"],
+      "field": "rfi_document",
+      "type": "string",
+      "required": true,
+      "min_length": 50,
+      "severity": "high"
+    },
+    {
+      "id": "bim_element_has_content",
+      "agents": ["bim_coordinator"],
+      "field": "bim_element",
+      "type": "string",
+      "required": true,
+      "min_length": 30,
+      "severity": "high"
+    },
+    {
+      "id": "answer_not_empty",
+      "agents": ["engineering_assistant"],
+      "field": "answer",
+      "type": "string",
+      "required": true,
+      "min_length": 10,
+      "severity": "medium"
+    }
+  ]
+}

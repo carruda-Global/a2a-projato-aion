@@ -1,0 +1,69 @@
+global:
+  max_tokens_per_session: 1000000
+  max_cost_per_session_usd: 10.0
+
+agents:
+  default:
+    max_tokens_per_call: 100000
+    max_calls_per_hour: 100
+  
+  aec:
+    max_tokens_per_call: 150000
+    max_calls_per_hour: 50
+  
+  regulatory:
+    max_tokens_per_call: 200000
+    max_calls_per_hour: 30
+  
+  microsoft:
+    max_tokens_per_call: 100000
+    max_calls_per_hour: 60
+  
+  dynamics:
+    max_tokens_per_call: 150000
+    max_calls_per_hour: 40
+  
+  agentforce:
+    max_tokens_per_call: 150000
+    max_calls_per_hour: 40
+  
+  oracle:
+    max_tokens_per_call: 200000
+    max_calls_per_hour: 20
+  
+  sap:
+    max_tokens_per_call: 200000
+    max_calls_per_hour: 20
+  
+  coordination:
+    max_tokens_per_call: 500000
+    max_calls_per_hour: 10
+  
+  intelligence:
+    max_tokens_per_call: 400000
+    max_calls_per_hour: 20
+  
+  self_improvement:
+    max_tokens_per_call: 300000
+    max_calls_per_hour: 5
+  
+  tech:
+    max_tokens_per_call: 200000
+    max_calls_per_hour: 30
+  
+  micro:
+    max_tokens_per_call: 25000
+    max_calls_per_hour: 200
+
+llm:
+  deepseek-v4-flash:
+    cost_per_1k_input_tokens: 0.00015
+    cost_per_1k_output_tokens: 0.00060
+  
+  gemini:
+    cost_per_1k_input_tokens: 0.00025
+    cost_per_1k_output_tokens: 0.00050
+  
+  claude:
+    cost_per_1k_input_tokens: 0.00300
+    cost_per_1k_output_tokens: 0.01500

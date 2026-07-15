@@ -1,0 +1,39 @@
+{
+  "modulos": [
+    {
+      "nome": "Perigos",
+      "meta": "800 registros",
+      "fonte": "NRs + literatura técnica"
+    },
+    {
+      "nome": "Máquinas",
+      "meta": "2000 registros",
+      "fonte": "Fabricantes"
+    },
+    {
+      "nome": "Produtos Químicos",
+      "meta": "1000 registros",
+      "fonte": "FISPQ/SDS"
+    },
+    {
+      "nome": "CNAEs",
+      "meta": "Completo",
+      "fonte": "Classificação oficial"
+    },
+    {
+      "nome": "CBOs",
+      "meta": "Completo",
+      "fonte": "Catálogo oficial"
+    },
+    {
+      "nome": "EPIs",
+      "meta": "Completo",
+      "fonte": "Fabricantes/CA"
+    },
+    {
+      "nome": "EPCs",
+      "meta": "Completo",
+      "fonte": "Normas técnicas"
+    }
+  ]
+}

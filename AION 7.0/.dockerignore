@@ -1,0 +1,22 @@
+.env
+.env.*
+EcoSystem 2.0.env
+EcoSystem_2_0.env
+chave api- projeto engenharia.txt
+chave_api.txt
+*.key
+*.pem
+*.log
+data/
+tests/
+.git/
+__pycache__/
+*.pyc
+.pytest_cache/
+monitoring/
+venv/
+node_modules/
+dist/
+.vite/
+src/security/aip/credentials/
+microsoft ids.txt

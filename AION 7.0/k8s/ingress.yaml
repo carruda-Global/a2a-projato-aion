@@ -1,0 +1,67 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: aion-ingress
+  namespace: aion
+  labels:
+    app.kubernetes.io/name: aion
+    app.kubernetes.io/component: ingress
+  annotations:
+    kubernetes.io/ingress.global-static-ip-name: "aion-ingress-ip"
+    networking.gke.io/managed-certificates: "aion-cert"
+    kubernetes.io/ingress.class: "gce"
+    cloud.google.com/app-hub: "true"
+spec:
+  defaultBackend:
+    service:
+      name: aion-orchestrator
+      port:
+        number: 8000
+  rules:
+  - host: aion.engenheiro-producao-ai.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: aion-orchestrator
+            port:
+              number: 8000
+      - path: /mcp/regulatory
+        pathType: Prefix
+        backend:
+          service:
+            name: aion-mcp-regulatory
+            port:
+              number: 8010
+      - path: /mcp/esg
+        pathType: Prefix
+        backend:
+          service:
+            name: aion-mcp-esg
+            port:
+              number: 8011
+      - path: /mcp/erp
+        pathType: Prefix
+        backend:
+          service:
+            name: aion-mcp-erp
+            port:
+              number: 8012
+      - path: /mcp/microsoft
+        pathType: Prefix
+        backend:
+          service:
+            name: aion-mcp-microsoft
+            port:
+              number: 8013
+---
+apiVersion: networking.k8s.io/v1
+kind: ManagedCertificate
+metadata:
+  name: aion-cert
+  namespace: aion
+spec:
+  domains:
+    - aion.engenheiro-producao-ai.com

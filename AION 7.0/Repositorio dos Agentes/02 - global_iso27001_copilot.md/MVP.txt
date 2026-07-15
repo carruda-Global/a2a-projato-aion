@@ -1,0 +1,102 @@
+# Global ISO27001 Copilot
+
+## Objetivo
+
+Avaliar automaticamente documentos da empresa conforme ISO 27001.
+
+---
+
+# Problema
+
+Consultorias gastam muitas horas verificando documentação.
+
+---
+
+# Público
+
+- Consultorias
+- Empresas Enterprise
+- Bancos
+- Saúde
+- Tecnologia
+
+---
+
+# MVP
+
+Entrada
+
+- Política de Segurança
+- Inventário
+- Procedimentos
+- Normas
+
+Saída
+
+- Controles ISO encontrados
+- Controles faltantes
+- Grau de aderência
+
+---
+
+# Fluxo
+
+Upload
+
+↓
+
+Extração
+
+↓
+
+Mapeamento Anexo A
+
+↓
+
+Gap Analysis
+
+↓
+
+Relatório
+
+---
+
+# Conhecimento
+
+ISO27001
+
+Anexo A
+
+ISO27002
+
+---
+
+# IA
+
+RAG
+
+Embeddings
+
+LLM
+
+---
+
+# Saída
+
+PDF
+
+Checklist
+
+Plano de Correção
+
+---
+
+# Evolução
+
+Dashboard
+
+Histórico
+
+Monitoramento
+
+Integração SharePoint

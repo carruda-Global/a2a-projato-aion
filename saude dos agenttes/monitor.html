@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>AION — Monitor de Agentes</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'SF Pro Display', -apple-system, sans-serif; background: #080810; color: #e2e2f0; min-height: 100vh; }
+
+  #grant-screen {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    height: 100vh; gap: 20px; text-align: center; padding: 40px;
+  }
+  #grant-screen h1 { font-size: 24px; font-weight: 700; }
+  #grant-screen p { color: #6b6b8a; font-size: 14px; max-width: 400px; line-height: 1.6; }
+  #btn-open {
+    background: #3b82f6; color: #fff; border: none; border-radius: 8px;
+    padding: 14px 28px; font-size: 15px; font-weight: 600; cursor: pointer;
+    transition: background .2s;
+  }
+  #btn-open:hover { background: #2563eb; }
+  .hint { font-size: 11px; color: #3b3b55; }
+
+  #dashboard { display: none; padding: 20px; }
+
+  .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 14px; border-bottom: 1px solid #1a1a28; }
+  .topbar h1 { font-size: 18px; font-weight: 700; }
+  .topbar-right { display: flex; align-items: center; gap: 14px; }
+  .live-badge { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #22d3a5; font-weight: 700; }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: #22d3a5; animation: blink 2s infinite; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
+  .folder-name { font-size: 11px; color: #3b82f6; }
+  #last-scan { font-size: 10px; color: #3b3b55; }
+
+  .kpi-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 18px; }
+  .kpi { background: #10101e; border: 1px solid #1a1a28; border-radius: 8px; padding: 14px; }
+  .kpi-label { font-size: 9px; color: #6b6b8a; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+  .kpi-val { font-size: 26px; font-weight: 800; letter-spacing: -1px; }
+  .kpi-sub { font-size: 10px; color: #6b6b8a; margin-top: 3px; }
+  .c-green { color: #22d3a5; } .c-blue { color: #60a5fa; }
+  .c-purple { color: #a78bfa; } .c-amber { color: #fbbf24; } .c-red { color: #f87171; }
+
+  .section { margin-bottom: 16px; }
+  .section-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: #6b6b8a; margin-bottom: 10px; display: flex; justify-content: space-between; }
+
+  .file-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 10px; }
+  .file-card { background: #10101e; border: 1px solid #1a1a28; border-radius: 8px; padding: 14px; }
+  .file-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+  .file-name { font-size: 12px; font-weight: 600; color: #e2e2f0; word-break: break-all; }
+  .file-meta { font-size: 10px; color: #3b3b55; white-space: nowrap; margin-left: 8px; }
+  .file-content { background: #08080f; border-radius: 5px; padding: 10px; font-size: 10px; font-family: 'SF Mono', Consolas, monospace; color: #a0a0c0; line-height: 1.6; max-height: 160px; overflow-y: auto; white-space: pre-wrap; word-break: break-word; }
+
+  /* JSON pretty */
+  .json-key { color: #60a5fa; }
+  .json-str { color: #22d3a5; }
+  .json-num { color: #fbbf24; }
+  .json-bool { color: #f472b6; }
+  .json-null { color: #6b6b8a; }
+
+  .status-ok { border-left: 3px solid #22d3a5; }
+  .status-warn { border-left: 3px solid #fbbf24; }
+  .status-err { border-left: 3px solid #f87171; }
+  .status-info { border-left: 3px solid #60a5fa; }
+
+  .empty-state { color: #3b3b55; font-size: 13px; text-align: center; padding: 40px; }
+  .empty-state span { font-size: 32px; display: block; margin-bottom: 10px; }
+
+  #log-area { background: #08080f; border-radius: 8px; padding: 14px; font-size: 11px; font-family: 'SF Mono', Consolas, monospace; color: #6b6b8a; max-height: 120px; overflow-y: auto; line-height: 1.8; }
+  .log-line { border-bottom: 1px solid #10101e; padding: 1px 0; }
+  .log-time { color: #3b3b55; margin-right: 8px; }
+  .log-ok { color: #22d3a5; } .log-warn { color: #fbbf24; } .log-err { color: #f87171; }
+
+  .re-btn { background: none; border: 1px solid #1a1a28; color: #6b6b8a; border-radius: 5px; padding: 4px 10px; font-size: 10px; cursor: pointer; }
+  .re-btn:hover { border-color: #3b82f6; color: #3b82f6; }
+</style>
+</head>
+<body>
+
+<!-- TELA INICIAL -->
+<div id="grant-screen">
+  <div style="font-size:48px">🤖</div>
+  <h1>AION — Monitor de Agentes</h1>
+  <p>Abre e lê a pasta <strong>saude dos agenttes</strong> em tempo real.<br>
+  O navegador vai pedir permissão para acessar os arquivos — clique em "Permitir".</p>
+  <button id="btn-open" onclick="openFolder()">📂 Selecionar Pasta para Monitorar</button>
+  <div class="hint">Chrome / Edge recomendado · arquivos lidos localmente, nada é enviado</div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboard">
+  <div class="topbar">
+    <h1>AION · Monitor de Agentes</h1>
+    <div class="topbar-right">
+      <span class="folder-name" id="folder-name">—</span>
+      <div class="live-badge"><div class="dot"></div> AO VIVO</div>
+      <span id="last-scan">—</span>
+      <button class="re-btn" onclick="scan()">↻ scan agora</button>
+    </div>
+  </div>
+
+  <div class="kpi-row">
+    <div class="kpi"><div class="kpi-label">Arquivos</div><div class="kpi-val c-blue" id="kpi-files">0</div><div class="kpi-sub">na pasta</div></div>
+    <div class="kpi"><div class="kpi-label">Status OK</div><div class="kpi-val c-green" id="kpi-ok">0</div><div class="kpi-sub">sem erros</div></div>
+    <div class="kpi"><div class="kpi-label">Avisos</div><div class="kpi-val c-amber" id="kpi-warn">0</div><div class="kpi-sub">atenção</div></div>
+    <div class="kpi"><div class="kpi-label">Erros</div><div class="kpi-val c-red" id="kpi-err">0</div><div class="kpi-sub">crítico</div></div>
+    <div class="kpi"><div class="kpi-label">Último scan</div><div class="kpi-val c-purple" id="kpi-age">—</div><div class="kpi-sub">segundos atrás</div></div>
+  </div>
+
+  <div class="section">
+    <div class="section-title"><span>Arquivos na pasta</span><span id="file-count">0 arquivos</span></div>
+    <div class="file-grid" id="file-grid">
+      <div class="empty-state"><span>📂</span>Aguardando arquivos...</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Log de Scans</div>
+    <div id="log-area"></div>
+  </div>
+</div>
+
+<script>
+let dirHandle = null;
+let scanInterval = null;
+let lastScanTime = null;
+let scanCount = 0;
+const logs = [];
+
+async function openFolder() {
+  try {
+    dirHandle = await window.showDirectoryPicker({ mode: 'read' });
+    document.getElementById('grant-screen').style.display = 'none';
+    document.getElementById('dashboard').style.display = 'block';
+    document.getElementById('folder-name').textContent = dirHandle.name;
+    addLog('info', `Pasta aberta: ${dirHandle.name}`);
+    await scan();
+    scanInterval = setInterval(scan, 3000); // scan a cada 3 segundos
+  } catch (e) {
+    if (e.name !== 'AbortError') alert('Erro ao abrir pasta: ' + e.message);
+  }
+}
+
+async function scan() {
+  if (!dirHandle) return;
+  scanCount++;
+  lastScanTime = new Date();
+
+  const files = [];
+  let ok = 0, warn = 0, err = 0;
+
+  try {
+    for await (const [name, handle] of dirHandle.entries()) {
+      if (handle.kind !== 'file') continue;
+      try {
+        const file = await handle.getFile();
+        const text = await file.text();
+        const age = Math.round((Date.now() - file.lastModified) / 1000);
+        const status = detectStatus(name, text);
+        if (status === 'ok') ok++;
+        else if (status === 'warn') warn++;
+        else if (status === 'err') err++;
+        else ok++;
+        files.push({ name, text, size: file.size, modified: file.lastModified, age, status });
+      } catch (e) {
+        files.push({ name, text: `Erro ao ler: ${e.message}`, size: 0, modified: 0, age: 0, status: 'err' });
+        err++;
+      }
+    }
+  } catch (e) {
+    addLog('err', 'Erro no scan: ' + e.message);
+    return;
+  }
+
+  files.sort((a, b) => b.modified - a.modified);
+
+  document.getElementById('kpi-files').textContent = files.length;
+  document.getElementById('kpi-ok').textContent = ok;
+  document.getElementById('kpi-warn').textContent = warn;
+  document.getElementById('kpi-err').textContent = err;
+  document.getElementById('last-scan').textContent = 'scan #' + scanCount;
+
+  renderFiles(files);
+
+  if (scanCount === 1 || scanCount % 10 === 0 || err > 0) {
+    addLog(err > 0 ? 'warn' : 'ok', `scan #${scanCount} — ${files.length} arqs · ${ok} OK · ${warn} avisos · ${err} erros`);
+  }
+}
+
+function detectStatus(name, text) {
+  const low = (name + text).toLowerCase();
+  if (low.includes('error') || low.includes('erro') || low.includes('failed') || low.includes('critical')) return 'err';
+  if (low.includes('warn') || low.includes('aviso') || low.includes('timeout')) return 'warn';
+  if (low.includes('ok') || low.includes('success') || low.includes('healthy') || low.includes('connected')) return 'ok';
+  return 'info';
+}
+
+function prettifyJSON(text) {
+  try {
+    const obj = JSON.parse(text);
+    return syntaxHighlight(JSON.stringify(obj, null, 2));
+  } catch { return escHtml(text); }
+}
+
+function syntaxHighlight(json) {
+  return json
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/("[\w\s\-\/\.@:]*")\s*:/g, '<span class="json-key">$1</span>:')
+    .replace(/:\s*(".*?")/g, ': <span class="json-str">$1</span>')
+    .replace(/:\s*(\d+\.?\d*)/g, ': <span class="json-num">$1</span>')
+    .replace(/:\s*(true|false)/g, ': <span class="json-bool">$1</span>')
+    .replace(/:\s*(null)/g, ': <span class="json-null">$1</span>');
+}
+
+function escHtml(t) { return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function fmtAge(sec) {
+  if (sec < 60) return sec + 's atrás';
+  if (sec < 3600) return Math.round(sec/60) + 'min atrás';
+  return Math.round(sec/3600) + 'h atrás';
+}
+
+function fmtSize(bytes) {
+  if (bytes < 1024) return bytes + 'B';
+  return (bytes/1024).toFixed(1) + 'KB';
+}
+
+function renderFiles(files) {
+  const grid = document.getElementById('file-grid');
+  document.getElementById('file-count').textContent = files.length + ' arquivo(s)';
+
+  if (files.length === 0) {
+    grid.innerHTML = '<div class="empty-state"><span>📂</span>Pasta vazia — nenhum arquivo encontrado.<br><small style="color:#3b3b55">Os agentes vão escrever aqui automaticamente.</small></div>';
+    return;
+  }
+
+  grid.innerHTML = files.map(f => `
+    <div class="file-card status-${f.status}">
+      <div class="file-header">
+        <div class="file-name">${escHtml(f.name)}</div>
+        <div class="file-meta">${fmtSize(f.size)} · ${fmtAge(f.age)}</div>
+      </div>
+      <div class="file-content">${prettifyJSON(f.text)}</div>
+    </div>
+  `).join('');
+
+  // atualiza KPI de idade
+  const newest = files[0];
+  document.getElementById('kpi-age').textContent = newest ? fmtAge(newest.age) : '—';
+}
+
+function addLog(type, msg) {
+  const t = new Date().toLocaleTimeString('pt-BR');
+  logs.unshift({ type, msg, t });
+  if (logs.length > 50) logs.pop();
+  const area = document.getElementById('log-area');
+  area.innerHTML = logs.map(l =>
+    `<div class="log-line"><span class="log-time">${l.t}</span><span class="log-${l.type}">${escHtml(l.msg)}</span></div>`
+  ).join('');
+}
+</script>
+</body>
+</html>

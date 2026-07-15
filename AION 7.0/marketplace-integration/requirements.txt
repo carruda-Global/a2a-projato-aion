@@ -1,0 +1,16 @@
+# Core
+python-dotenv>=1.0.0
+pyyaml>=6.0
+requests>=2.31.0
+
+# Google Cloud Marketplace
+google-auth>=2.0.0
+google-api-python-client>=2.0.0
+# google-cloud-marketplace (instalar via: pip install google-cloud-marketplace --extra-index-url https://googleapis.dev/python/pypi)
+
+
+# Oracle Cloud Marketplace
+oci>=2.179.0
+
+# Salesforce
+simple-salesforce>=1.12.0

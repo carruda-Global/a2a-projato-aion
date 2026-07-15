@@ -1,0 +1,67 @@
+PRODUTOS PARA KIWIFY
+=====================
+
+1. NR-1 Psicossocial
+Preço: R$ 390/mês
+Tipo: Assinatura mensal
+Descrição: Identificação e documentação de riscos psicossociais conforme Portaria MTE 1.419/2024. Inclui inventário FRPRT, plano de ação hierarquizado e relatório executivo para fiscalização. Não exige ART.
+
+2. Tributário CBS/IBS
+Preço: R$ 390/mês
+Tipo: Assinatura mensal
+Descrição: Conformidade com a reforma tributária LC 214/2025. Classificação NCM com alíquotas corretas, geração automática da DeRE, simulador de impacto financeiro e checklist de adequação. Multas a partir de agosto/2026.
+
+3. LGPD Operacional
+Preço: R$ 290/mês
+Tipo: Assinatura mensal
+Descrição: Adequação à Lei 13.709/2018 com mapeamento de fluxos de dados, geração do RoPA conforme ANPD, identificação de lacunas de base legal e protocolo de resposta a incidentes.
+
+4. ESG IFRS S1/S2
+Preço: R$ 490/mês
+Tipo: Assinatura mensal
+Descrição: Diagnóstico de maturidade ESG, relatórios de sustentabilidade alinhados ao IFRS S1/S2, resposta automatizada a questionários de clientes e mapeamento de indicadores SASB.
+
+5. Inventário Carbono
+Preço: R$ 890/mês
+Tipo: Assinatura mensal
+Descrição: Cálculo de emissões Escopo 1 e 2 conforme GHG Protocol e Lei 15.042/2024 (SBCE). Fatores de emissão MCTI e SIN atualizados. Identificação de hotspots e oportunidades de redução.
+
+6. Escopo 3 Fornecedores
+Preço: R$ 690/mês
+Tipo: Assinatura mensal
+Descrição: Rastreabilidade de emissões na cadeia de fornecedores com portal self-service. Consolidação das 15 categorias do GHG Protocol, score ESG por fornecedor e relatórios IFRS S2 e CBAM.
+
+7. Canal de Denúncias
+Preço: R$ 290/mês
+Tipo: Assinatura mensal
+Descrição: Canal omnichannel (WhatsApp, web, e-mail) com anonimato garantido. Obrigatório para empresas com CIPA (Lei 14.457/2022). Triagem automática, fluxo de investigação e relatórios semestrais.
+
+8. Igualdade Salarial
+Preço: R$ 490/mês
+Tipo: Assinatura mensal
+Descrição: Análise de equidade salarial por cargo, gênero e raça conforme Lei 14.611/2023. Geração do relatório semestral no formato do Portal Emprega Brasil MTE. Plano de ação para redução de gaps.
+
+9. Compliance Anticorrupção
+Preço: R$ 390/mês
+Tipo: Assinatura mensal
+Descrição: Programa de integridade para PMEs conforme Lei 12.846/2013. Diagnóstico CGU, código de ética personalizado, due diligence de terceiros e relatório para licitações públicas.
+
+10. Regulatory Starter
+Preço: R$ 590/mês
+Tipo: Assinatura mensal
+Descrição: Pacote com NR-1 Psicossocial + LGPD Operacional. Ideal para iniciar a conformidade regulatória com as duas normas mais urgentes. Relatórios para fiscalização incluídos.
+
+11. Regulatory Professional
+Preço: R$ 1.490/mês
+Tipo: Assinatura mensal
+Descrição: Pacote com 5 agentes: NR-1 Psicossocial, LGPD, Canal de Denúncias, Igualdade Salarial e Compliance Anticorrupção. Solução completa para RH, jurídico e compliance.
+
+12. Regulatory Full
+Preço: R$ 3.490/mês
+Tipo: Assinatura mensal
+Descrição: Todos os 9 agentes regulatórios: NR-1, Tributário, LGPD, ESG, Carbono, Escopo 3, Canal de Denúncias, Igualdade Salarial e Compliance Anticorrupção. Painel unificado de conformidade.
+
+13. ESG + Carbono
+Preço: R$ 2.490/mês
+Tipo: Assinatura mensal
+Descrição: Pacote com ESG IFRS S1/S2 + Inventário Carbono + Escopo 3 Fornecedores. Solução completa para relatórios de sustentabilidade e pegada de carbono.

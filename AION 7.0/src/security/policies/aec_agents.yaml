@@ -1,0 +1,57 @@
+agents:
+  - agent_id: "did:aip:spec_analyst_001"
+    agent_name: "Spec Analyst"
+    principal: "Cristiano Arruda (CREA-SP 5071200171)"
+    permissions:
+      deepseek_chat: { allowed: true, constraints: [{ max_tokens: 8192 }] }
+      document_read: { allowed: true, constraints: [{ max_documents: 50 }] }
+      supabase_read: { allowed: true, constraints: [{ max_rows: 500 }] }
+      supabase_insert: { allowed: true }
+      supabase_delete: { allowed: false }
+    dlp_rules:
+      - { pattern: "CPF|\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}", action: "mask" }
+      - { pattern: "CNPJ|\\d{2}\\.\\d{3}\\.\\d{3}/\\d{4}-\\d{2}", action: "mask" }
+
+  - agent_id: "did:aip:procurement_001"
+    agent_name: "Procurement"
+    principal: "Cristiano Arruda (CREA-SP 5071200171)"
+    permissions:
+      deepseek_chat: { allowed: true, constraints: [{ max_tokens: 4096 }] }
+      supabase_read: { allowed: true }
+      supabase_insert: { allowed: true }
+      stripe_create_invoice: { allowed: false }
+      stripe_read: { allowed: true }
+    dlp_rules:
+      - { pattern: "CPF|\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}", action: "mask" }
+
+  - agent_id: "did:aip:inventory_001"
+    agent_name: "Inventory"
+    principal: "Cristiano Arruda (CREA-SP 5071200171)"
+    permissions:
+      deepseek_chat: { allowed: true }
+      supabase_read: { allowed: true }
+      supabase_update: { allowed: true }
+      supabase_delete: { allowed: false }
+    hitl_actions:
+      bulk_stock_adjustment:
+        require_approval: true
+        approver: "Cristiano Arruda"
+
+  - agent_id: "did:aip:logistics_001"
+    agent_name: "Logistics"
+    principal: "Cristiano Arruda (CREA-SP 5071200171)"
+    permissions:
+      deepseek_chat: { allowed: true }
+      supabase_read: { allowed: true }
+      tracking_api: { allowed: true, constraints: [{ read_only: true }] }
+      supabase_delete: { allowed: false }
+
+  - agent_id: "did:aip:field_execution_001"
+    agent_name: "Field Execution"
+    principal: "Cristiano Arruda (CREA-SP 5071200171)"
+    permissions:
+      deepseek_chat: { allowed: true, constraints: [{ max_tokens: 8192 }] }
+      bim_api_read: { allowed: true }
+      bim_api_write: { allowed: true }
+      supabase_read: { allowed: true }
+      supabase_insert: { allowed: true }

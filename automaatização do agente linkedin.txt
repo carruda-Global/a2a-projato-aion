@@ -1,0 +1,269 @@
+Estruturação do Agente LinkedIn no AION
+1. Workflow de Prospecção (Agente #58)
+yaml
+
+# config/linkedin_workflow.yaml
+name: "Prospecção Automática AION"
+description: "Workflow de prospecção no LinkedIn com qualificação automática"
+
+triggers:
+  - schedule: "daily 08:00"  # Roda todo dia às 8h
+  - manual: true             # Pode ser acionado manualmente
+
+steps:
+  - id: search_leads
+    agent: "#58"
+    action: linkedin_search
+    params:
+      filters:
+        - industry: ["tecnologia", "engenharia", "construção"]
+        - seniority: ["manager", "director", "head", "vp", "ceo"]
+        - location: ["São Paulo", "Brasil"]
+        - activity: "last_30_days"  # Só quem postou recentemente
+      limit: 50
+
+  - id: enrich_leads
+    agent: "#58"
+    action: linkedin_enrich
+    params:
+      fields: ["email", "company_size", "company_industry", "recent_posts"]
+
+  - id: score_leads
+    agent: "#52"
+    action: score_lead
+    params:
+      thresholds:
+        - high_score: 80
+        - medium_score: 50
+        - low_score: 30
+
+  - id: store_leads
+    agent: "#52"
+    action: save_to_supabase
+    params:
+      table: "leads"
+      status: "prospected"
+
+  - id: notify_qualified
+    agent: "#52"
+    action: notify_slack
+    params:
+      channel: "#leads-qualificados"
+      only_high_score: true
+
+  - id: start_outreach
+    agent: "#29"
+    action: start_campaign
+    params:
+      campaign: "outreach_inicial"
+      leads_from: "leads_qualificados"
+
+2. Workflow de Outreach (Agente #29)
+yaml
+
+# config/outreach_workflow.yaml
+name: "Outreach Inicial AION"
+description: "Envia mensagens personalizadas para leads qualificados"
+
+steps:
+  - id: generate_message
+    agent: "#29"
+    action: generate_linkedin_message
+    params:
+      style: "conversacional"
+      length: "curto"
+      includes: ["empresa", "setor", "dor_identificada"]
+
+  - id: send_connection
+    agent: "#29"
+    action: linkedin_connect
+    params:
+      message: "{generated_message}"
+      wait_after: 48  # horas antes de enviar mensagem
+
+  - id: send_followup
+    agent: "#29"
+    action: linkedin_message
+    params:
+      delay_days: 3  # Após conexão aceita
+      message: "Olá {first_name}, vi que você atua em {industry}..."
+
+  - id: track_engagement
+    agent: "#29"
+    action: track_linkedin_response
+    params:
+      keywords: ["interesse", "sim", "vamos marcar", "gostaria de saber"]
+
+  - id: qualify_engagement
+    agent: "#52"
+    action: update_lead_score
+    params:
+      increase: 20  # pontos extras por engajamento
+
+3. Workflow de Geração de Conteúdo (Novo Agente)
+yaml
+
+# config/content_workflow.yaml
+name: "Geração de Conteúdo LinkedIn"
+description: "Cria posts otimizados com RAG baseado em dados de leads"
+
+triggers:
+  - schedule: "weekly monday 09:00"
+  - manual: true
+
+steps:
+  - id: analyze_industry
+    agent: "#52"
+    action: analyze_lead_industry
+    params:
+      timeframe: "last_7_days"
+
+  - id: generate_post_ideas
+    agent: "#8"
+    action: generate_linkedin_post_ideas
+    params:
+      topics: ["problemas_identificados", "cases_sucesso", "tendencias_setor"]
+      quantity: 5
+
+  - id: create_post
+    agent: "#8"
+    action: create_linkedin_post
+    params:
+      style: "autoridade"
+      includes: ["dados", "insights", "call_to_action"]
+
+  - id: schedule_post
+    agent: "#8"
+    action: schedule_linkedin_post
+    params:
+      date: "{next_available_date}"
+      time: "08:00"
+
+  - id: track_performance
+    agent: "#8"
+    action: track_post_performance
+    params:
+      engagement_threshold: 10  # mínimo de interações para considerar relevante
+
+4. Integração com o Site (Webhook)
+yaml
+
+# config/site_integration.yaml
+name: "Captura de Leads do Site"
+description: "Recebe leads do site e integra ao funil de vendas"
+
+webhook:
+  endpoint: "/webhook/site-lead"
+  method: "POST"
+  fields:
+    - name: "nome"
+      required: true
+    - name: "email"
+      required: true
+    - name: "empresa"
+      required: false
+    - name: "telefone"
+      required: false
+    - name: "interesse"
+      required: false
+
+actions:
+  - id: save_lead
+    agent: "#52"
+    action: save_to_supabase
+    params:
+      table: "leads"
+      source: "site"
+
+  - id: score_lead
+    agent: "#52"
+    action: score_lead
+    params:
+      auto: true
+
+  - id: send_confirmation
+    agent: "#52"
+    action: send_email
+    params:
+      template: "lead_recebido"
+
+  - id: start_drip
+    agent: "#52"
+    action: start_drip_campaign
+    params:
+      campaign: "nutricao_inicial"
+
+📋 Estrutura de Diretórios para os Workflows
+text
+
+aion/
+├── config/
+│   ├── linkedin_workflow.yaml
+│   ├── outreach_workflow.yaml
+│   ├── content_workflow.yaml
+│   ├── site_integration.yaml
+│   └── sales_pipeline.yaml
+├── src/
+│   ├── workflows/
+│   │   ├── __init__.py
+│   │   ├── linkedin.py        # Executa linkedin_workflow.yaml
+│   │   ├── outreach.py        # Executa outreach_workflow.yaml
+│   │   ├── content.py         # Executa content_workflow.yaml
+│   │   └── site.py            # Executa site_integration.yaml
+│   └── orchestrator/
+│       └── workflow_runner.py # Orquestra todos os workflows
+└── scripts/
+    └── deploy_workflows.py    # Script de deploy dos workflows
+
+🚀 O que você precisa enviar para o Flash
+
+Agora que os workflows estão estruturados, envie este prompt para o DeepSeek Flash:
+markdown
+
+# Implementação: Workflows do Agente LinkedIn no AION
+
+Precisamos implementar os workflows de vendas integrados com o agente LinkedIn já criado. A estrutura está em `config/*.yaml` e os arquivos em `src/workflows/`.
+
+## O que implementar:
+
+1. **Workflow de Prospecção** (`linkedin_workflow.yaml` + `src/workflows/linkedin.py`)
+   - Busca leads diária com filtros
+   - Enriquecimento e pontuação
+   - Armazenamento no Supabase
+   - Notificações para leads qualificados
+
+2. **Workflow de Outreach** (`outreach_workflow.yaml` + `src/workflows/outreach.py`)
+   - Geração de mensagens personalizadas
+   - Envio de convites e follow-ups
+   - Rastreamento de engajamento
+
+3. **Workflow de Conteúdo** (`content_workflow.yaml` + `src/workflows/content.py`)
+   - Geração semanal de posts com RAG
+   - Agendamento automático
+   - Monitoramento de performance
+
+4. **Workflow de Captura do Site** (`site_integration.yaml` + `src/workflows/site.py`)
+   - Webhook para receber leads
+   - Qualificação automática
+   - Drip campaigns
+
+5. **Orquestrador de Workflows** (`src/orchestrator/workflow_runner.py`)
+   - Gerencia a execução agendada
+   - Mantém logs de execução
+   - Trata falhas e retry
+
+## Entregáveis:
+- Código Python para cada workflow
+- Integração com Supabase para persistência
+- Integração com Slack para notificações
+- Testes unitários
+- Documentação de cada workflow
+
+📊 Métricas e KPIs
+Métrica	Target	Workflow
+Leads prospectados/dia	50	linkedin_workflow
+Taxa de conexão	>15%	outreach_workflow
+Taxa de resposta	>30%	outreach_workflow
+Leads qualificados/semana	10	site_integration
+Posts/semana	3	content_workflow
+Engajamento médio/post	>20	content_workflow

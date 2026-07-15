@@ -1,0 +1,452 @@
+text
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    FLUXO DE VENDA E ATIVAÇÃO AUTOMÁTICA                    │
+│                                                                             │
+│  1. Cliente acessa seu site (aion.global)                                 │
+│     ↓                                                                       │
+│  2. Escolhe um plano e clica em "Comprar"                                 │
+│     ↓                                                                       │
+│  3. Stripe Checkout (página de pagamento)                                 │
+│     ↓                                                                       │
+│  4. Cliente preenche os dados e finaliza a compra                         │
+│     ↓                                                                       │
+│  5. Stripe confirma o pagamento e dispara webhook                         │
+│     ↓                                                                       │
+│  6. Seu backend recebe o webhook e processa a venda                       │
+│     ↓                                                                       │
+│  7. Cria o cliente no Supabase                                            │
+│     ↓                                                                       │
+│  8. Ativa os agentes do AION para o cliente                               │
+│     ↓                                                                       │
+│  9. Envia e-mail de boas-vindas com credenciais                           │
+│     ↓                                                                       │
+│  10. Cliente acessa o portal e começa a usar os agentes                    │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+💻 Implementação no Código
+1. Página de Checkout no Site (HTML)
+html
+
+<!-- site/checkout.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Checkout — AION</title>
+</head>
+<body>
+    <div class="checkout-container">
+        <h1>Assinar AION</h1>
+        <div class="plan-details">
+            <h2>Plano Professional</h2>
+            <p>R$ 2.391/mês</p>
+            <ul>
+                <li>12 agentes AEC + Regulatórios</li>
+                <li>Prospecção LinkedIn avançada</li>
+                <li>Suporte prioritário</li>
+            </ul>
+        </div>
+        <form id="checkout-form">
+            <input type="email" id="email" placeholder="Seu e-mail" required>
+            <input type="text" id="name" placeholder="Seu nome" required>
+            <input type="text" id="company" placeholder="Nome da empresa" required>
+            <input type="hidden" id="plan" value="professional">
+            <button type="submit" id="checkout-button">Assinar Agora — R$ 2.391/mês</button>
+        </form>
+        <div id="error-message"></div>
+    </div>
+
+    <script>
+        document.getElementById('checkout-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const email = document.getElementById('email').value;
+            const name = document.getElementById('name').value;
+            const company = document.getElementById('company').value;
+            const plan = document.getElementById('plan').value;
+
+            try {
+                const response = await fetch('/api/create-checkout-session', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, name, company, plan })
+                });
+
+                const data = await response.json();
+
+                if (data.url) {
+                    window.location.href = data.url;
+                } else {
+                    document.getElementById('error-message').textContent = 'Erro ao iniciar checkout. Tente novamente.';
+                }
+            } catch (error) {
+                document.getElementById('error-message').textContent = 'Erro ao iniciar checkout. Tente novamente.';
+            }
+        });
+    </script>
+</body>
+</html>
+
+2. Endpoint para Criar Sessão no Stripe (Backend Python)
+python
+
+# src/monetization/checkout.py
+"""
+Cria sessão de checkout no Stripe
+"""
+
+import stripe
+import os
+from fastapi import FastAPI, Request, HTTPException
+from pydantic import BaseModel
+
+app = FastAPI()
+stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
+
+class CheckoutRequest(BaseModel):
+    email: str
+    name: str
+    company: str
+    plan: str
+
+PLAN_PRICES = {
+    "starter": "price_starter_id",       # ID do preço no Stripe
+    "professional": "price_professional_id",
+    "enterprise": "price_enterprise_id",
+    "full_suite": "price_full_suite_id"
+}
+
+@app.post("/api/create-checkout-session")
+async def create_checkout_session(request: CheckoutRequest):
+    try:
+        # 1. Cria ou busca cliente no Stripe
+        customers = stripe.Customer.list(email=request.email, limit=1)
+        if customers.data:
+            customer_id = customers.data[0].id
+        else:
+            customer = stripe.Customer.create(
+                email=request.email,
+                name=request.name,
+                metadata={"company": request.company}
+            )
+            customer_id = customer.id
+
+        # 2. Busca o preço do plano
+        price_id = PLAN_PRICES.get(request.plan)
+        if not price_id:
+            raise HTTPException(status_code=400, detail="Plano inválido")
+
+        # 3. Cria sessão de checkout
+        session = stripe.checkout.Session.create(
+            customer=customer_id,
+            payment_method_types=["card", "boleto", "pix"],
+            line_items=[{
+                "price": price_id,
+                "quantity": 1,
+            }],
+            mode="subscription",
+            success_url="https://aion.global/success?session_id={CHECKOUT_SESSION_ID}",
+            cancel_url="https://aion.global/cancel",
+            metadata={
+                "plan": request.plan,
+                "company": request.company,
+                "customer_name": request.name
+            },
+            customer_update={
+                "address": "auto",
+                "shipping": "auto"
+            }
+        )
+
+        return {"url": session.url, "session_id": session.id}
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+3. Webhook para Processar Pagamentos Confirmados
+python
+
+# src/monetization/webhooks.py
+"""
+Webhook do Stripe para ativação automática dos agentes
+"""
+
+import stripe
+import os
+from fastapi import FastAPI, Request, HTTPException
+from src.database.supabase_client import supabase
+from src.fulfillment.provisioning import activate_tenant
+from src.fulfillment.email import send_welcome_email
+
+app = FastAPI()
+stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
+webhook_secret = os.getenv("STRIPE_WEBHOOK_SECRET")
+
+@app.post("/webhook/stripe")
+async def stripe_webhook(request: Request):
+    payload = await request.body()
+    sig_header = request.headers.get("stripe-signature")
+
+    try:
+        event = stripe.Webhook.construct_event(
+            payload, sig_header, webhook_secret
+        )
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid payload")
+    except stripe.error.SignatureVerificationError:
+        raise HTTPException(status_code=400, detail="Invalid signature")
+
+    # Processa eventos
+    if event.type == "checkout.session.completed":
+        session = event.data.object
+        await handle_checkout_completed(session)
+
+    elif event.type == "customer.subscription.deleted":
+        subscription = event.data.object
+        await handle_subscription_cancelled(subscription)
+
+    elif event.type == "invoice.paid":
+        invoice = event.data.object
+        await handle_invoice_paid(invoice)
+
+    return {"status": "ok"}
+
+
+async def handle_checkout_completed(session: dict):
+    """Ativa o cliente e os agentes após pagamento confirmado"""
+    customer_email = session.get("customer_email")
+    customer_name = session.get("metadata", {}).get("customer_name", "Cliente")
+    company = session.get("metadata", {}).get("company", "")
+    plan = session.get("metadata", {}).get("plan", "starter")
+    customer_id = session.get("customer")
+
+    # 1. Cria cliente no Supabase
+    client_data = {
+        "email": customer_email,
+        "name": customer_name,
+        "company": company,
+        "plan": plan,
+        "stripe_customer_id": customer_id,
+        "status": "active"
+    }
+    client = supabase.table("clients").insert(client_data).execute()
+    client_id = client.data[0]["id"]
+
+    # 2. Ativa os agentes
+    await activate_tenant(client_id, plan)
+
+    # 3. Envia e-mail de boas-vindas
+    await send_welcome_email(customer_email, customer_name, client_id, plan)
+
+    # 4. Registra no log
+    print(f"✅ Cliente ativado: {customer_email} - Plano: {plan}")
+
+
+async def handle_subscription_cancelled(subscription: dict):
+    """Suspende ou cancela o acesso do cliente"""
+    customer_id = subscription.get("customer")
+    
+    # Busca cliente no Supabase
+    client = supabase.table("clients")\
+        .select("*")\
+        .eq("stripe_customer_id", customer_id)\
+        .execute()
+
+    if client.data:
+        client_id = client.data[0]["id"]
+        supabase.table("clients")\
+            .update({"status": "cancelled"})\
+            .eq("id", client_id)\
+            .execute()
+        
+        # Desativa agentes
+        supabase.table("client_agents")\
+            .update({"status": "inactive"})\
+            .eq("client_id", client_id)\
+            .execute()
+
+        print(f"❌ Cliente cancelado: {customer_id}")
+
+
+async def handle_invoice_paid(invoice: dict):
+    """Renova a assinatura do cliente"""
+    customer_id = invoice.get("customer")
+    
+    # Atualiza status no Supabase
+    supabase.table("clients")\
+        .update({"status": "active"})\
+        .eq("stripe_customer_id", customer_id)\
+        .execute()
+
+    print(f"🔄 Assinatura renovada: {customer_id}")
+
+4. Provisionamento dos Agentes
+python
+
+# src/fulfillment/provisioning.py
+"""
+Ativa os agentes do AION para o cliente
+"""
+
+from src.database.supabase_client import supabase
+from src.orchestrator import orchestrator
+
+PLAN_AGENTS = {
+    "starter": ["#1"],
+    "professional": ["#1", "#2", "#3"],
+    "enterprise": ["#1", "#2", "#3", "#4", "#5"],
+    "full_suite": ["#1", "#2", "#3", "#4", "#5", "#6", "#7", "#8", "#9", 
+                   "#10", "#11", "#12", "#13", "#14", "#15", "#16", "#17", 
+                   "#18", "#19", "#20", "#21", "#22", "#23", "#24", "#25", 
+                   "#26", "#27", "#49", "#50", "#51", "#52", "#53", "#57", "#58", "#59"]
+}
+
+async def activate_tenant(client_id: str, plan: str):
+    """Cria tenant e ativa agentes para o cliente"""
+    
+    # 1. Obtém agentes do plano
+    agent_ids = PLAN_AGENTS.get(plan, [])
+    
+    # 2. Cria registro de tenant
+    tenant = supabase.table("tenants").insert({
+        "client_id": client_id,
+        "plan": plan,
+        "status": "active"
+    }).execute()
+    tenant_id = tenant.data[0]["id"]
+    
+    # 3. Ativa cada agente
+    for agent_id in agent_ids:
+        await orchestrator.activate_agent(agent_id, tenant_id)
+        
+        # Registra no banco
+        supabase.table("client_agents").insert({
+            "client_id": client_id,
+            "tenant_id": tenant_id,
+            "agent_id": agent_id,
+            "status": "active"
+        }).execute()
+    
+    # 4. Gera API Key para o cliente
+    api_key = generate_api_key(client_id)
+    supabase.table("clients")\
+        .update({"api_key": api_key})\
+        .eq("id", client_id)\
+        .execute()
+    
+    return {
+        "tenant_id": tenant_id,
+        "agent_ids": agent_ids,
+        "api_key": api_key
+    }
+
+
+def generate_api_key(client_id: str) -> str:
+    """Gera chave de API para o cliente"""
+    import secrets
+    return f"aion_{client_id}_{secrets.token_hex(24)}"
+
+5. Envio de E-mail de Boas-Vindas
+python
+
+# src/fulfillment/email.py
+"""
+Envio de e-mails automáticos para clientes
+"""
+
+import sendgrid
+from sendgrid.helpers.mail import Mail
+import os
+
+SENDGRID_API_KEY = os.getenv("SENDGRID_API_KEY")
+FROM_EMAIL = "contato@aion.global"
+
+def send_welcome_email(to_email: str, name: str, client_id: str, plan: str):
+    """Envia e-mail de boas-vindas com instruções de uso"""
+    
+    sg = sendgrid.SendGridAPIClient(SENDGRID_API_KEY)
+    
+    # Template HTML
+    html_content = f"""
+    <h1>Bem-vindo ao AION, {name}!</h1>
+    <p>Sua assinatura do plano <strong>{plan}</strong> foi ativada com sucesso.</p>
+    
+    <h2>✅ Seus agentes já estão prontos para uso</h2>
+    <p>Você pode acessar seu portal em: <a href="https://aion.global/dashboard/{client_id}">https://aion.global/dashboard/{client_id}</a></p>
+    
+    <h2>🔑 Sua chave de API</h2>
+    <p><code>aion_{client_id}_{os.urandom(24).hex()}</code></p>
+    <p><em>Guarde esta chave em local seguro. Ela será usada para autenticar suas requisições.</em></p>
+    
+    <h2>📋 Como usar seus agentes</h2>
+    <ul>
+        <li><strong>Portal Web:</strong> Acesse seu dashboard para interagir com os agentes via chat</li>
+        <li><strong>API REST:</strong> Use sua chave de API para chamar agentes programaticamente</li>
+        <li><strong>Integração Microsoft:</strong> Adicione seus agentes ao Teams, SharePoint ou Outlook</li>
+    </ul>
+    
+    <h2>📞 Suporte</h2>
+    <p>Precisa de ajuda? Fale com nosso agente #8 (Engineering Assistant) diretamente no portal.</p>
+    <p>Ou envie um e-mail para: suporte@aion.global</p>
+    
+    <hr>
+    <p><small>Ecosystem AION — Agents Intelligence Orchestration Network</small></p>
+    """
+    
+    message = Mail(
+        from_email=FROM_EMAIL,
+        to_emails=to_email,
+        subject=f"🎉 Bem-vindo ao AION — Seus agentes estão ativos!",
+        html_content=html_content
+    )
+    
+    try:
+        response = sg.send(message)
+        print(f"✅ E-mail enviado para {to_email} - Status: {response.status_code}")
+    except Exception as e:
+        print(f"❌ Erro ao enviar e-mail: {e}")
+
+🚀 Comandos para Subir no Netlify
+bash
+
+# 1. Criar arquivo netlify.toml
+cat > netlify.toml << 'EOF'
+[build]
+  publish = "site/"
+  command = "echo 'Build completed'"
+
+[[redirects]]
+  from = "/api/*"
+  to = "https://api.aion.global/api/:splat"
+  status = 200
+  force = true
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+EOF
+
+# 2. Subir o site
+netlify deploy --prod --dir=./site
+
+# 3. Adicionar variáveis de ambiente no Netlify
+netlify env:set STRIPE_SECRET_KEY "sk_live_..."
+netlify env:set STRIPE_WEBHOOK_SECRET "whsec_..."
+netlify env:set SENDGRID_API_KEY "SG..."
+netlify env:set SUPABASE_URL "https://..."
+netlify env:set SUPABASE_KEY "ey..."
+
+✅ CHECKLIST DE IMPLANTAÇÃO
+#	Item	Status
+1	Página de checkout no site (HTML/JS)	⬜
+2	Endpoint /api/create-checkout-session (Python)	⬜
+3	Webhook /webhook/stripe (Python)	⬜
+4	Ativação de clientes no Supabase	⬜
+5	Provisionamento de agentes para o cliente	⬜
+6	Envio de e-mail de boas-vindas	⬜
+7	Variáveis de ambiente configuradas	⬜
+8	Deploy no Netlify	⬜
+9	Teste completo (compra → ativação → e-mail)

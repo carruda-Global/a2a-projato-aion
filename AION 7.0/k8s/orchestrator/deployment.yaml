@@ -1,0 +1,115 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aion-orchestrator
+  namespace: aion
+  labels:
+    app.kubernetes.io/name: aion-orchestrator
+    app.kubernetes.io/component: orchestrator
+    app.kubernetes.io/managed-by: aion
+  annotations:
+    apphub.cloud.google.com/functional-type: "AGENT"
+    aion.agent/description: "Master Orchestrator - coordena 78 agentes de IA"
+    aion.agent/capabilities: "orchestration,planning,delegation,monitoring"
+    aion.agent/llm: "claude-api"
+    aion.agent/a2a-enabled: "true"
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: aion-orchestrator
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: aion-orchestrator
+        app.kubernetes.io/component: orchestrator
+      annotations:
+        apphub.cloud.google.com/functional-type: "AGENT"
+    spec:
+      serviceAccountName: aion-orchestrator
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1001
+        runAsGroup: 1001
+        fsGroup: 1001
+      containers:
+      - name: orchestrator
+        image: gcr.io/global-engenharia-498823/aion-orchestrator:7.0.0
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8000
+          name: http
+          protocol: TCP
+        - containerPort: 9090
+          name: metrics
+          protocol: TCP
+        env:
+        - name: APP_ENV
+          value: "production"
+        - name: PYTHONPATH
+          value: "/app"
+        - name: A2A_ENABLED
+          value: "true"
+        - name: A2A_BASE_URL
+          value: "https://aion.engenheiro-producao-ai.com"
+        envFrom:
+        - secretRef:
+            name: aion-secrets
+        - configMapRef:
+            name: aion-config
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "500m"
+          limits:
+            memory: "2Gi"
+            cpu: "2000m"
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 15
+          timeoutSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /api/agents/health
+            port: 8000
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 5
+        volumeMounts:
+        - mountPath: /app/config.yaml
+          name: config
+          subPath: config.yaml
+        - mountPath: /app/data
+          name: data
+      volumes:
+      - name: config
+        configMap:
+          name: aion-config
+      - name: data
+        emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: aion-orchestrator
+  namespace: aion
+  labels:
+    app.kubernetes.io/name: aion-orchestrator
+    app.kubernetes.io/component: orchestrator
+  annotations:
+    cloud.google.com/app-hub: "true"
+    cloud.google.com/neg: '{"ingress": true}'
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8000
+    targetPort: 8000
+    name: http
+  - port: 9090
+    targetPort: 9090
+    name: metrics
+  selector:
+    app.kubernetes.io/name: aion-orchestrator

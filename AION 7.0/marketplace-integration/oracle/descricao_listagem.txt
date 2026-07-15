@@ -1,0 +1,47 @@
+EcoSystem AEC + Regulatory é o único sistema multiagente de IA que cobre as 9 principais obrigações regulatórias brasileiras ativas em 2026 em um único produto integrado.
+
+DIFERENCIAL DE MERCADO:
+Enquanto concorrentes como Domani, Carbonova e Mangue Tech focam em grandes empresas com tickets acima de R$ 10 mil/mês, o EcoSystem AEC atende PMEs e médias empresas com planos de R$ 290 a R$ 3.490/mês — um segmento 10x maior em volume e sem cobertura de IA.
+
+AGENTES INCLUSOS:
+
+1. NR-1 Riscos Psicossociais (Portaria MTE 1.419/2024)
+Vigente desde maio/2026. 82% das empresas não estão preparadas. Identifica, avalia e documenta Fatores de Riscos Psicossociais (FRPRT) com metodologias validadas (COPSOQ, JCQ, PHQ-9, GAD-7). Gera inventário, plano de ação e relatório executivo para fiscalização. Não exige ART — pode ser lançado imediatamente.
+
+2. Tributário CBS/IBS (Lei Complementar 214/2025)
+Reforma tributária mais complexa da história do Brasil. Penalidades a partir de agosto/2026. Classificação automática de produtos com NCM e alíquotas corretas, geração da DeRE, verificação de inconsistências entre regime antigo e novo, simulador de impacto financeiro.
+
+3. LGPD Operacional (Lei 13.709/2018)
+Fiscalização plena pela ANPD em 2026. Multa de até 2% do faturamento ou R$ 50 milhões. Mapeamento automatizado de fluxos de dados, geração do RoPA conforme ANPD, identificação de lacunas de base legal, protocolo de resposta a incidentes.
+
+4. ESG IFRS S1/S2 (Resolução CVM 193/2023)
+Obrigatório para companhias abertas desde 2026. Efeito cascata: grandes empresas repassam exigências para toda a cadeia via contratos. PMEs sem indicadores ESG serão excluídas de cadeias de suprimento. Diagnóstico de maturidade, relatórios IFRS, resposta a questionários de clientes.
+
+5. Inventário de Carbono Escopo 1 e 2 (Lei 15.042/2024 - SBCE)
+Sistema Brasileiro de Comércio de Emissões. Piloto 2026, multa até R$ 5 milhões. Cálculo automatizado com fatores MCTI e SIN atualizados, inventário GHG Protocol com trilha de auditoria, identificação de hotspots.
+
+6. Escopo 3 Rastreabilidade de Fornecedores (SBCE + CBAM + IFRS S2)
+Escopo 3 representa 70-90% da pegada total de carbono. Grandes empresas já incluem em contratos como critério de homologação. Portal self-service para fornecedores, consolidação das 15 categorias GHG Protocol, score ESG por fornecedor.
+
+7. Canal de Denúncias Inteligente (Lei 14.457/2022)
+Obrigatório para empresas com CIPA (20+ funcionários). Canal omnichannel (WhatsApp, formulário web, e-mail criptografado) com anonimato garantido. Triagem automática por categoria, fluxo de investigação, relatórios semestrais para CIPA.
+
+8. Igualdade Salarial e Diversidade (Lei 14.611/2023)
+Relatório semestral obrigatório para empresas com 100+ empregados. Multa de até 3% da folha. Integração com folha de pagamento, cálculo de indicadores de equidade, geração do relatório no formato MTE/Portal Emprega Brasil.
+
+9. Compliance Anticorrupção PME (Lei 12.846/2013 + Decreto 11.129/2022)
+Empresas que contratam com o poder público precisam de programa de integridade. Critério objetivo em licitações federais e estaduais em 2026. Diagnóstico CGU, código de ética personalizado, due diligence de terceiros, treinamento automatizado.
+
+INFRAESTRUTURA:
+- LLM Core: DeepSeek-V4-Flash / Claude / Gemini
+- Framework: FastAPI + A2A Protocol (Google Agent-to-Agent)
+- Pagamentos: Stripe + PIX
+- Disponibilidade: 99.5% SLA
+- LGPD: dados em servidores Brasil, criptografia em trânsito e repouso
+
+PLANOS:
+- Planos individuais por agente: R$ 290 a R$ 890/mês
+- Regulatory Starter (NR-1 + LGPD): R$ 590/mês
+- Regulatory Professional (5 agentes): R$ 1.490/mês
+- Regulatory Full (9 agentes): R$ 3.490/mês
+- Trial de 15 dias disponível

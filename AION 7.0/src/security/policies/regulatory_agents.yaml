@@ -1,0 +1,98 @@
+agents:
+  - agent_id: "did:aip:nr1_psicossocial_001"
+    agent_name: "NR-1 Psicossocial"
+    principal: "Cristiano Arruda (CREA-SP 5071200171)"
+    permissions:
+      deepseek_chat: { allowed: true, constraints: [{ max_tokens: 8192 }] }
+      document_read: { allowed: true, constraints: [{ max_documents: 200 }] }
+      supabase_read: { allowed: true }
+      supabase_insert: { allowed: true, constraints: [{ max_rows: 100 }] }
+      supabase_delete: { allowed: false }
+    dlp_rules:
+      - { pattern: "CPF|\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}", action: "mask" }
+      - { pattern: "RG|\\d{2}\\.\\d{3}\\.\\d{3}-\\d{1}", action: "mask" }
+
+  - agent_id: "did:aip:tributario_001"
+    agent_name: "Tributario CBS/IBS"
+    principal: "Cristiano Arruda (CREA-SP 5071200171)"
+    permissions:
+      deepseek_chat: { allowed: true }
+      document_read: { allowed: true }
+      supabase_read: { allowed: true }
+      supabase_insert: { allowed: true }
+      stripe_read: { allowed: true }
+
+  - agent_id: "did:aip:lgpd_001"
+    agent_name: "LGPD Operacional"
+    principal: "Cristiano Arruda (CREA-SP 5071200171)"
+    permissions:
+      deepseek_chat: { allowed: true }
+      document_read: { allowed: true }
+      supabase_read: { allowed: true }
+      supabase_insert: { allowed: true }
+      supabase_delete: { allowed: false }
+
+  - agent_id: "did:aip:esg_001"
+    agent_name: "ESG IFRS"
+    principal: "Cristiano Arruda (CREA-SP 5071200171)"
+    permissions:
+      deepseek_chat: { allowed: true, constraints: [{ max_tokens: 8192 }] }
+      document_read: { allowed: true }
+      supabase_read: { allowed: true }
+      supabase_insert: { allowed: true }
+
+  - agent_id: "did:aip:carbono_001"
+    agent_name: "Inventario Carbono"
+    principal: "Cristiano Arruda (CREA-SP 5071200171)"
+    permissions:
+      deepseek_chat: { allowed: true }
+      document_read: { allowed: true }
+      supabase_read: { allowed: true }
+      supabase_insert: { allowed: true }
+
+  - agent_id: "did:aip:escopo3_001"
+    agent_name: "Escopo 3 Fornecedores"
+    principal: "Cristiano Arruda (CREA-SP 5071200171)"
+    permissions:
+      deepseek_chat: { allowed: true }
+      supabase_read: { allowed: true }
+      supabase_insert: { allowed: true }
+      supplier_api: { allowed: true, constraints: [{ read_only: true }] }
+
+  - agent_id: "did:aip:canal_denuncias_001"
+    agent_name: "Canal de Denuncias"
+    principal: "Cristiano Arruda (CREA-SP 5071200171)"
+    permissions:
+      deepseek_chat: { allowed: true }
+      supabase_read: { allowed: true }
+      supabase_insert: { allowed: true }
+      supabase_delete: { allowed: false }
+    dlp_rules:
+      - { pattern: "CPF|\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}", action: "mask" }
+      - { pattern: "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}", action: "mask" }
+      - { pattern: "\\d{10,11}", action: "mask" }
+    hitl_actions:
+      denuncia_finalizar: { require_approval: true, approver: "Cristiano Arruda" }
+
+  - agent_id: "did:aip:igualdade_001"
+    agent_name: "Igualdade Salarial"
+    principal: "Cristiano Arruda (CREA-SP 5071200171)"
+    permissions:
+      deepseek_chat: { allowed: true }
+      document_read: { allowed: true }
+      supabase_read: { allowed: true }
+      supabase_insert: { allowed: true }
+    dlp_rules:
+      - { pattern: "CPF|\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}", action: "mask" }
+      - { pattern: "salario|renda|remuneracao", action: "mask" }
+
+  - agent_id: "did:aip:anticorrupcao_001"
+    agent_name: "Compliance Anticorrupcao"
+    principal: "Cristiano Arruda (CREA-SP 5071200171)"
+    permissions:
+      deepseek_chat: { allowed: true }
+      document_read: { allowed: true }
+      supabase_read: { allowed: true }
+      supabase_insert: { allowed: true, constraints: [{ max_rows: 50 }] }
+    hitl_actions:
+      due_diligence_aprovar: { require_approval: true, approver: "Cristiano Arruda" }

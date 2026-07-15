@@ -1,0 +1,197 @@
+openapi: 3.1.0
+info:
+  title: EcoSystem AEC — 86 AI Compliance Agents
+  description: >
+    AI-powered compliance diagnostics for NR-1, LGPD, EU AI Act, CSRD, DORA, NIS2, and more.
+    Returns structured risk reports in seconds. Covers Brazil, EU, US markets.
+  version: "7.0.0"
+  contact:
+    name: Global Match Engenharia de Produção
+    url: https://global-engenharia.com
+    email: contact@global-engenharia.com
+
+servers:
+  - url: https://engenheiro-producao-ai.onrender.com
+
+paths:
+  /mcp/regulatory/tools/nr1_psicossocial:
+    post:
+      operationId: generateNR1Inventory
+      summary: NR-1 Psychosocial Risk Inventory
+      description: Generates a psychosocial risk inventory (FRPRT) per Portaria MTE 1.419/2024. Returns risk factors, severity classification, and 90-day action plan.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [empresa, num_funcionarios]
+              properties:
+                empresa:
+                  type: string
+                  description: Company name
+                num_funcionarios:
+                  type: integer
+                  description: Number of employees
+                cnpj:
+                  type: string
+                  description: Brazilian company tax ID (optional)
+                setor:
+                  type: string
+                  description: Industry sector (e.g., manufacturing, retail, tech)
+      responses:
+        "200":
+          description: NR-1 risk inventory with action plan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ComplianceReport"
+
+  /mcp/regulatory/tools/eu_ai_act:
+    post:
+      operationId: checkEUAIActReadiness
+      summary: EU AI Act Readiness Check
+      description: Assesses AI system compliance with EU AI Act (August 2026 deadline). Classifies risk level (prohibited/high/limited/minimal) and provides remediation roadmap.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [company, ai_systems]
+              properties:
+                company:
+                  type: string
+                ai_systems:
+                  type: array
+                  items:
+                    type: string
+                  description: List of AI systems or use cases to assess
+                sector:
+                  type: string
+                  description: Industry sector (financial, healthcare, HR, etc.)
+      responses:
+        "200":
+          description: EU AI Act compliance assessment
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ComplianceReport"
+
+  /mcp/regulatory/tools/csrd_assessment:
+    post:
+      operationId: runCSRDAssessment
+      summary: CSRD Double Materiality Assessment
+      description: Performs double materiality assessment for CSRD reporting (ESRS standards). Identifies material sustainability topics and disclosure gaps.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [company, sector]
+              properties:
+                company:
+                  type: string
+                sector:
+                  type: string
+                  description: Industry sector (important for ESRS sector-specific standards)
+                employees:
+                  type: integer
+                  description: Employee count (determines mandatory reporting threshold)
+                revenue_eur_million:
+                  type: number
+                  description: Annual revenue in EUR millions
+      responses:
+        "200":
+          description: CSRD double materiality assessment
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ComplianceReport"
+
+  /api/pricing/quote:
+    post:
+      operationId: getPricingQuote
+      summary: Get Dynamic Pricing Quote
+      description: Returns a personalized pricing quote based on company profile, country, and compliance needs.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                country:
+                  type: string
+                  description: ISO 3166-1 alpha-2 country code
+                company_size:
+                  type: string
+                  enum: [startup, smb, mid_market, enterprise]
+                compliance_needs:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        "200":
+          description: Personalized pricing quote
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  segment:
+                    type: string
+                  price_usd:
+                    type: number
+                  price_local:
+                    type: number
+                  currency:
+                    type: string
+                  checkout_url:
+                    type: string
+
+components:
+  schemas:
+    ComplianceReport:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [compliant, partial, non_compliant]
+        risk_score:
+          type: integer
+          minimum: 0
+          maximum: 100
+        summary:
+          type: string
+        findings:
+          type: array
+          items:
+            type: object
+            properties:
+              category:
+                type: string
+              severity:
+                type: string
+                enum: [critical, high, medium, low]
+              description:
+                type: string
+              recommendation:
+                type: string
+        action_plan:
+          type: array
+          items:
+            type: object
+            properties:
+              priority:
+                type: integer
+              action:
+                type: string
+              deadline_days:
+                type: integer
+        report_id:
+          type: string
+        generated_at:
+          type: string
+          format: date-time

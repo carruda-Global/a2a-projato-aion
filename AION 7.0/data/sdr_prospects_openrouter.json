@@ -1,0 +1,16 @@
+[
+  {
+    "empresa": "Construtora Alvorada",
+    "setor": "construtora residencial médio porte",
+    "cargo_decisor": "Engenheiro de Segurança do Trabalho",
+    "motivo": "Crescimento acelerado com 180 funcionários em 8 obras simultâneas sem gestão centralizada de PGR e riscos psicossociais obrigatórios na NR-1",
+    "mensagem_whatsapp": "Oi [nome], vi que a Alvorada expandiu para 8 obras. Como está gerenciando os laudos de insalubridade e PGR da NR-1 em todas elas? Tenho uma solução que automatiza isso."
+  },
+  {
+    "empresa": "Incorporadora Vista Verde",
+    "setor": "incorporadora de loteamentos",
+    "cargo_decisor": "Diretor Administrativo",
+    "motivo": "Captação de dados de clientes em stands de vendas sem estrutura de consentimento LGPD e risco de multas do Procon",
+    "mensagem_whatsapp": "Olá [nome], a Vista Verde coleta dados em stands né? Vi que muitas incorporadoras estão sendo notificadas pela LGPD. Posso mostrar como automatizar o compliance em 15 min?"
+  }
+]

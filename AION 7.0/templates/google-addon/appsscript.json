@@ -1,0 +1,26 @@
+{
+  "timeZone": "America/Sao_Paulo",
+  "urlFetchWhitelist": [
+    "https://engenheiro-producao-ai.onrender.com/"
+  ],
+  "addOns": {
+    "common": {
+      "name": "SallesJam Compliance",
+      "logoUrl": "https://engenheiro-producao-ai.onrender.com/static/icons/icon-80.png",
+      "homepageTrigger": {
+        "runFunction": "onHomepage"
+      }
+    },
+    "gmail": {
+      "contextualTriggers": [{
+        "unconditional": {},
+        "onTriggerFunction": "onGmailMessageOpen"
+      }]
+    }
+  },
+  "oauthScopes": [
+    "https://www.googleapis.com/auth/gmail.addons.execute",
+    "https://www.googleapis.com/auth/gmail.readonly",
+    "https://www.googleapis.com/auth/script.external_request"
+  ]
+}

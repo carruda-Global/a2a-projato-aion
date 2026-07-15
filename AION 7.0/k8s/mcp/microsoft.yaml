@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aion-mcp-microsoft
+  namespace: aion
+  labels:
+    app.kubernetes.io/name: aion-mcp-microsoft
+    app.kubernetes.io/component: mcp-server
+  annotations:
+    apphub.cloud.google.com/functional-type: "AGENT"
+    aion.agent/description: "MCP Microsoft Server - 53 tools: M365 agentes + micro-agentes"
+    aion.agent/capabilities: "microsoft,m365,teams,sharepoint,powerbi"
+    aion.agent/llm: "deepseek,gemini,claude"
+    aion.agent/a2a-enabled: "true"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: aion-mcp-microsoft
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: aion-mcp-microsoft
+        app.kubernetes.io/component: mcp-server
+      annotations:
+        apphub.cloud.google.com/functional-type: "AGENT"
+    spec:
+      serviceAccountName: aion-orchestrator
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1001
+      containers:
+      - name: mcp-microsoft
+        image: gcr.io/global-engenharia-498823/aion-mcp-microsoft:7.0.0
+        ports:
+        - containerPort: 8013
+          name: mcp
+        env:
+        - name: APP_ENV
+          value: "production"
+        - name: MCP_SERVER_ID
+          value: "microsoft"
+        envFrom:
+        - secretRef:
+            name: aion-secrets
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "500m"
+          limits:
+            memory: "2Gi"
+            cpu: "2000m"
+        livenessProbe:
+          httpGet:
+            path: /tools
+            port: 8013
+          initialDelaySeconds: 20
+          periodSeconds: 15
+        readinessProbe:
+          httpGet:
+            path: /tools
+            port: 8013
+          initialDelaySeconds: 10
+          periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: aion-mcp-microsoft
+  namespace: aion
+  annotations:
+    cloud.google.com/app-hub: "true"
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8013
+    targetPort: 8013
+    name: mcp
+  selector:
+    app.kubernetes.io/name: aion-mcp-microsoft
