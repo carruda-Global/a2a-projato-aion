@@ -5,7 +5,7 @@
   xmlns:bt="http://schemas.microsoft.com/office/officeappbasictypes/1.0"
   xmlns:ov="http://schemas.microsoft.com/office/taskpaneappversionoverrides"
   xsi:type="TaskPaneApp">
-  <Id>a1b2c3d4-e5f6-7890-abcd-ef1234567890</Id>
+  <Id>a9252d49-7462-4024-8c45-a18397fc8a62</Id>
   <Version>1.0.0.0</Version>
   <ProviderName>Global Match Engenharia de Producao</ProviderName>
   <DefaultLocale>pt-BR</DefaultLocale>
@@ -13,7 +13,7 @@
   <Description DefaultValue="Agentes de IA para compliance regulatorio - NR-1, LGPD, CBS/IBS e mais"/>
   <IconUrl DefaultValue="https://engenheiro-producao-ai.onrender.com/static/icons/icon-32.png"/>
   <HighResolutionIconUrl DefaultValue="https://engenheiro-producao-ai.onrender.com/static/icons/icon-64.png"/>
-  <SupportUrl DefaultValue="https://global-engenharia.com/ecosystem"/>
+  <SupportUrl DefaultValue="https://global-engenharia.com/contato.html"/>
   <Hosts>
     <Host Name="Workbook"/>
     <Host Name="Document"/>
@@ -73,7 +73,7 @@
       <bt:Urls>
         <bt:Url id="Commands.Url" DefaultValue="https://engenheiro-producao-ai.onrender.com/office-addin/commands.html"/>
         <bt:Url id="Taskpane.Url" DefaultValue="https://engenheiro-producao-ai.onrender.com/office-addin/taskpane.html"/>
-        <bt:Url id="GetStarted.LearnMoreUrl" DefaultValue="https://global-engenharia.com/ecosystem"/>
+        <bt:Url id="GetStarted.LearnMoreUrl" DefaultValue="https://global-engenharia.com/sobre.html"/>
       </bt:Urls>
       <bt:ShortStrings>
         <bt:String id="GetStarted.Title" DefaultValue="SallesJam Compliance ativado!"/>
