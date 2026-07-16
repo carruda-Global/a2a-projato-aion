@@ -162,9 +162,13 @@ class SEOContentAgent:
 
 
 @router.post("/generate/{market}")
-async def trigger_generation(market: str):
+async def trigger_generation(market: str, limit: int | None = None):
+    """limit caps how many NEW pages this call generates — keeps a single
+    request comfortably under the platform's reverse-proxy timeout. Safe to
+    call repeatedly: already-generated slugs are skipped, so batching just
+    resumes where the previous call left off."""
     agent = SEOContentAgent(Settings())
-    return await agent.generate_market_pages(market.upper())
+    return await agent.generate_market_pages(market.upper(), limit=limit)
 
 
 # SEO page rendering movido para src/agents/seo_pages_router.py
