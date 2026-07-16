@@ -26,6 +26,7 @@ REDDIT_PASSWORD = os.getenv("REDDIT_PASSWORD", "")
 _SUPABASE_URL = os.getenv("SUPABASE_URL", "")
 _SUPABASE_KEY = os.getenv("SUPABASE_API_KEY", "")
 _DIRECTORY_RESEND_DAYS = 60
+_DIRECTORIES_PER_RUN = 10
 _DEVTO_RESEND_DAYS = 90
 
 
@@ -108,6 +109,19 @@ DIRECTORIES = [
     {"name": "Crozdesk", "url": "https://crozdesk.com/software-vendors", "type": "email_request", "traffic": "500k/month", "note": "SaaS discovery + comparison, free listing tier"},
     {"name": "FinancesOnline", "url": "https://reviews.financesonline.com/vendors", "type": "email_request", "traffic": "3M/month", "note": "High-authority B2B review site, strong small-business audience"},
     {"name": "SaaSGenius", "url": "https://www.saasgenius.com/list-your-software", "type": "email_request", "traffic": "300k/month", "note": "SaaS directory, free listing"},
+    # Added 2026-07-16 from a competitor backlink-gap analysis, filtered down
+    # to genuine self-serve directories. Deliberately excludes lookalike
+    # domains from that report (seo-anomaly-*, seo-cartel-*) -- those follow
+    # a textbook PBN/link-farm naming pattern and pursuing them risks a
+    # Google spam-link penalty rather than helping rankings. Also excludes
+    # Twilio, Ringover, CB Insights -- not self-serve directories, need a
+    # bespoke partner-pitch/profile-claim approach, not this generic template.
+    {"name": "GetVoIP", "url": "https://getvoip.com/contact/", "type": "email_request", "traffic": "300k/month", "note": "VoIP/telephony review site, direct category match"},
+    {"name": "BestStartup.us", "url": "https://beststartup.us/submit-startup/", "type": "email_request", "traffic": "200k/month", "note": "Startup directory"},
+    {"name": "Colormango", "url": "https://colormango.com/submit-tool", "type": "email_request", "traffic": "100k/month", "note": "Tool discovery directory"},
+    {"name": "Mrowl", "url": "https://mrowl.com/submit", "type": "email_request", "traffic": "100k/month", "note": "Startup/tool directory"},
+    {"name": "Taranker", "url": "https://taranker.com/submit-app", "type": "email_request", "traffic": "100k/month", "note": "App/tool directory"},
+    {"name": "Dialfyne", "url": "https://dialfyne.com/contact", "type": "email_request", "traffic": "unknown", "note": "Call-answering/voice-AI adjacent tool site"},
 ]
 
 LISTING_EMAIL_TEMPLATE = """Subject: Request to List AION Voice Receptionist on {directory}
@@ -356,7 +370,7 @@ async def auto_job_directories():
                 due.append((last or datetime.min.replace(tzinfo=timezone.utc), d))
         due.sort(key=lambda pair: pair[0])  # never-sent (None) and oldest first
 
-        for _, d in due[:2]:
+        for _, d in due[:_DIRECTORIES_PER_RUN]:
             sent = await _send_listing_email(d)
             logger.info("[SDR] Directory %s: email %s", d["name"], "sent" if sent else "skipped")
             if sent:
@@ -394,6 +408,14 @@ async def auto_job_press_release_distribution():
         logger.info("[SDR] Press release distribution cycle done")
     except Exception as e:
         logger.error("[SDR] PR distribution error: %s", e)
+
+
+@router.post("/run-now")
+async def run_directories_now():
+    """Manual trigger for auto_job_directories() -- fires today's due batch
+    immediately instead of waiting for the daily cron tick."""
+    await auto_job_directories()
+    return {"status": "triggered"}
 
 
 @router.get("/list")

@@ -597,7 +597,7 @@ async def startup_event():
         ("SDR-Emails",       _sdr,                          43200),   # 12h
         ("Press-Release",    _pr,                           604800),  # 7d
         ("LinkedIn",         auto_job_linkedin_content,     86400),   # 24h
-        ("Directories",      auto_job_directories,          259200),  # 72h
+        ("Directories",      auto_job_directories,          86400),   # 24h, 10/run
         ("PR-Distribution",  auto_job_press_release_distribution, 1209600),  # 14d
         ("Nurture-Emails",   auto_job_nurture_sequence,     86400),   # 24h
         ("Reactivation",     auto_job_reactivation,         604800),  # 7d
