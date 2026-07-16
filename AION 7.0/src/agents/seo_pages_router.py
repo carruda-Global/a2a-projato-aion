@@ -80,15 +80,20 @@ async def cleanup_legacy_pages():
     if not supa_url or not supa_key:
         return {"error": "Supabase not configured"}
     headers = {"apikey": supa_key, "Authorization": "Bearer " + supa_key}
+    # product IS NULL (never tagged) OR product != voice_receptionist (tagged
+    # with a now-retired product) -- the first attempt only matched IS NULL
+    # and found 0 rows, meaning these legacy rows carry a stale non-null
+    # product value instead.
+    filter_q = "or=(product.is.null,product.neq.voice_receptionist)"
     count_r = httpx.get(
-        supa_url + "/rest/v1/seo_pages?product=is.null&select=slug",
+        supa_url + f"/rest/v1/seo_pages?{filter_q}&select=slug",
         headers=headers, timeout=15,
     )
     slugs = [row["slug"] for row in count_r.json()] if count_r.status_code == 200 else []
     if not slugs:
         return {"deleted": 0, "message": "No legacy rows found"}
     del_r = httpx.delete(
-        supa_url + "/rest/v1/seo_pages?product=is.null",
+        supa_url + f"/rest/v1/seo_pages?{filter_q}",
         headers=headers, timeout=30,
     )
     return {"found": len(slugs), "delete_status_code": del_r.status_code, "sample_slugs": slugs[:5]}
