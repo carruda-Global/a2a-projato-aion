@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, Response
 
 router = APIRouter(prefix="/office-addin", tags=["office_addin"])
 
@@ -95,4 +95,4 @@ async def commands():
 async def get_manifest():
     from pathlib import Path
     manifest_path = Path(__file__).parent.parent.parent / "templates" / "office-addin" / "manifest.xml"
-    return manifest_path.read_text(encoding="utf-8")
+    return Response(content=manifest_path.read_text(encoding="utf-8"), media_type="application/xml")
