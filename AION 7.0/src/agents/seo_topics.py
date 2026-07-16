@@ -129,6 +129,68 @@ CAPABILITY_TOPICS: list[Topic] = [
         stripe_link=VOICE_RECEPTIONIST_CHECKOUT,
         markets=("US", "UK", "CA", "AU"),
     ),
+    # ── Added 2026-07-16: real buyer-doubt questions sourced from actual
+    # Reddit search-intent research (r/smallbusiness, r/EntrepreneurRideAlong,
+    # r/voiceagents) and QuestionDB keyword volume data — not invented. Each
+    # still runs through the existing per-sector/size LLM generation + dedup
+    # gate above, so this multiplies genuine long-tail coverage rather than
+    # publishing templated variants.
+    Topic(
+        key="ai-receptionist-cost-vs-staff", kind="capability", product="voice_receptionist",
+        nome="AI Receptionist Cost vs. Hiring Staff", norma="AI Voice Receptionist — Cost Comparison",
+        dor="a part-time receptionist hire costs far more than expected once wages, training, and turnover are counted",
+        stripe_link=VOICE_RECEPTIONIST_CHECKOUT,
+        markets=("US", "UK", "CA", "AU"),
+    ),
+    Topic(
+        key="ai-receptionist-answers-all-calls", kind="capability", product="voice_receptionist",
+        nome="Does an AI Receptionist Really Answer Every Call?", norma="AI Voice Receptionist — Call Coverage",
+        dor="doubt that an AI can actually handle real call volume without calls falling through",
+        stripe_link=VOICE_RECEPTIONIST_CHECKOUT,
+        markets=("US", "UK", "CA", "AU"),
+    ),
+    Topic(
+        key="ai-receptionist-escalation-handling", kind="capability", product="voice_receptionist",
+        nome="What Happens When the AI Can't Answer a Call", norma="AI Voice Receptionist — Escalation & Handoff",
+        dor="worry that a hard question gets dropped instead of handed to a human",
+        stripe_link=VOICE_RECEPTIONIST_CHECKOUT,
+        markets=("US", "UK", "CA", "AU"),
+    ),
+    Topic(
+        key="ai-receptionist-appointment-booking", kind="capability", product="voice_receptionist",
+        nome="AI Receptionist Appointment & Scheduling Info", norma="AI Voice Receptionist — Booking Integration",
+        dor="callers asking about availability with no one free to check the calendar",
+        stripe_link=VOICE_RECEPTIONIST_CHECKOUT,
+        markets=("US", "UK", "CA", "AU"),
+    ),
+    Topic(
+        key="ai-receptionist-data-security", kind="capability", product="voice_receptionist",
+        nome="How Secure Is an AI Receptionist With Customer Data", norma="AI Voice Receptionist — Privacy & Data Handling",
+        dor="uncertainty about call recording, data retention, and caller privacy compliance",
+        stripe_link=VOICE_RECEPTIONIST_CHECKOUT,
+        markets=("US", "UK", "CA", "AU"),
+    ),
+    Topic(
+        key="ai-receptionist-vs-voicemail", kind="capability", product="voice_receptionist",
+        nome="AI Receptionist vs. Voicemail", norma="AI Voice Receptionist — Beyond Voicemail",
+        dor="callers who reach voicemail almost never leave a message and just call a competitor",
+        stripe_link=VOICE_RECEPTIONIST_CHECKOUT,
+        markets=("US", "UK", "CA", "AU"),
+    ),
+    Topic(
+        key="ai-receptionist-setup-time", kind="capability", product="voice_receptionist",
+        nome="How Fast Can You Set Up an AI Receptionist", norma="AI Voice Receptionist — Setup & Onboarding",
+        dor="expecting a long implementation project when the business needs coverage now",
+        stripe_link=VOICE_RECEPTIONIST_CHECKOUT,
+        markets=("US", "UK", "CA", "AU"),
+    ),
+    Topic(
+        key="ai-receptionist-concurrent-calls", kind="capability", product="voice_receptionist",
+        nome="Can an AI Receptionist Handle Multiple Calls at Once", norma="AI Voice Receptionist — Concurrent Call Capacity",
+        dor="busy periods where every call would otherwise hit a busy signal or hold queue",
+        stripe_link=VOICE_RECEPTIONIST_CHECKOUT,
+        markets=("US", "UK", "CA", "AU"),
+    ),
 ]
 
 
