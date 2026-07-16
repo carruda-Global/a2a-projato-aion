@@ -2,6 +2,7 @@ from src.agents.base import BaseAgent
 from src.security.trust_agent import TrustAgent
 from src.security.praglocker import PragLocker
 from src.security.cotguard import CoTGuard
+from src.security.itr import ITR
 from src.security.model_extraction import ModelExtractionDetector
 from src.security.agentmark import AgentMarkProxy
 from src.security.seqwm import SeqWM
@@ -28,6 +29,7 @@ class QualityCriticAgent(BaseAgent):
         self.trust_agent = TrustAgent()
         self.praglocker = PragLocker()
         self.cotguard = CoTGuard()
+        self.itr = ITR()
         self.extraction = ModelExtractionDetector()
         self.agentmark = AgentMarkProxy()
         self.seqwm = SeqWM("#53")
