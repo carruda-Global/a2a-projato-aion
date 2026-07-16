@@ -65,3 +65,30 @@ async def sitemap():
         items.append('  <url><loc>https://global-engenharia.com' + base + p["slug"] + '</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>')
     xml = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + "\n".join(items) + "\n</urlset>"
     return HTMLResponse(content=xml, media_type="application/xml")
+
+
+@router.delete("/legacy-pages")
+async def cleanup_legacy_pages():
+    """One-time cleanup: removes seo_pages rows from the retired 19-Copilot
+    compliance catalog (product IS NULL) that pre-date the 2026-07 Voice
+    Receptionist pivot — never deleted, still polluting the sitemap with
+    irrelevant BR compliance slugs. Counts before deleting; safe to retry
+    (matches 0 rows once cleaned)."""
+    import os, httpx
+    supa_url = os.getenv("SUPABASE_URL", "")
+    supa_key = os.getenv("SUPABASE_API_KEY", "")
+    if not supa_url or not supa_key:
+        return {"error": "Supabase not configured"}
+    headers = {"apikey": supa_key, "Authorization": "Bearer " + supa_key}
+    count_r = httpx.get(
+        supa_url + "/rest/v1/seo_pages?product=is.null&select=slug",
+        headers=headers, timeout=15,
+    )
+    slugs = [row["slug"] for row in count_r.json()] if count_r.status_code == 200 else []
+    if not slugs:
+        return {"deleted": 0, "message": "No legacy rows found"}
+    del_r = httpx.delete(
+        supa_url + "/rest/v1/seo_pages?product=is.null",
+        headers=headers, timeout=30,
+    )
+    return {"found": len(slugs), "delete_status_code": del_r.status_code, "sample_slugs": slugs[:5]}
