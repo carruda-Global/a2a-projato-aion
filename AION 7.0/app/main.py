@@ -83,6 +83,7 @@ from app.routers.voice_agent import router as voice_agent_router
 from app.core.database.db import init_pool as nr1_init_pool, close_pool as nr1_close_pool
 from app.core.engineering.db import init_pool as engineering_init_pool, close_pool as engineering_close_pool
 from src.agents.seo_content_agent import router as seo_agent_router
+from src.agents.seo_orchestrator_agent import router as seo_orchestrator_router
 from src.agents.seo_pages_router import router as seo_pages_router
 from src.agents.eu_ai_act_agent import router as eu_ai_act_router
 from src.agents.lfpdppp_agent import router as lfpdppp_router
@@ -448,6 +449,7 @@ async def _engineering_copilot_shutdown():
 
 
 app.include_router(seo_agent_router)
+app.include_router(seo_orchestrator_router)
 app.include_router(seo_pages_router)
 app.include_router(eu_ai_act_router)
 app.include_router(lfpdppp_router)
