@@ -122,6 +122,10 @@ DIRECTORIES = [
     {"name": "Mrowl", "url": "https://mrowl.com/submit", "type": "email_request", "traffic": "100k/month", "note": "Startup/tool directory"},
     {"name": "Taranker", "url": "https://taranker.com/submit-app", "type": "email_request", "traffic": "100k/month", "note": "App/tool directory"},
     {"name": "Dialfyne", "url": "https://dialfyne.com/contact", "type": "email_request", "traffic": "unknown", "note": "Call-answering/voice-AI adjacent tool site"},
+    # Added 2026-07-17, country-specific to the 4 markets we actually serve
+    # (US/UK/CA/AU) rather than generic global directories.
+    {"name": "NAIC AI Directory (Australia)", "url": "https://aidirectory.industry.gov.au/directory", "type": "email_request", "traffic": "gov.au", "note": "Official Australian government AI business directory -- high-authority, market-relevant since we serve AU"},
+    {"name": "TopAI.tools", "url": "https://topai.tools/", "type": "email_request", "traffic": "1M/month", "note": "AI tool directory, free submission"},
 ]
 
 LISTING_EMAIL_TEMPLATE = """Subject: Request to List AION Voice Receptionist on {directory}
