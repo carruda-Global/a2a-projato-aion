@@ -83,7 +83,7 @@ from app.routers.voice_agent import router as voice_agent_router
 from app.core.database.db import init_pool as nr1_init_pool, close_pool as nr1_close_pool
 from app.core.engineering.db import init_pool as engineering_init_pool, close_pool as engineering_close_pool
 from src.agents.seo_content_agent import router as seo_agent_router
-from src.agents.seo_orchestrator_agent import router as seo_orchestrator_router
+from src.agents.seo_orchestrator_agent import router as seo_orchestrator_router, auto_job_indexnow
 from src.agents.seo_pages_router import router as seo_pages_router
 from src.agents.eu_ai_act_agent import router as eu_ai_act_router
 from src.agents.lfpdppp_agent import router as lfpdppp_router
@@ -600,6 +600,7 @@ async def startup_event():
         ("Press-Release",    _pr,                           604800),  # 7d
         ("LinkedIn",         auto_job_linkedin_content,     86400),   # 24h
         ("Directories",      auto_job_directories,          86400),   # 24h, 10/run
+        ("IndexNow",         auto_job_indexnow,             21600),   # 6h, retries through IndexNow's rate limits
         ("PR-Distribution",  auto_job_press_release_distribution, 1209600),  # 14d
         ("Nurture-Emails",   auto_job_nurture_sequence,     86400),   # 24h
         ("Reactivation",     auto_job_reactivation,         604800),  # 7d
