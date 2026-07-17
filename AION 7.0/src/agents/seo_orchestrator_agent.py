@@ -3,6 +3,7 @@ page generation (seo_content_agent), backlink/directory outreach
 (directory_submission_agent), and GSC performance feedback (seo_feedback_agent).
 Ties them together as one checkable "SEO Agent" instead of separate silent crons."""
 import os
+from datetime import datetime, timezone
 import httpx
 from fastapi import APIRouter
 
@@ -30,6 +31,35 @@ INDEXNOW_URLS = [
 ]
 
 
+BLOG_URLS = [u for u in INDEXNOW_URLS if "/blog" in u]
+
+
+async def _log_indexnow_run(status_code: int) -> None:
+    """Persist a timestamp for the last IndexNow batch so /status can report
+    it -- before this, the cron ran every 6h but left no record anywhere,
+    making it indistinguishable from silently having stopped."""
+    supa_url = os.getenv("SUPABASE_URL", "")
+    supa_key = os.getenv("SUPABASE_API_KEY", "")
+    if not (supa_url and supa_key):
+        return
+    try:
+        async with httpx.AsyncClient(timeout=10) as client:
+            await client.post(
+                supa_url + "/rest/v1/sdr_growth_log",
+                json={
+                    "channel": "indexnow",
+                    "item_key": f"batch-status-{status_code}",
+                    "last_sent_at": datetime.now(timezone.utc).isoformat(),
+                },
+                headers={
+                    "apikey": supa_key, "Authorization": "Bearer " + supa_key,
+                    "Prefer": "resolution=merge-duplicates",
+                },
+            )
+    except Exception:
+        pass
+
+
 async def auto_job_indexnow():
     """Called by the JOBS loop. IndexNow's public API rate-limits by source
     IP independent of our own key/quota, so a submission can 429 for reasons
@@ -46,6 +76,7 @@ async def auto_job_indexnow():
                     "urlList": INDEXNOW_URLS,
                 },
             )
+        await _log_indexnow_run(r.status_code)
         return {"status_code": r.status_code, "body": r.text[:200]}
     except Exception as e:
         return {"error": str(e)}
@@ -85,13 +116,38 @@ async def seo_agent_status():
         )
         recent_directory_sends = dirs_r.json() if dirs_r.status_code == 200 else []
 
+        indexnow_r = await client.get(
+            supa_url + "/rest/v1/sdr_growth_log?channel=eq.indexnow&select=item_key,last_sent_at&order=last_sent_at.desc&limit=1",
+            headers=headers,
+        )
+        indexnow_last = indexnow_r.json() if indexnow_r.status_code == 200 else []
+
+        blog_health = {}
+        for url in BLOG_URLS:
+            try:
+                br = await client.head(url, timeout=10, follow_redirects=True)
+                blog_health[url] = br.status_code
+            except Exception as e:
+                blog_health[url] = f"error: {e}"
+
     return {
         "combinatorial_pages": {"by_market": pages_by_market, "total": sum(pages_by_market.values())},
         "legacy_stale_pages_pending_cleanup": legacy_stale_pages,
         "recent_directory_outreach": recent_directory_sends,
+        "blog": {
+            "pages_checked": len(BLOG_URLS),
+            "status_by_url": blog_health,
+            "all_live": all(v == 200 for v in blog_health.values()),
+        },
+        "indexnow": {
+            "last_run": indexnow_last[0] if indexnow_last else None,
+            "urls_per_batch": len(INDEXNOW_URLS),
+            "note": "IndexNow pushes to Bing/Yandex directly, but there is no automated read of Bing's own index count -- that requires a Bing Webmaster API key (not configured). Check bing.com/webmasters manually for indexed-page counts.",
+        },
         "cron_schedule": {
             "seo_page_generation": "every 6h, all 4 markets",
             "directory_outreach": "every 24h, 10 per run",
+            "indexnow": "every 6h",
             "gsc_feedback": "every 7d (requires GSC_* env vars)",
         },
         "sitemap_url": "https://global-engenharia.com/sitemap.xml",
