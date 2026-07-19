@@ -187,7 +187,15 @@ class SEOContentAgent:
                 seen_hashes.add(content_hash)
                 page_data = {
                     "slug": slug,
-                    "title": f"AI Voice Receptionist — {topic.nome} — {sector.title()} ({size_label})",
+                    # market must be in the title -- without it, the same
+                    # topic/sector/size combo across US/UK/CA/AU produces an
+                    # identical <title> string (Semrush "duplicate title
+                    # tags" finding, confirmed 2026-07-19 audit: e.g.
+                    # us-missed-call-text-back-home-services-multi-location
+                    # and ca-missed-call-text-back-home-services-multi-location
+                    # both rendered "Missed-Call Text-Back — Home-Services —
+                    # multi-location business").
+                    "title": f"AI Voice Receptionist — {topic.nome} — {market} {sector.title()} ({size_label})",
                     "meta_description": (
                         f"AI voice receptionist for {sector} {size_label.lower()} businesses: "
                         f"{topic.dor} See how our virtual receptionist handles it, 24/7."

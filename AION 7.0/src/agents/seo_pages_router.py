@@ -5,6 +5,12 @@ from fastapi.responses import HTMLResponse
 
 router = APIRouter(prefix="/api/seo", tags=["seo_pages"])
 
+# Static hand-written guide/comparison pages live under /ecosystem/callreception/
+# (see global-match-site/.htaccess); combinatorial capability/regulation pages
+# are served via the /artigos/{slug} reverse proxy. Shared by sitemap() and
+# get_seo_page()'s canonical tag so both agree on the "real" URL for a slug.
+_STATIC_KINDS = {"guide", "comparison"}
+
 
 def _esc(s: str) -> str:
     return _html.escape(s or "", quote=True)
@@ -159,6 +165,15 @@ async def get_seo_page(slug: str):
     body_raw = page.get("body", "")
     link = page.get("stripe_link", "") or "https://global-engenharia.com/vendas.html"
     market = (page.get("market") or "").upper()
+    # Static hand-written guide/comparison pages (aion-vs-retell-ai.html etc.)
+    # are the real canonical URL under /ecosystem/callreception/ (see
+    # sitemap() below, which already routes these there). This dynamic
+    # /api/seo/page/{slug} render of the same slug is a secondary/duplicate
+    # copy -- self-canonicalizing it to /artigos/{slug} told crawlers it was
+    # the authoritative version, producing a canonical that pointed away from
+    # the actual indexed URL (Semrush "broken canonical links" finding,
+    # confirmed 2026-07-19 for vs-retell-ai, vs-synthflow, etc).
+    canonical_path = "/ecosystem/callreception/" if page.get("topic_kind") in _STATIC_KINDS else "/artigos/"
     lang = "pt-BR" if market == "BR" else "en"
     cta_text = "🚀 Comece o teste gratuito" if lang == "pt-BR" else "🚀 Start free trial"
 
@@ -194,7 +209,7 @@ async def get_seo_page(slug: str):
         '<title>' + _esc(title) + ' | AION Voice Receptionist</title>'
         '<meta name="description" content="' + _esc(meta_desc) + '">'
         '<meta name="robots" content="index,follow">'
-        '<link rel="canonical" href="https://global-engenharia.com/artigos/' + _esc(slug) + '">'
+        '<link rel="canonical" href="https://global-engenharia.com' + canonical_path + _esc(slug) + '">'
         '<style>' + _PREMIUM_CSS + '</style>'
         '</head><body>' + content_html + '</body></html>'
     )
@@ -214,14 +229,11 @@ async def sitemap():
         pages = r.json()
     except:
         return HTMLResponse(content="", status_code=500)
-    # Static hand-written guide/comparison pages live under /ecosystem/callreception/
-    # (see global-match-site/.htaccess); combinatorial capability/regulation pages
-    # are served via the /artigos/{slug} reverse proxy. Both were emitted as
-    # /artigos/ previously, which 404'd the 4 static pages in any real crawl.
-    STATIC_KINDS = {"guide", "comparison"}
+    # (previously redefined this set locally; both were emitted as /artigos/
+    # at one point, which 404'd the static pages in any real crawl.)
     items = []
     for p in pages or []:
-        base = "/ecosystem/callreception/" if p.get("topic_kind") in STATIC_KINDS else "/artigos/"
+        base = "/ecosystem/callreception/" if p.get("topic_kind") in _STATIC_KINDS else "/artigos/"
         items.append('  <url><loc>https://global-engenharia.com' + base + p["slug"] + '</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>')
     xml = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + "\n".join(items) + "\n</urlset>"
     return HTMLResponse(content=xml, media_type="application/xml")
