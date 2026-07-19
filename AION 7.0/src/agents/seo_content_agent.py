@@ -209,7 +209,14 @@ class SEOContentAgent:
                     "region": market,
                     "content_hash": content_hash,
                 }
-                db.client.table("seo_pages").upsert(page_data).execute()
+                # on_conflict="slug" is required -- slug is UNIQUE but not the
+                # primary key (id is), so a plain upsert() targets the PK by
+                # default. Since page_data has no id, every upsert against an
+                # EXISTING slug (i.e. every force=true regeneration) was
+                # silently INSERTing and hitting the slug UNIQUE constraint,
+                # caught by the except below and counted as "skipped" -- this
+                # is why force=true regeneration never visibly progressed.
+                db.client.table("seo_pages").upsert(page_data, on_conflict="slug").execute()
                 generated.append(slug)
             except Exception as e:
                 print(f"Erro ao gerar {slug}: {e}")
