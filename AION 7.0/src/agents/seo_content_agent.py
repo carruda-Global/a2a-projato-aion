@@ -151,12 +151,21 @@ class SEOContentAgent:
         language = LANGUAGE_BY_REGION[market]
         db = SupabaseClient(self.settings)
 
+        existing = (
+            db.client.table("seo_pages").select("slug,body").eq("market", market).execute()
+        )
         if force:
-            existing_slugs: set[str] = set()
+            # Skip rows already migrated to the structured-JSON template so
+            # repeated batched calls make real progress instead of
+            # regenerating the same first `limit` slugs every time.
+            existing_slugs = set()
+            for row in existing.data or []:
+                try:
+                    if isinstance(json.loads(row["body"]), dict):
+                        existing_slugs.add(row["slug"])
+                except (json.JSONDecodeError, TypeError):
+                    pass
         else:
-            existing = (
-                db.client.table("seo_pages").select("slug").eq("market", market).execute()
-            )
             existing_slugs = {row["slug"] for row in (existing.data or [])}
 
         seen_hashes: set[str] = set()
