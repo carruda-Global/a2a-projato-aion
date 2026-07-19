@@ -211,12 +211,14 @@ class SEOContentAgent:
                     # market must be in the title -- without it, the same
                     # topic/sector/size combo across US/UK/CA/AU produces an
                     # identical <title> string (Semrush "duplicate title
-                    # tags" finding, confirmed 2026-07-19 audit: e.g.
-                    # us-missed-call-text-back-home-services-multi-location
-                    # and ca-missed-call-text-back-home-services-multi-location
-                    # both rendered "Missed-Call Text-Back — Home-Services —
-                    # multi-location business").
-                    "title": f"AI Voice Receptionist — {topic.nome} — {market} {sector.title()} ({size_label})",
+                    # tags" finding, confirmed 2026-07-19 audit). Keeps size
+                    # out of the title (still in meta description) and drops
+                    # the "AI Voice Receptionist —" prefix -- the renderer
+                    # already appends " | AION Voice Receptionist" to every
+                    # title, so repeating it here just wasted length: sampled
+                    # titles were 77-128 chars (Semrush "title too long"
+                    # finding, confirmed systemic, not a 21-page edge case).
+                    "title": f"{topic.nome} — {sector.replace('-', ' ').title()} ({market})",
                     "meta_description": (
                         f"AI voice receptionist for {sector} {size_label.lower()} businesses: "
                         f"{topic.dor} See how our virtual receptionist handles it, 24/7."
