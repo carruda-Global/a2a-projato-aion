@@ -308,6 +308,18 @@ async def debug_try_upsert(market: str):
         return {"slug": slug, "stage": "upsert_exception", "error": repr(e), "traceback": traceback.format_exc()}
 
 
+@router.get("/debug/list-static-pages")
+async def debug_list_static_pages():
+    """Diagnostic-only: lists every seo_pages row with topic_kind in
+    (guide, comparison) -- these are the hand-written static pages whose
+    real URL is a root-level .html file, not derivable from slug alone."""
+    db = SupabaseClient(Settings())
+    rows = db.client.table("seo_pages").select("slug,title,topic_kind,market").in_(
+        "topic_kind", ["guide", "comparison"]
+    ).execute()
+    return {"count": len(rows.data or []), "rows": rows.data}
+
+
 @router.get("/debug/raw-row/{slug}")
 async def debug_raw_row(slug: str):
     """Diagnostic-only: returns exactly what's stored for one slug, no
