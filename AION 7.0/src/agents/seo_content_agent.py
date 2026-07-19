@@ -228,6 +228,32 @@ class SEOContentAgent:
         }
 
 
+@router.get("/debug/raw-row/{slug}")
+async def debug_raw_row(slug: str):
+    """Diagnostic-only: returns exactly what's stored for one slug, no
+    interpretation -- to see whether existing_slugs' 'is it valid JSON'
+    check is classifying rows correctly."""
+    db = SupabaseClient(Settings())
+    row = db.client.table("seo_pages").select("slug,title,body").eq("slug", slug).execute()
+    if not row.data:
+        return {"found": False}
+    r = row.data[0]
+    body = r.get("body") or ""
+    try:
+        parsed = json.loads(body)
+        is_json = isinstance(parsed, dict)
+    except (json.JSONDecodeError, TypeError):
+        is_json = False
+    return {
+        "found": True,
+        "title": r.get("title"),
+        "body_len": len(body),
+        "body_preview": body[:300],
+        "is_valid_json_dict": is_json,
+        "row_count_for_slug": len(row.data),
+    }
+
+
 @router.get("/debug/generate-one/{market}")
 async def debug_generate_one(market: str):
     """Diagnostic-only: runs one generation synchronously against the first
