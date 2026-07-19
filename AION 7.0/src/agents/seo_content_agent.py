@@ -88,17 +88,38 @@ class SEOContentAgent:
         self.settings = settings
         self.llm = OpenAI(
             api_key=settings.openrouter_api_key,
-            base_url="https://openrouter.ai/api/v1",
+            base_url=settings.openrouter_api_base,
+        )
+        self.fallback_llm = (
+            OpenAI(api_key=settings.opencode_zen_api_key, base_url=settings.opencode_zen_api_base)
+            if settings.opencode_zen_api_key
+            else None
         )
 
     def _generate(self, prompt: str) -> str:
-        resp = self.llm.chat.completions.create(
-            model="openai/gpt-4o-mini",
-            messages=[{"role": "user", "content": prompt}],
-            max_tokens=1800,
-            response_format={"type": "json_object"},
-        )
-        return resp.choices[0].message.content or ""
+        try:
+            resp = self.llm.chat.completions.create(
+                model=self.settings.openrouter_model,
+                messages=[{"role": "user", "content": prompt}],
+                max_tokens=1800,
+                response_format={"type": "json_object"},
+            )
+            return resp.choices[0].message.content or ""
+        except Exception as e:
+            if self.fallback_llm is None:
+                raise
+            # OpenRouter out of credits (402) or any other failure -- fall
+            # back to OpenCode Zen's free-tier model. It's a reasoning model
+            # (thinking tokens count against max_tokens before the actual
+            # JSON answer), so it gets a larger budget than the primary call.
+            print(f"[SEO] OpenRouter failed ({e!r}), falling back to OpenCode Zen")
+            resp = self.fallback_llm.chat.completions.create(
+                model=self.settings.opencode_zen_model,
+                messages=[{"role": "user", "content": prompt}],
+                max_tokens=4000,
+                response_format={"type": "json_object"},
+            )
+            return resp.choices[0].message.content or ""
 
     def _validate_structured(self, raw: str) -> dict | None:
         """Confirms the LLM actually returned the required sections -- a

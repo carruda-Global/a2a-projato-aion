@@ -52,6 +52,10 @@ class Settings:
         self.llm_timeout: int = self.config.get("openrouter", {}).get("timeout", 120)
         self.llm_default_provider: str = self.config.get("llm_routing", {}).get("default", "openrouter")
 
+        self.opencode_zen_api_key: str = os.getenv("OPENCODE_ZEN_API_KEY", "")
+        self.opencode_zen_api_base: str = "https://opencode.ai/zen/v1"
+        self.opencode_zen_model: str = "deepseek-v4-flash-free"
+
         self.stripe_secret_key: str = os.getenv("STRIPE_SECRET_KEY", "")
         self.stripe_publishable_key: str = os.getenv("STRIPE_PUBLISHABLE_KEY", "")
         self.stripe_webhook_secret: str = os.getenv("STRIPE_WEBHOOK_SECRET", "")
