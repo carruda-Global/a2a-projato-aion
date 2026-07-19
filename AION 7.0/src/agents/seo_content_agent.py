@@ -247,6 +247,21 @@ async def debug_generate_one(market: str):
     }
 
 
+@router.get("/debug/generate-one-sync/{market}")
+async def debug_generate_one_sync(market: str):
+    """Diagnostic-only: runs the REAL generate_market_pages() pipeline
+    synchronously (limit=1, force=true) so exceptions that background_tasks
+    would otherwise swallow into unreachable server logs surface directly
+    in the HTTP response. This DOES write to the DB (real upsert)."""
+    agent = SEOContentAgent(Settings())
+    try:
+        result = await agent.generate_market_pages(market.upper(), limit=1, force=True)
+        return {"stage": "ok", "result": result}
+    except Exception as e:
+        import traceback
+        return {"stage": "exception", "error": repr(e), "traceback": traceback.format_exc()}
+
+
 @router.post("/generate/{market}")
 async def trigger_generation(
     market: str, background_tasks: BackgroundTasks, limit: int | None = None, force: bool = False
