@@ -1,7 +1,7 @@
 import asyncio
 import hashlib
 import json
-from fastapi import APIRouter
+from fastapi import APIRouter, BackgroundTasks
 from openai import OpenAI
 from src.database.supabase_client import SupabaseClient
 from src.config import Settings
@@ -205,14 +205,19 @@ class SEOContentAgent:
 
 
 @router.post("/generate/{market}")
-async def trigger_generation(market: str, limit: int | None = None, force: bool = False):
-    """limit caps how many pages this call processes — keeps a single
-    request comfortably under the platform's reverse-proxy timeout. Safe to
-    call repeatedly: without force, already-generated slugs are skipped so
-    batching resumes where the previous call left off; with force=true,
-    existing pages are regenerated (used for the premium-template migration)."""
+async def trigger_generation(
+    market: str, background_tasks: BackgroundTasks, limit: int | None = None, force: bool = False
+):
+    """Fire-and-forget: the structured-JSON generation is slow enough per page
+    (LLM call + validation) that even limit=1 can exceed the platform's ~100s
+    reverse-proxy timeout, so this returns immediately and runs in the
+    background. Poll /api/seo/agent/status for the updated page counts.
+    Without force, already-generated slugs are skipped so batching resumes
+    where the previous call left off; with force=true, existing pages are
+    regenerated (used for the premium-template migration)."""
     agent = SEOContentAgent(Settings())
-    return await agent.generate_market_pages(market.upper(), limit=limit, force=force)
+    background_tasks.add_task(agent.generate_market_pages, market.upper(), limit=limit, force=force)
+    return {"market": market.upper(), "status": "started", "limit": limit, "force": force}
 
 
 # SEO page rendering movido para src/agents/seo_pages_router.py
