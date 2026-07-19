@@ -230,47 +230,59 @@ class SEOContentAgent:
 
 @router.get("/debug/try-upsert/{market}")
 async def debug_try_upsert(market: str):
-    """Diagnostic-only: runs generation for the first un-migrated slug and
-    attempts the real upsert OUTSIDE the swallow-and-continue try/except, so
-    the actual DB exception (RLS, constraint, schema mismatch, etc) surfaces
-    instead of being logged to server logs we can't see."""
-    plan = plan_slugs(market.upper())
-    language = LANGUAGE_BY_REGION[market.upper()]
+    """Diagnostic-only: one bulk select (same pattern as the real function,
+    not N+1) to find the first un-migrated slug, then attempts the real
+    upsert OUTSIDE any swallow-and-continue handler so the actual DB
+    exception (RLS, constraint, schema mismatch, etc) surfaces directly."""
+    import traceback
+
+    market = market.upper()
+    plan = plan_slugs(market)
+    language = LANGUAGE_BY_REGION[market]
     db = SupabaseClient(Settings())
     agent = SEOContentAgent(Settings())
-    for topic, sector, size_key, size_label, slug in plan:
-        existing = db.client.table("seo_pages").select("body").eq("slug", slug).execute()
-        if existing.data:
-            try:
-                if isinstance(json.loads(existing.data[0]["body"]), dict):
-                    continue  # already migrated, move to next
-            except (json.JSONDecodeError, TypeError):
-                pass
+
+    existing = db.client.table("seo_pages").select("slug,body").eq("market", market).execute()
+    migrated_slugs = set()
+    for row in existing.data or []:
+        try:
+            if isinstance(json.loads(row["body"]), dict):
+                migrated_slugs.add(row["slug"])
+        except (json.JSONDecodeError, TypeError):
+            pass
+
+    target = next(((t, s, sk, sl, slug) for t, s, sk, sl, slug in plan if slug not in migrated_slugs), None)
+    if target is None:
+        return {"stage": "all_migrated_already", "total_slugs": len(plan), "migrated": len(migrated_slugs)}
+    topic, sector, size_key, size_label, slug = target
+
+    try:
         prompt = _build_prompt(topic, sector, size_label, language)
         result = await agent._generate_unique_body(prompt, set())
-        if result is None:
-            return {"slug": slug, "stage": "generation_failed"}
-        structured, content_hash = result
-        page_data = {
-            "slug": slug,
-            "title": f"AI Voice Receptionist — {topic.nome} — {market.upper()} {sector.title()} ({size_label})",
-            "meta_description": f"AI voice receptionist for {sector} {size_label.lower()} businesses: {topic.dor} See how our virtual receptionist handles it, 24/7.",
-            "body": json.dumps(structured, ensure_ascii=False),
-            "stripe_link": topic.stripe_link,
-            "market": market.upper(),
-            "published": True,
-            "topic_kind": topic.kind,
-            "product": topic.product,
-            "region": market.upper(),
-            "content_hash": content_hash,
-        }
-        try:
-            resp = db.client.table("seo_pages").upsert(page_data, on_conflict="slug").execute()
-            return {"slug": slug, "stage": "upsert_ok", "returned_rows": len(resp.data or [])}
-        except Exception as e:
-            import traceback
-            return {"slug": slug, "stage": "upsert_exception", "error": repr(e), "traceback": traceback.format_exc()}
-    return {"stage": "all_migrated_already"}
+    except Exception as e:
+        return {"slug": slug, "stage": "generation_exception", "error": repr(e), "traceback": traceback.format_exc()}
+    if result is None:
+        return {"slug": slug, "stage": "generation_returned_none"}
+    structured, content_hash = result
+
+    page_data = {
+        "slug": slug,
+        "title": f"AI Voice Receptionist — {topic.nome} — {market} {sector.title()} ({size_label})",
+        "meta_description": f"AI voice receptionist for {sector} {size_label.lower()} businesses: {topic.dor} See how our virtual receptionist handles it, 24/7.",
+        "body": json.dumps(structured, ensure_ascii=False),
+        "stripe_link": topic.stripe_link,
+        "market": market,
+        "published": True,
+        "topic_kind": topic.kind,
+        "product": topic.product,
+        "region": market,
+        "content_hash": content_hash,
+    }
+    try:
+        resp = db.client.table("seo_pages").upsert(page_data, on_conflict="slug").execute()
+        return {"slug": slug, "stage": "upsert_ok", "returned_rows": len(resp.data or [])}
+    except Exception as e:
+        return {"slug": slug, "stage": "upsert_exception", "error": repr(e), "traceback": traceback.format_exc()}
 
 
 @router.get("/debug/raw-row/{slug}")
