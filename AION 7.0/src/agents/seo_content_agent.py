@@ -178,8 +178,11 @@ class SEOContentAgent:
                 seen_hashes.add(content_hash)
                 page_data = {
                     "slug": slug,
-                    "title": f"{topic.nome} — {sector.title()} — {size_label}",
-                    "meta_description": f"{topic.nome} ({topic.norma}). {topic.dor}.",
+                    "title": f"AI Voice Receptionist — {topic.nome} — {sector.title()} ({size_label})",
+                    "meta_description": (
+                        f"AI voice receptionist for {sector} {size_label.lower()} businesses: "
+                        f"{topic.dor} See how our virtual receptionist handles it, 24/7."
+                    ),
                     "body": json.dumps(structured, ensure_ascii=False),
                     "stripe_link": topic.stripe_link,
                     "market": market,
