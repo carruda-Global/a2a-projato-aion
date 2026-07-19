@@ -113,7 +113,8 @@ async def seo_agent_status():
         # GSC clicks landing on us-rfi-creation-automation-*, us-po-
         # reconciliation-*, us-spend-analysis-* pages). Broadened to catch both.
         legacy_r = await client.get(
-            supa_url + "/rest/v1/seo_pages?or=(product.is.null,product.neq.voice_receptionist)&select=slug",
+            supa_url + "/rest/v1/seo_pages?or=(product.is.null,product.neq.voice_receptionist)"
+            "&topic_kind=not.in.(guide,comparison)&select=slug",
             headers={**headers, "Prefer": "count=exact"},
         )
         legacy_stale_pages = int(legacy_r.headers.get("content-range", "0/0").split("/")[-1])
@@ -176,14 +177,18 @@ async def cleanup_legacy_pages():
     headers = {"apikey": supa_key, "Authorization": "Bearer " + supa_key, "Content-Type": "application/json"}
 
     async with httpx.AsyncClient(timeout=30) as client:
+        # Excludes topic_kind guide/comparison explicitly -- those are the
+        # hand-written aion-vs-retell-ai/aion-vs-synthflow pages; whatever
+        # their product field happens to be, they must never be swept up here.
+        legacy_filter = "or=(product.is.null,product.neq.voice_receptionist)&topic_kind=not.in.(guide,comparison)"
         before = await client.get(
-            supa_url + "/rest/v1/seo_pages?or=(product.is.null,product.neq.voice_receptionist)&select=slug",
+            supa_url + f"/rest/v1/seo_pages?{legacy_filter}&select=slug",
             headers={**headers, "Prefer": "count=exact"},
         )
         count = int(before.headers.get("content-range", "0/0").split("/")[-1])
 
         resp = await client.patch(
-            supa_url + "/rest/v1/seo_pages?or=(product.is.null,product.neq.voice_receptionist)",
+            supa_url + f"/rest/v1/seo_pages?{legacy_filter}",
             headers={**headers, "Prefer": "return=minimal"},
             json={"published": False},
         )
