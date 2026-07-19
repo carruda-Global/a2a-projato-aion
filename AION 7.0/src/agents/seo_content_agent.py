@@ -1,5 +1,6 @@
 import asyncio
 import hashlib
+import json
 from fastapi import APIRouter
 from openai import OpenAI
 from src.database.supabase_client import SupabaseClient
@@ -8,8 +9,25 @@ from src.agents.seo_topics import Topic, LANGUAGE_BY_REGION, topics_for_market
 
 router = APIRouter(prefix="/api/seo", tags=["seo_agent"])
 
-MIN_BODY_LEN = 350  # chars — cheap floor against near-empty/truncated LLM output
 MAX_REGEN_ATTEMPTS = 2
+
+# JSON schema the LLM must fill -- rendered by seo_pages_router.py into the
+# premium landing-page template (hero, TOC, comparison table, FAQ w/ schema,
+# etc). Keeping this as structured JSON (not a prose blob) is what lets one
+# template serve all ~1000 combinatorial pages consistently.
+_CONTENT_SCHEMA_INSTRUCTIONS = """
+Respond with ONLY a valid JSON object (no markdown fences, no commentary), with exactly these keys:
+{
+  "intro": "150-250 word intro paragraph framing the problem, in __LANGUAGE__",
+  "how_it_works": ["step 1 (short phrase)", "step 2", "step 3", "step 4"],
+  "benefits": [{"title": "short benefit title", "desc": "1-2 sentence explanation"}, ... 5 items],
+  "comparison": [{"criterion": "e.g. Availability", "human": "human/manual answer", "ai": "AI agent answer"}, ... 5 rows covering Availability, Cost, Scalability, Response Time, Consistency],
+  "real_example": {"before": "1-2 sentences describing the pain before", "after": "1-2 sentences describing the outcome after", "result": "one concrete metric-style result phrase"},
+  "industries": ["industry 1", "industry 2", "industry 3", "industry 4"],
+  "faq": [{"q": "question", "a": "80-150 word answer"}, ... 6 items]
+}
+All text in __LANGUAGE__. Be concrete and specific to the sector/topic given, not generic. No invented statistics presented as fact -- use realistic, qualitative framing instead (e.g. "significantly fewer missed calls" not a fabricated percentage).
+"""
 
 
 def _normalize(text: str) -> str:
@@ -45,27 +63,24 @@ def plan_slugs(
 
 
 def _build_prompt(topic: Topic, sector: str, size_label: str, language: str) -> str:
+    schema = _CONTENT_SCHEMA_INSTRUCTIONS.replace("__LANGUAGE__", language)
     if topic.kind == "regulation":
-        return (
-            f"Write a landing page in {language} for:\n"
+        context = (
             f"Regulation: {topic.nome} ({topic.norma})\n"
             f"Sector: {sector}, Company size: {size_label}\n"
             f"Pain: {topic.dor}\n"
-            f"Structure: H1, risk paragraph, 3 action bullets, "
-            f"how the agent solves it in 48h, CTA.\n"
-            f"Direct tone, real numbers, max 600 words."
+            f"Frame 'how_it_works' as how the agent resolves this in 48h. "
+            f"Frame 'comparison' as Manual/Legal-team handling vs the agent."
         )
-    return (
-        f"Write a landing page in {language} for:\n"
-        f"Workflow automated: {topic.nome} ({topic.norma})\n"
-        f"Sector: {sector}, Company size: {size_label}\n"
-        f"Pain today without automation: {topic.dor}\n"
-        f"Structure: H1, current-state pain paragraph, 3 outcome bullets "
-        f"(time saved, error reduction, cost avoided), how the agent does "
-        f"it end-to-end, CTA.\n"
-        f"Direct tone, real numbers, max 600 words. Avoid legal/fine framing "
-        f"— this is a workflow-automation pitch, not a compliance penalty pitch."
-    )
+    else:
+        context = (
+            f"Workflow automated: {topic.nome} ({topic.norma})\n"
+            f"Sector: {sector}, Company size: {size_label}\n"
+            f"Pain today without automation: {topic.dor}\n"
+            f"Avoid legal/fine framing — this is a workflow-automation pitch, "
+            f"not a compliance penalty pitch."
+        )
+    return f"{context}\n\n{schema}"
 
 
 class SEOContentAgent:
@@ -80,24 +95,42 @@ class SEOContentAgent:
         resp = self.llm.chat.completions.create(
             model="openai/gpt-4o-mini",
             messages=[{"role": "user", "content": prompt}],
-            max_tokens=1000,
+            max_tokens=1800,
+            response_format={"type": "json_object"},
         )
         return resp.choices[0].message.content or ""
 
-    async def _generate_unique_body(self, prompt: str, seen_hashes: set[str]) -> tuple[str, str] | None:
-        """Generates a body, retrying once with a higher-variance nudge if it's
-        too short or a hash-duplicate of something already produced this run.
-        Returns (body, hash) or None if still bad after MAX_REGEN_ATTEMPTS."""
+    def _validate_structured(self, raw: str) -> dict | None:
+        """Confirms the LLM actually returned the required sections -- a
+        malformed/truncated JSON response would otherwise silently render as
+        a broken page (empty FAQ, missing comparison table, etc)."""
+        try:
+            data = json.loads(raw)
+        except (json.JSONDecodeError, TypeError):
+            return None
+        required = ("intro", "how_it_works", "benefits", "comparison", "real_example", "industries", "faq")
+        if not all(k in data for k in required):
+            return None
+        if len(data.get("intro", "")) < 100 or len(data.get("faq", [])) < 3:
+            return None
+        return data
+
+    async def _generate_unique_body(self, prompt: str, seen_hashes: set[str]) -> tuple[dict, str] | None:
+        """Generates a structured page body, retrying once with a nudge if
+        it's malformed, too thin, or a hash-duplicate of something already
+        produced this run. Returns (structured_dict, hash) or None."""
         current_prompt = prompt
         for attempt in range(MAX_REGEN_ATTEMPTS):
-            content = await asyncio.to_thread(self._generate, current_prompt)
-            h = _content_hash(content)
-            if len(content.strip()) >= MIN_BODY_LEN and h not in seen_hashes:
-                return content, h
+            raw = await asyncio.to_thread(self._generate, current_prompt)
+            data = self._validate_structured(raw)
+            if data is not None:
+                h = _content_hash(data["intro"] + "".join(f["q"] for f in data["faq"]))
+                if h not in seen_hashes:
+                    return data, h
             current_prompt = prompt + (
-                "\nPrevious attempt was too short or too generic — write a "
-                "longer, more specific version with concrete numbers and a "
-                "distinct angle."
+                "\nPrevious attempt was malformed, too short, or too generic — "
+                "return valid JSON matching the schema exactly, with a longer, "
+                "more specific, distinct angle."
             )
         return None
 
@@ -107,17 +140,24 @@ class SEOContentAgent:
         product_filter: str | None = None,
         kind_filter: str | None = None,
         limit: int | None = None,
+        force: bool = False,
     ) -> dict:
+        """force=True regenerates pages that already exist (used for the
+        2026-07-19 premium-template migration -- rewrites old plain-text
+        `body` rows into the structured JSON the new template renders)."""
         plan = plan_slugs(market, product_filter, kind_filter)
         if not plan:
             return {"error": f"No topics configured for market: {market}"}
         language = LANGUAGE_BY_REGION[market]
         db = SupabaseClient(self.settings)
 
-        existing = (
-            db.client.table("seo_pages").select("slug").eq("market", market).execute()
-        )
-        existing_slugs = {row["slug"] for row in (existing.data or [])}
+        if force:
+            existing_slugs: set[str] = set()
+        else:
+            existing = (
+                db.client.table("seo_pages").select("slug").eq("market", market).execute()
+            )
+            existing_slugs = {row["slug"] for row in (existing.data or [])}
 
         seen_hashes: set[str] = set()
         generated: list[str] = []
@@ -134,13 +174,13 @@ class SEOContentAgent:
                 if result is None:
                     skipped.append(slug)
                     continue
-                content, content_hash = result
+                structured, content_hash = result
                 seen_hashes.add(content_hash)
                 page_data = {
                     "slug": slug,
                     "title": f"{topic.nome} — {sector.title()} — {size_label}",
                     "meta_description": f"{topic.nome} ({topic.norma}). {topic.dor}.",
-                    "body": content,
+                    "body": json.dumps(structured, ensure_ascii=False),
                     "stripe_link": topic.stripe_link,
                     "market": market,
                     "published": True,
@@ -162,13 +202,14 @@ class SEOContentAgent:
 
 
 @router.post("/generate/{market}")
-async def trigger_generation(market: str, limit: int | None = None):
-    """limit caps how many NEW pages this call generates — keeps a single
+async def trigger_generation(market: str, limit: int | None = None, force: bool = False):
+    """limit caps how many pages this call processes — keeps a single
     request comfortably under the platform's reverse-proxy timeout. Safe to
-    call repeatedly: already-generated slugs are skipped, so batching just
-    resumes where the previous call left off."""
+    call repeatedly: without force, already-generated slugs are skipped so
+    batching resumes where the previous call left off; with force=true,
+    existing pages are regenerated (used for the premium-template migration)."""
     agent = SEOContentAgent(Settings())
-    return await agent.generate_market_pages(market.upper(), limit=limit)
+    return await agent.generate_market_pages(market.upper(), limit=limit, force=force)
 
 
 # SEO page rendering movido para src/agents/seo_pages_router.py
