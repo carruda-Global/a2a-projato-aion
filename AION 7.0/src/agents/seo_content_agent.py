@@ -228,6 +228,51 @@ class SEOContentAgent:
         }
 
 
+@router.get("/debug/try-upsert/{market}")
+async def debug_try_upsert(market: str):
+    """Diagnostic-only: runs generation for the first un-migrated slug and
+    attempts the real upsert OUTSIDE the swallow-and-continue try/except, so
+    the actual DB exception (RLS, constraint, schema mismatch, etc) surfaces
+    instead of being logged to server logs we can't see."""
+    plan = plan_slugs(market.upper())
+    language = LANGUAGE_BY_REGION[market.upper()]
+    db = SupabaseClient(Settings())
+    agent = SEOContentAgent(Settings())
+    for topic, sector, size_key, size_label, slug in plan:
+        existing = db.client.table("seo_pages").select("body").eq("slug", slug).execute()
+        if existing.data:
+            try:
+                if isinstance(json.loads(existing.data[0]["body"]), dict):
+                    continue  # already migrated, move to next
+            except (json.JSONDecodeError, TypeError):
+                pass
+        prompt = _build_prompt(topic, sector, size_label, language)
+        result = await agent._generate_unique_body(prompt, set())
+        if result is None:
+            return {"slug": slug, "stage": "generation_failed"}
+        structured, content_hash = result
+        page_data = {
+            "slug": slug,
+            "title": f"AI Voice Receptionist — {topic.nome} — {market.upper()} {sector.title()} ({size_label})",
+            "meta_description": f"AI voice receptionist for {sector} {size_label.lower()} businesses: {topic.dor} See how our virtual receptionist handles it, 24/7.",
+            "body": json.dumps(structured, ensure_ascii=False),
+            "stripe_link": topic.stripe_link,
+            "market": market.upper(),
+            "published": True,
+            "topic_kind": topic.kind,
+            "product": topic.product,
+            "region": market.upper(),
+            "content_hash": content_hash,
+        }
+        try:
+            resp = db.client.table("seo_pages").upsert(page_data, on_conflict="slug").execute()
+            return {"slug": slug, "stage": "upsert_ok", "returned_rows": len(resp.data or [])}
+        except Exception as e:
+            import traceback
+            return {"slug": slug, "stage": "upsert_exception", "error": repr(e), "traceback": traceback.format_exc()}
+    return {"stage": "all_migrated_already"}
+
+
 @router.get("/debug/raw-row/{slug}")
 async def debug_raw_row(slug: str):
     """Diagnostic-only: returns exactly what's stored for one slug, no
