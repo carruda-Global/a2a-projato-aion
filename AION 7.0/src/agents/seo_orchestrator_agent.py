@@ -104,8 +104,16 @@ async def seo_agent_status():
             )
             pages_by_market[market] = int(r.headers.get("content-range", "0/0").split("/")[-1])
 
+        # product=is.null caught rows the generator never tagged, but rows
+        # from the pre-pivot catalog (RFI automation, PO reconciliation,
+        # spend analysis, etc) DO have a product value -- just not
+        # "voice_receptionist" -- so they were invisible to this count while
+        # still being served live at /artigos/{slug} and diluting search
+        # relevance for the current product (confirmed 2026-07-19 via real
+        # GSC clicks landing on us-rfi-creation-automation-*, us-po-
+        # reconciliation-*, us-spend-analysis-* pages). Broadened to catch both.
         legacy_r = await client.get(
-            supa_url + "/rest/v1/seo_pages?product=is.null&select=slug",
+            supa_url + "/rest/v1/seo_pages?or=(product.is.null,product.neq.voice_receptionist)&select=slug",
             headers={**headers, "Prefer": "count=exact"},
         )
         legacy_stale_pages = int(legacy_r.headers.get("content-range", "0/0").split("/")[-1])
@@ -152,3 +160,35 @@ async def seo_agent_status():
         },
         "sitemap_url": "https://global-engenharia.com/sitemap.xml",
     }
+
+
+@router.post("/cleanup-legacy")
+async def cleanup_legacy_pages():
+    """Unpublishes (not deletes -- reversible) every seo_pages row whose
+    product isn't voice_receptionist: pre-pivot catalog leftovers (RFI
+    automation, PO reconciliation, spend analysis, etc) still being served
+    live at /artigos/{slug} alongside the current product, diluting search
+    relevance (confirmed 2026-07-19: real GSC clicks landing on these)."""
+    supa_url = os.getenv("SUPABASE_URL", "")
+    supa_key = os.getenv("SUPABASE_API_KEY", "")
+    if not (supa_url and supa_key):
+        return {"error": "Supabase not configured"}
+    headers = {"apikey": supa_key, "Authorization": "Bearer " + supa_key, "Content-Type": "application/json"}
+
+    async with httpx.AsyncClient(timeout=30) as client:
+        before = await client.get(
+            supa_url + "/rest/v1/seo_pages?or=(product.is.null,product.neq.voice_receptionist)&select=slug",
+            headers={**headers, "Prefer": "count=exact"},
+        )
+        count = int(before.headers.get("content-range", "0/0").split("/")[-1])
+
+        resp = await client.patch(
+            supa_url + "/rest/v1/seo_pages?or=(product.is.null,product.neq.voice_receptionist)",
+            headers={**headers, "Prefer": "return=minimal"},
+            json={"published": False},
+        )
+        return {
+            "matched": count,
+            "status_code": resp.status_code,
+            "note": "Rows unpublished, not deleted -- get_seo_page() should treat published=false as 404. Re-run GET /api/seo/agent/status afterward to confirm legacy_stale_pages_pending_cleanup drops to 0.",
+        }

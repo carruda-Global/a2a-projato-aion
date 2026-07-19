@@ -153,7 +153,10 @@ async def get_seo_page(slug: str):
         return HTMLResponse(content="<h1>Service unavailable</h1>", status_code=503)
     try:
         headers = {"apikey": supa_key, "Authorization": "Bearer " + supa_key}
-        r = httpx.get(supa_url + "/rest/v1/seo_pages?slug=eq." + slug + "&select=*", headers=headers, timeout=10)
+        r = httpx.get(
+            supa_url + "/rest/v1/seo_pages?slug=eq." + slug + "&published=eq.true&select=*",
+            headers=headers, timeout=10,
+        )
         if r.status_code != 200 or not r.json():
             return HTMLResponse(content="<h1>Page not found</h1>", status_code=404)
         page = r.json()[0]
