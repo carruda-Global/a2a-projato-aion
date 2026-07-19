@@ -221,6 +221,32 @@ class SEOContentAgent:
         }
 
 
+@router.get("/debug/generate-one/{market}")
+async def debug_generate_one(market: str):
+    """Diagnostic-only: runs one generation synchronously against the first
+    not-yet-migrated slug and returns the raw LLM output plus why validation
+    passed/failed -- background_tasks swallows exceptions into server logs
+    we can't otherwise see. Safe to leave in; makes no DB writes."""
+    plan = plan_slugs(market.upper())
+    if not plan:
+        return {"error": f"No topics for market {market}"}
+    topic, sector, size_key, size_label, slug = plan[0]
+    language = LANGUAGE_BY_REGION[market.upper()]
+    prompt = _build_prompt(topic, sector, size_label, language)
+    agent = SEOContentAgent(Settings())
+    try:
+        raw = await asyncio.to_thread(agent._generate, prompt)
+    except Exception as e:
+        return {"slug": slug, "stage": "llm_call", "error": repr(e)}
+    validated = agent._validate_structured(raw)
+    return {
+        "slug": slug,
+        "raw_len": len(raw),
+        "raw_preview": raw[:1500],
+        "valid": validated is not None,
+    }
+
+
 @router.post("/generate/{market}")
 async def trigger_generation(
     market: str, background_tasks: BackgroundTasks, limit: int | None = None, force: bool = False
