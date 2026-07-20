@@ -131,6 +131,16 @@ async def seo_agent_status():
         )
         indexnow_last = indexnow_r.json() if indexnow_r.status_code == 200 else []
 
+        # Real per-run production report from the force=True migration cron
+        # (2026-07-20) -- lets progress be checked here instead of
+        # re-invoking an external agent just to ask "how far along is it".
+        migration_r = await client.get(
+            supa_url + "/rest/v1/sdr_growth_log?channel=eq.seo_migration_report&select=item_key,last_sent_at,notes&order=last_sent_at.desc&limit=1",
+            headers=headers,
+        )
+        migration_rows = migration_r.json() if migration_r.status_code == 200 else []
+        last_migration_report = migration_rows[0] if migration_rows else None
+
         blog_health = {}
         for url in BLOG_URLS:
             try:
@@ -153,8 +163,12 @@ async def seo_agent_status():
             "urls_per_batch": len(INDEXNOW_URLS),
             "note": "IndexNow pushes to Bing/Yandex directly, but there is no automated read of Bing's own index count -- that requires a Bing Webmaster API key (not configured). Check bing.com/webmasters manually for indexed-page counts.",
         },
+        "seo_migration_report": {
+            "last_run": last_migration_report,
+            "note": "Real per-market generated/skipped counts from the last force=True premium-template migration cron run. Requires the sdr_growth_log.notes column migration -- if last_run is null despite the cron having run, that migration probably hasn't been applied in Supabase yet.",
+        },
         "cron_schedule": {
-            "seo_page_generation": "every 6h, all 4 markets",
+            "seo_page_generation": "every 3h, all 4 markets, force=True (premium-template migration in progress as of 2026-07-20)",
             "directory_outreach": "every 24h, 10 per run",
             "indexnow": "every 6h",
             "gsc_feedback": "every 7d (requires GSC_* env vars)",

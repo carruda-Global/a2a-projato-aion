@@ -374,6 +374,20 @@ CREATE TABLE IF NOT EXISTS sdr_growth_log (
     PRIMARY KEY (channel, item_key)
 );
 
+-- 2026-07-20: "notes" column for the SEO migration production report
+-- (channel=seo_migration_report) -- stores the per-run generated/skipped
+-- counts per market as JSON text, so /api/seo/agent/status can surface
+-- real progress without re-invoking anything.
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.columns
+        WHERE table_name = 'sdr_growth_log' AND column_name = 'notes'
+    ) THEN
+        ALTER TABLE sdr_growth_log ADD COLUMN notes TEXT;
+    END IF;
+END $$;
+
 -- Real AgentOps execution log -- src/security/agent_execution_log.py.
 -- Duration + success/failure per agent call, the operational data that was
 -- previously nonexistent (no signal short of a user noticing a slow or

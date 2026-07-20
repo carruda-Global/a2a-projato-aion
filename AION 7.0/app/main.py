@@ -507,19 +507,63 @@ async def startup_event():
     from src.agents.pricing_optimizer_agent import auto_job_price_optimizer
     from src.agents.seo_feedback_agent import SEOFeedbackAgent
 
-    # ── SEO Ecosystem — Voice Receptionist, roda a cada 6h ──────────────────
+    # ── SEO Ecosystem — Voice Receptionist, roda a cada 3h ──────────────────
     # Lista de mercados desatualizada desde o pivot (2026-07): seo_topics.py
     # so tem topicos para US/UK/CA/AU (compliance BR/MX/CO/AR/IN/AE foi
     # aposentado). O loop antigo rodava sem erro mas sem gerar nada pra 6 dos
     # 7 mercados, e nunca cobria UK/CA/AU -- 3 dos 4 mercados reais do produto
     # atual ficavam sem geracao automatica nenhuma.
+    #
+    # force=True (2026-07-20): esse job roda in-process no startup do
+    # Render, sem o timeout de proxy reverso que limita o endpoint HTTP
+    # /api/seo/generate/{market} -- por isso pode rodar sem limit e migrar
+    # as ~972 paginas existentes (template antigo -> premium) sem precisar
+    # de um agente externo chamando a API repetidamente. Reverter pra
+    # force=False depois que a migracao das 972 terminar (checar via
+    # /api/seo/agent/status), pra voltar ao comportamento normal de so
+    # gerar paginas novas.
     async def _seo():
         agent = SEOContentAgent(get_settings())
+        report = {}
         for market in ["US", "UK", "CA", "AU"]:
             try:
-                await agent.generate_market_pages(market)
+                result = await agent.generate_market_pages(market, force=True)
+                report[market] = result
+                logger.info("[24/7] SEO market=%s force-migration: %s", market, result)
             except Exception as e:
                 logger.warning("[24/7] SEO market=%s: %s", market, e)
+                report[market] = {"error": str(e)}
+        await _log_seo_production_report(report)
+
+    async def _log_seo_production_report(report: dict) -> None:
+        """Persists a real per-run production report to sdr_growth_log so
+        it's checkable via /api/seo/agent/status without re-running anything
+        (2026-07-20, requested to replace repeatedly re-invoking an external
+        agent just to check batch progress). Requires the "notes" column
+        added to sdr_growth_log (see sql_para_supabase.sql) -- degrades to
+        a no-op (logged, not raised) if that migration hasn't been applied
+        yet, so it never breaks the actual generation run above."""
+        import json as _json
+        import httpx
+        from datetime import datetime, timezone
+        supa_url = os.getenv("SUPABASE_URL", "")
+        supa_key = os.getenv("SUPABASE_API_KEY", "")
+        if not (supa_url and supa_key):
+            return
+        try:
+            async with httpx.AsyncClient(timeout=10) as client:
+                await client.post(
+                    f"{supa_url}/rest/v1/sdr_growth_log",
+                    json={
+                        "channel": "seo_migration_report",
+                        "item_key": f"run-{datetime.now(timezone.utc).isoformat()}",
+                        "last_sent_at": datetime.now(timezone.utc).isoformat(),
+                        "notes": _json.dumps(report, ensure_ascii=False),
+                    },
+                    headers={"apikey": supa_key, "Authorization": "Bearer " + supa_key, "Content-Type": "application/json"},
+                )
+        except Exception as e:
+            logger.warning("[24/7] Could not log SEO production report: %s", e)
 
     # ── SEO Feedback (GSC) — roda 1x/semana; pula se GSC_* nao configurado ──
     async def _seo_feedback():
@@ -593,7 +637,7 @@ async def startup_event():
     JOBS = [
         ("Keep-Alive",       _keepalive,                    600),     # 10min
         ("Voice-Data-Retention", _voice_data_retention,      86400),  # 24h
-        ("SEO-Ecosystem",    _seo,                          21600),   # 6h
+        ("SEO-Ecosystem",    _seo,                          10800),   # 3h (2026-07-20: force=True migration in progress)
         ("SEO-Feedback",     _seo_feedback,                 604800),  # 7d (GSC pull + bucket scoring)
         ("Dev.to",           _devto,                        28800),   # 8h
         ("SDR-Emails",       _sdr,                          43200),   # 12h
