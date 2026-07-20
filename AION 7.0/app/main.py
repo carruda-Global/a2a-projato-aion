@@ -637,7 +637,7 @@ async def startup_event():
     JOBS = [
         ("Keep-Alive",       _keepalive,                    600),     # 10min
         ("Voice-Data-Retention", _voice_data_retention,      86400),  # 24h
-        ("SEO-Ecosystem",    _seo,                          10800),   # 3h (2026-07-20: force=True migration in progress)
+        ("SEO-Ecosystem",    _seo,                          16200),   # 4.5h (2026-07-20: migration at 99.4%, spacing out from 3h test)
         ("SEO-Feedback",     _seo_feedback,                 604800),  # 7d (GSC pull + bucket scoring)
         ("Dev.to",           _devto,                        28800),   # 8h
         ("SDR-Emails",       _sdr,                          43200),   # 12h
