@@ -308,6 +308,45 @@ async def debug_try_upsert(market: str):
         return {"slug": slug, "stage": "upsert_exception", "error": repr(e), "traceback": traceback.format_exc()}
 
 
+@router.get("/debug/migration-progress")
+async def debug_migration_progress():
+    """Diagnostic-only: real count of combinatorial pages already migrated to
+    the premium JSON template vs still on the old prose format, per market --
+    a direct answer to "how far along is the migration" that doesn't depend
+    on the sdr_growth_log report (which silently no-ops if that table's
+    "notes" column migration hasn't landed yet)."""
+    db = SupabaseClient(Settings())
+    result = {}
+    for market in ["US", "UK", "CA", "AU"]:
+        rows = (
+            db.client.table("seo_pages")
+            .select("body")
+            .eq("market", market)
+            .not_.in_("topic_kind", ["guide", "comparison"])
+            .execute()
+        )
+        total = len(rows.data or [])
+        migrated = 0
+        for row in rows.data or []:
+            try:
+                if isinstance(json.loads(row.get("body") or ""), dict):
+                    migrated += 1
+            except (json.JSONDecodeError, TypeError):
+                pass
+        result[market] = {"total": total, "migrated": migrated, "pending": total - migrated}
+    grand_total = sum(v["total"] for v in result.values())
+    grand_migrated = sum(v["migrated"] for v in result.values())
+    return {
+        "by_market": result,
+        "overall": {
+            "total": grand_total,
+            "migrated": grand_migrated,
+            "pending": grand_total - grand_migrated,
+            "pct_migrated": round(100 * grand_migrated / grand_total, 1) if grand_total else 0,
+        },
+    }
+
+
 @router.get("/debug/list-static-pages")
 async def debug_list_static_pages():
     """Diagnostic-only: lists every seo_pages row with topic_kind in
