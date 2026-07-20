@@ -63,7 +63,13 @@ def _slug_from_page_url(page_url: str) -> str | None:
 class SEOFeedbackAgent:
     def __init__(self, settings: Settings):
         self.settings = settings
-        self.site_url = os.getenv("GSC_SITE_URL", "https://www.global-engenharia.com/")
+        # Default MUST match the actual verified Search Console property
+        # exactly, or every query 403s ("insufficient permission") even
+        # with valid credentials -- confirmed 2026-07-20: the property is
+        # the non-www host (https://global-engenharia.com/, matching the
+        # www->non-www redirect added this same day), not the www variant
+        # this defaulted to.
+        self.site_url = os.getenv("GSC_SITE_URL", "https://global-engenharia.com/")
         creds = _load_credentials()
         self.service = build("searchconsole", "v1", credentials=creds) if creds else None
         self.db = SupabaseClient(settings)
