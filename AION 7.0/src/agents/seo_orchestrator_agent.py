@@ -211,3 +211,19 @@ async def cleanup_legacy_pages():
             "status_code": resp.status_code,
             "note": "Rows unpublished, not deleted -- get_seo_page() should treat published=false as 404. Re-run GET /api/seo/agent/status afterward to confirm legacy_stale_pages_pending_cleanup drops to 0.",
         }
+
+
+@router.post("/gsc-feedback-now")
+async def run_gsc_feedback_now():
+    """Manual trigger for the weekly GSC feedback pull (2026-07-20), so the
+    freshly-authorized GSC_CLIENT_ID/SECRET/REFRESH_TOKEN can be verified
+    immediately instead of waiting up to 7 days for the cron."""
+    from src.agents.seo_feedback_agent import SEOFeedbackAgent
+    from src.config import Settings
+
+    feedback = SEOFeedbackAgent(Settings())
+    if not feedback.is_configured():
+        return {"configured": False, "error": "GSC_CLIENT_ID/SECRET/REFRESH_TOKEN not set or invalid"}
+    import asyncio
+    result = await asyncio.to_thread(feedback.pull_and_store)
+    return {"configured": True, "result": result}
