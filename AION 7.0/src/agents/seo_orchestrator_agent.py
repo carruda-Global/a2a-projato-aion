@@ -217,13 +217,25 @@ async def cleanup_legacy_pages():
 async def run_gsc_feedback_now():
     """Manual trigger for the weekly GSC feedback pull (2026-07-20), so the
     freshly-authorized GSC_CLIENT_ID/SECRET/REFRESH_TOKEN can be verified
-    immediately instead of waiting up to 7 days for the cron."""
-    from src.agents.seo_feedback_agent import SEOFeedbackAgent
-    from src.config import Settings
-
-    feedback = SEOFeedbackAgent(Settings())
-    if not feedback.is_configured():
-        return {"configured": False, "error": "GSC_CLIENT_ID/SECRET/REFRESH_TOKEN not set or invalid"}
+    immediately instead of waiting up to 7 days for the cron. Construction
+    (SEOFeedbackAgent.__init__ calls the blocking googleapiclient `build()`,
+    which does synchronous network I/O to fetch the API discovery doc) and
+    the pull itself both run in a worker thread so neither can block the
+    event loop or crash the request with an unhandled exception -- any
+    failure comes back as a normal JSON error instead of a 500."""
     import asyncio
-    result = await asyncio.to_thread(feedback.pull_and_store)
-    return {"configured": True, "result": result}
+
+    def _run():
+        from src.agents.seo_feedback_agent import SEOFeedbackAgent
+        from src.config import Settings
+
+        feedback = SEOFeedbackAgent(Settings())
+        if not feedback.is_configured():
+            return {"configured": False, "error": "GSC_CLIENT_ID/SECRET/REFRESH_TOKEN not set or invalid"}
+        return {"configured": True, "result": feedback.pull_and_store()}
+
+    try:
+        return await asyncio.to_thread(_run)
+    except Exception as e:
+        import traceback
+        return {"configured": None, "error": repr(e), "traceback": traceback.format_exc()}
