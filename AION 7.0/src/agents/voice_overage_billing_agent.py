@@ -1,15 +1,16 @@
-"""Real overage-minute billing for the Voice Receptionist product.
+"""Real overage billing for the Voice Receptionist product -- billed per
+unique caller over the plan's monthly cap, not per minute.
 
-Before this file existed, "$0.15/min after 300 min" was only text on
-vendas.html's FAQ -- usage_billing.py (the metered-billing pattern reused by
-every other product) had zero references to voice_receptionist, voice_calls,
-or overage. Every customer who used more than their plan's included minutes
-cost real Vapi/LLM infra money with no invoice ever created for the
-difference. This agent closes that gap using voice_calls (the source of
-truth for real minutes used, logged by the Vapi end-of-call-report webhook
-in voice_agent.py) against each plan's minute cap, and creates a real Stripe
-invoice item for the overage -- idempotent via voice_overage_billing_log so
-a daily cron never double-charges the same month.
+Matches vendas.html's sales copy ("unlimited minutes, up to N unique
+callers/mo") exactly, and mirrors Goodcall's real, market-proven pricing
+model ($0.50 per extra unique caller past the plan cap) instead of a
+per-minute rate customers never see broken out. Before this file existed,
+overage was only text on vendas.html's FAQ -- usage_billing.py (the metered
+pattern reused by every other product) had zero references to
+voice_receptionist, voice_calls, or overage, so any customer over cap was
+pure margin loss with no invoice ever created for the difference.
+Idempotent via voice_overage_billing_log so a daily cron never
+double-charges the same month.
 """
 import logging
 from calendar import monthrange
@@ -22,24 +23,19 @@ from src.database.supabase_client import SupabaseClient
 
 logger = logging.getLogger(__name__)
 
-# Minutes included per plan. Agency was sold on vendas.html with NO stated
-# per-line minute cap -- 200 min/line is the first real number for it,
-# documented here and in vendas.html together so the two never drift apart.
-PLAN_MINUTES_INCLUDED = {
-    "voice_receptionist_starter": 300,
-    "voice_receptionist_growth": 750,
+# Unique-caller caps sold on vendas.html/index.html -- keep these three
+# numbers in sync if pricing copy ever changes.
+PLAN_CALLER_CAPS = {
+    "voice_receptionist_starter": 120,
+    "voice_receptionist_growth": 300,
 }
-AGENCY_MINUTES_PER_LINE = 200
+AGENCY_CALLERS_PER_LINE = 80
 
-# Same overage rates already advertised on vendas.html -- this agent is what
-# makes those numbers real instead of aspirational.
-PLAN_OVERAGE_RATE_USD = {
-    "voice_receptionist_starter": 0.15,
-    "voice_receptionist_growth": 0.12,
-    "voice_receptionist_agency": 0.15,
-}
+# Same $0.50/extra-caller rate Goodcall uses -- a real, market-validated
+# number, not invented. Flat across plans (their pricing does this too).
+OVERAGE_RATE_USD_PER_CALLER = 0.50
 
-VOICE_PLAN_IDS = tuple(PLAN_OVERAGE_RATE_USD.keys())
+VOICE_PLAN_IDS = ("voice_receptionist_starter", "voice_receptionist_growth", "voice_receptionist_agency")
 
 
 def _previous_month_str(today: datetime | None = None) -> str:
@@ -57,9 +53,9 @@ def _month_bounds(month_str: str) -> tuple[str, str]:
     return start.isoformat(), end.isoformat()
 
 
-def _minutes_included(plan_id: str, customer_email: str, db: SupabaseClient) -> float:
+def _caller_cap(plan_id: str, customer_email: str, db: SupabaseClient) -> int:
     if plan_id != "voice_receptionist_agency":
-        return PLAN_MINUTES_INCLUDED.get(plan_id, 0)
+        return PLAN_CALLER_CAPS.get(plan_id, 0)
     try:
         resp = (
             db.client.table("voice_agent_numbers")
@@ -71,13 +67,13 @@ def _minutes_included(plan_id: str, customer_email: str, db: SupabaseClient) -> 
     except Exception as e:
         logger.warning("Could not count agency lines for %s, assuming 5 (plan minimum): %s", customer_email, e)
         num_lines = 5
-    return AGENCY_MINUTES_PER_LINE * max(num_lines, 1)
+    return AGENCY_CALLERS_PER_LINE * max(num_lines, 1)
 
 
-def _minutes_used(customer_email: str, month_start: str, month_end: str, db: SupabaseClient) -> float:
+def _unique_callers_used(customer_email: str, month_start: str, month_end: str, db: SupabaseClient) -> int:
     resp = (
         db.client.table("voice_calls")
-        .select("duration_seconds")
+        .select("caller_number")
         .eq("customer_email", customer_email)
         .eq("is_trial_call", False)
         .gte("started_at", month_start)
@@ -85,7 +81,7 @@ def _minutes_used(customer_email: str, month_start: str, month_end: str, db: Sup
         .execute()
     )
     rows = resp.data or []
-    return sum((r.get("duration_seconds") or 0) for r in rows) / 60.0
+    return len({r["caller_number"] for r in rows if r.get("caller_number")})
 
 
 async def run_overage_billing(target_month: str | None = None) -> dict:
@@ -132,16 +128,15 @@ async def run_overage_billing(target_month: str | None = None) -> dict:
             skipped.append({"customer_email": customer_email, "reason": "already_billed"})
             continue
 
-        minutes_used = _minutes_used(customer_email, month_start, month_end, db)
-        minutes_included = _minutes_included(plan_id, customer_email, db)
-        overage_minutes = max(0.0, minutes_used - minutes_included)
+        callers_used = _unique_callers_used(customer_email, month_start, month_end, db)
+        caller_cap = _caller_cap(plan_id, customer_email, db)
+        overage_callers = max(0, callers_used - caller_cap)
 
-        if overage_minutes <= 0:
-            skipped.append({"customer_email": customer_email, "reason": "no_overage", "minutes_used": round(minutes_used, 1)})
+        if overage_callers <= 0:
+            skipped.append({"customer_email": customer_email, "reason": "no_overage", "callers_used": callers_used})
             continue
 
-        rate = PLAN_OVERAGE_RATE_USD.get(plan_id, 0.15)
-        amount_cents = round(overage_minutes * rate * 100)
+        amount_cents = round(overage_callers * OVERAGE_RATE_USD_PER_CALLER * 100)
         if amount_cents <= 0:
             continue
 
@@ -150,7 +145,7 @@ async def run_overage_billing(target_month: str | None = None) -> dict:
         # email is not a valid Stripe customer ID, so invoicing would fail.
         # Log it as a real gap rather than silently eating the charge.
         if not customer_id or "@" in customer_id:
-            errors.append({"customer_email": customer_email, "reason": "no_stripe_customer_id", "overage_minutes": round(overage_minutes, 1)})
+            errors.append({"customer_email": customer_email, "reason": "no_stripe_customer_id", "overage_callers": overage_callers})
             continue
 
         invoice_item_id = None
@@ -160,8 +155,8 @@ async def run_overage_billing(target_month: str | None = None) -> dict:
                 amount=amount_cents,
                 currency="usd",
                 description=(
-                    f"Voice Receptionist overage: {overage_minutes:.0f} min over "
-                    f"{minutes_included:.0f} min included ({plan_id}, {month_str})"
+                    f"Voice Receptionist overage: {overage_callers} caller(s) over "
+                    f"{caller_cap} included ({plan_id}, {month_str}) at $0.50/caller"
                 ),
             )
             invoice_item_id = item.get("id")
@@ -175,19 +170,19 @@ async def run_overage_billing(target_month: str | None = None) -> dict:
             "customer_email": customer_email,
             "billing_month": month_str,
             "plan_id": plan_id,
-            "minutes_used": round(minutes_used, 2),
-            "minutes_included": round(minutes_included, 2),
-            "overage_minutes": round(overage_minutes, 2),
-            "overage_rate_usd": rate,
+            "unique_callers_used": callers_used,
+            "unique_caller_cap": caller_cap,
+            "overage_callers": overage_callers,
+            "overage_rate_usd": OVERAGE_RATE_USD_PER_CALLER,
             "amount_usd_cents": amount_cents,
             "stripe_invoice_item_id": invoice_item_id,
         }).execute()
 
         billed.append({
             "customer_email": customer_email,
-            "overage_minutes": round(overage_minutes, 1),
+            "overage_callers": overage_callers,
             "amount_usd": round(amount_cents / 100, 2),
         })
-        logger.info("Overage billed: %s | %.1f min | $%.2f", customer_email, overage_minutes, amount_cents / 100)
+        logger.info("Overage billed: %s | %d extra callers | $%.2f", customer_email, overage_callers, amount_cents / 100)
 
     return {"month": month_str, "billed": billed, "skipped": skipped, "errors": errors}

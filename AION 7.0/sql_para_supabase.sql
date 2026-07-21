@@ -144,14 +144,18 @@ CREATE TABLE IF NOT EXISTS zapier_webhook_subscriptions (
 );
 CREATE INDEX IF NOT EXISTS idx_zapier_subs_customer_event ON zapier_webhook_subscriptions(customer_email, event);
 
+-- Billed per unique caller over the plan's monthly cap ($0.50/extra caller,
+-- matching Goodcall's real, market-proven model) -- not per minute. Matches
+-- what vendas.html actually sells ("unlimited minutes, up to N unique
+-- callers/mo").
 CREATE TABLE IF NOT EXISTS voice_overage_billing_log (
     id TEXT PRIMARY KEY,
     customer_email TEXT NOT NULL,
     billing_month TEXT NOT NULL,  -- 'YYYY-MM'
     plan_id TEXT NOT NULL,
-    minutes_used NUMERIC(10,2) NOT NULL,
-    minutes_included NUMERIC(10,2) NOT NULL,
-    overage_minutes NUMERIC(10,2) NOT NULL,
+    unique_callers_used INTEGER NOT NULL,
+    unique_caller_cap INTEGER NOT NULL,
+    overage_callers INTEGER NOT NULL,
     overage_rate_usd NUMERIC(6,4) NOT NULL,
     amount_usd_cents INTEGER NOT NULL,
     stripe_invoice_item_id TEXT,

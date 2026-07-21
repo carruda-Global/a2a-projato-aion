@@ -352,7 +352,7 @@ async def customer_dashboard(customer_email: str):
         raise HTTPException(status_code=403, detail="Active subscription required")
 
     from src.database.supabase_client import SupabaseClient
-    from src.agents.voice_overage_billing_agent import AGENCY_MINUTES_PER_LINE, _minutes_included
+    from src.agents.voice_overage_billing_agent import _caller_cap
 
     db = SupabaseClient(Settings())
     sub = get_subscription(customer_email) or {}
@@ -386,10 +386,7 @@ async def customer_dashboard(customer_email: str):
     ).data or []]
     leads = [r for r in (leads_resp.data or []) if r.get("call_id") in call_ids and (r.get("lead_name") or r.get("lead_phone"))]
 
-    minutes_included = _minutes_included(plan_id, customer_email, db)
-    caller_cap = {"voice_receptionist_starter": 120, "voice_receptionist_growth": 300}.get(plan_id)
-    if plan_id == "voice_receptionist_agency":
-        caller_cap = round(minutes_included / AGENCY_MINUTES_PER_LINE) * 80
+    caller_cap = _caller_cap(plan_id, customer_email, db)
 
     return {
         "customer_email": customer_email,
