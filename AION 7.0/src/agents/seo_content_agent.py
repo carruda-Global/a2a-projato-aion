@@ -220,8 +220,8 @@ class SEOContentAgent:
                     # finding, confirmed systemic, not a 21-page edge case).
                     "title": f"{topic.nome} — {sector.replace('-', ' ').title()} ({market})",
                     "meta_description": (
-                        f"AI voice receptionist for {sector} {size_label.lower()} businesses: "
-                        f"{topic.dor} See how our virtual receptionist handles it, 24/7."
+                        f"AI voice receptionist for {sector.replace('-', ' ')} ({size_label.lower()}): "
+                        f"{topic.dor.rstrip('.')}. See how our virtual receptionist handles it, 24/7."
                     ),
                     "body": json.dumps(structured, ensure_ascii=False),
                     "stripe_link": topic.stripe_link,
@@ -291,7 +291,7 @@ async def debug_try_upsert(market: str):
     page_data = {
         "slug": slug,
         "title": f"AI Voice Receptionist — {topic.nome} — {market} {sector.title()} ({size_label})",
-        "meta_description": f"AI voice receptionist for {sector} {size_label.lower()} businesses: {topic.dor} See how our virtual receptionist handles it, 24/7.",
+        "meta_description": f"AI voice receptionist for {sector.replace('-', ' ')} ({size_label.lower()}): {topic.dor.rstrip('.')}. See how our virtual receptionist handles it, 24/7.",
         "body": json.dumps(structured, ensure_ascii=False),
         "stripe_link": topic.stripe_link,
         "market": market,
@@ -306,6 +306,31 @@ async def debug_try_upsert(market: str):
         return {"slug": slug, "stage": "upsert_ok", "returned_rows": len(resp.data or [])}
     except Exception as e:
         return {"slug": slug, "stage": "upsert_exception", "error": repr(e), "traceback": traceback.format_exc()}
+
+
+@router.post("/debug/backfill-meta-descriptions")
+async def debug_backfill_meta_descriptions():
+    """One-off fix for a template bug found 2026-07-21: meta_description was
+    built from raw sector slugs (hyphens left in, e.g. "real-estate-agencies")
+    and duplicated "business"/"businesses" wording (size_label already reads
+    "multi-location business", template appended another " businesses"), with
+    no punctuation before "See how...". Pure string recompute from plan_slugs
+    -- no LLM call, so this is cheap to run against all ~972 rows at once."""
+    db = SupabaseClient(Settings())
+    updated = 0
+    errors = []
+    for market in ["US", "UK", "CA", "AU"]:
+        for topic, sector, size_key, size_label, slug in plan_slugs(market):
+            new_desc = (
+                f"AI voice receptionist for {sector.replace('-', ' ')} ({size_label.lower()}): "
+                f"{topic.dor.rstrip('.')}. See how our virtual receptionist handles it, 24/7."
+            )
+            try:
+                db.client.table("seo_pages").update({"meta_description": new_desc}).eq("slug", slug).execute()
+                updated += 1
+            except Exception as e:
+                errors.append({"slug": slug, "error": repr(e)})
+    return {"updated": updated, "errors": errors[:20], "error_count": len(errors)}
 
 
 @router.get("/debug/migration-progress")
