@@ -191,6 +191,28 @@ CAPABILITY_TOPICS: list[Topic] = [
         stripe_link=VOICE_RECEPTIONIST_CHECKOUT,
         markets=("US", "UK", "CA", "AU"),
     ),
+    # ── Added 2026-07-21: real Google Ads Search Network keyword report
+    # (paid campaign, not a guess) showed "ai phone agent" pulling 176 real
+    # impressions -- more than every other keyword in the account combined --
+    # while every existing topic here uses "AI Receptionist" framing. The
+    # "answering service" phrasing cluster (small-business/24-7/missed-call
+    # answering service, virtual call answering) also had real impressions
+    # the current content never targets directly. Two new topics using that
+    # validated exact phrasing, run through the same per-sector/size loop.
+    Topic(
+        key="ai-phone-agent", kind="capability", product="voice_receptionist",
+        nome="AI Phone Agent for Business", norma="AI Voice Receptionist — AI Phone Agent",
+        dor="wanting an AI phone agent that actually sounds natural instead of a rigid IVR menu",
+        stripe_link=VOICE_RECEPTIONIST_CHECKOUT,
+        markets=("US", "UK", "CA", "AU"),
+    ),
+    Topic(
+        key="ai-answering-service", kind="capability", product="voice_receptionist",
+        nome="AI Answering Service for Small Business", norma="AI Voice Receptionist — Answering Service",
+        dor="a traditional answering service that just takes a message instead of actually resolving the call",
+        stripe_link=VOICE_RECEPTIONIST_CHECKOUT,
+        markets=("US", "UK", "CA", "AU"),
+    ),
 ]
 
 
