@@ -205,6 +205,24 @@ async def run_overage_billing_endpoint(month: str | None = None):
     return await run_overage_billing(target_month=month)
 
 
+@router.get("/billing/customer-count")
+async def voice_receptionist_customer_count():
+    """Real count of active paying Voice Receptionist subscriptions --
+    the one number that actually matters more than any traffic/SEO metric.
+    Used to detect the first real sale during the Google Ads budget test."""
+    from src.database.supabase_client import SupabaseClient
+
+    db = SupabaseClient(Settings())
+    resp = (
+        db.client.table("subscriptions")
+        .select("plan_id,activated_at", count="exact")
+        .eq("status", "active")
+        .in_("plan_id", ["voice_receptionist_starter", "voice_receptionist_growth", "voice_receptionist_agency"])
+        .execute()
+    )
+    return {"active_customers": resp.count or 0, "rows": resp.data or []}
+
+
 @router.post("/webhook/vapi")
 async def vapi_webhook(data: dict):
     """Receives Vapi server-side call events. `assistant-request` fires the
