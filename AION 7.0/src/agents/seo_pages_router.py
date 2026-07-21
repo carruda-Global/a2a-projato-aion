@@ -209,7 +209,7 @@ async def get_seo_page(slug: str):
     html = (
         '<!DOCTYPE html><html lang="' + lang + '"><head><meta charset="UTF-8">'
         '<meta name="viewport" content="width=device-width,initial-scale=1.0">'
-        '<title>' + _esc(title) + ' | AION Voice Receptionist</title>'
+        '<title>' + _esc(title) + ' | AION</title>'
         '<meta name="description" content="' + _esc(meta_desc) + '">'
         '<meta name="robots" content="index,follow">'
         '<link rel="canonical" href="https://global-engenharia.com' + canonical_path + _esc(slug) + '">'

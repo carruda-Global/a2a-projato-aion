@@ -218,7 +218,7 @@ class SEOContentAgent:
                     # title, so repeating it here just wasted length: sampled
                     # titles were 77-128 chars (Semrush "title too long"
                     # finding, confirmed systemic, not a 21-page edge case).
-                    "title": f"{topic.nome} — {sector.replace('-', ' ').title()} ({market})",
+                    "title": f"{topic.title_label} — {sector.replace('-', ' ').title()} ({market})",
                     "meta_description": (
                         f"AI voice receptionist for {sector.replace('-', ' ')} ({size_label.lower()}): "
                         f"{topic.dor.rstrip('.')}. See how our virtual receptionist handles it, 24/7."
@@ -290,7 +290,7 @@ async def debug_try_upsert(market: str):
 
     page_data = {
         "slug": slug,
-        "title": f"AI Voice Receptionist — {topic.nome} — {market} {sector.title()} ({size_label})",
+        "title": f"{topic.title_label} — {sector.replace('-', ' ').title()} ({market})",
         "meta_description": f"AI voice receptionist for {sector.replace('-', ' ')} ({size_label.lower()}): {topic.dor.rstrip('.')}. See how our virtual receptionist handles it, 24/7.",
         "body": json.dumps(structured, ensure_ascii=False),
         "stripe_link": topic.stripe_link,
@@ -327,6 +327,29 @@ async def debug_backfill_meta_descriptions():
             )
             try:
                 db.client.table("seo_pages").update({"meta_description": new_desc}).eq("slug", slug).execute()
+                updated += 1
+            except Exception as e:
+                errors.append({"slug": slug, "error": repr(e)})
+    return {"updated": updated, "errors": errors[:20], "error_count": len(errors)}
+
+
+@router.post("/debug/backfill-titles")
+async def debug_backfill_titles():
+    """One-off fix for real audit finding 2026-07-21 (30 pages flagged "title
+    element is too long", up to 103 chars): the 2026-07-19 title-length fix
+    only applied to newly generated pages, never backfilled to existing
+    rows -- same class of bug as the meta_description backfill above. Also
+    now uses topic.title_label (short_title where set) instead of the full
+    question-style topic.nome for especially verbose topics. Pure string
+    recompute from plan_slugs -- no LLM call."""
+    db = SupabaseClient(Settings())
+    updated = 0
+    errors = []
+    for market in ["US", "UK", "CA", "AU"]:
+        for topic, sector, size_key, size_label, slug in plan_slugs(market):
+            new_title = f"{topic.title_label} — {sector.replace('-', ' ').title()} ({market})"
+            try:
+                db.client.table("seo_pages").update({"title": new_title}).eq("slug", slug).execute()
                 updated += 1
             except Exception as e:
                 errors.append({"slug": slug, "error": repr(e)})

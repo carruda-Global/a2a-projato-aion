@@ -47,6 +47,18 @@ class Topic:
     # when a market isn't present in the override dict.
     sectors_override: dict[str, tuple[str, ...]] | None = None
     sizes_override: dict[str, tuple[str, ...]] | None = None
+    # Some topic names are written as full questions (good for content/E-E-A-T,
+    # matches real buyer search phrasing) but push the rendered <title> past
+    # Google's ~60-char display budget once sector+market+branding are added
+    # (confirmed 2026-07-21 audit: 30 pages flagged "title too long", up to
+    # 103 chars). short_title is ONLY for the <title>/meta title -- content
+    # generation still uses the full `nome` for context. Falls back to `nome`
+    # when a topic's name is already short enough.
+    short_title: str | None = None
+
+    @property
+    def title_label(self) -> str:
+        return self.short_title or self.nome
 
     def __post_init__(self):
         info = PRODUCTS.get(self.product)
@@ -138,6 +150,7 @@ CAPABILITY_TOPICS: list[Topic] = [
     Topic(
         key="ai-receptionist-cost-vs-staff", kind="capability", product="voice_receptionist",
         nome="AI Receptionist Cost vs. Hiring Staff", norma="AI Voice Receptionist — Cost Comparison",
+        short_title="AI Receptionist Cost vs Staff",
         dor="a part-time receptionist hire costs far more than expected once wages, training, and turnover are counted",
         stripe_link=VOICE_RECEPTIONIST_CHECKOUT,
         markets=("US", "UK", "CA", "AU"),
@@ -145,6 +158,7 @@ CAPABILITY_TOPICS: list[Topic] = [
     Topic(
         key="ai-receptionist-answers-all-calls", kind="capability", product="voice_receptionist",
         nome="Does an AI Receptionist Really Answer Every Call?", norma="AI Voice Receptionist — Call Coverage",
+        short_title="Does AI Answer Every Call?",
         dor="doubt that an AI can actually handle real call volume without calls falling through",
         stripe_link=VOICE_RECEPTIONIST_CHECKOUT,
         markets=("US", "UK", "CA", "AU"),
@@ -152,6 +166,7 @@ CAPABILITY_TOPICS: list[Topic] = [
     Topic(
         key="ai-receptionist-escalation-handling", kind="capability", product="voice_receptionist",
         nome="What Happens When the AI Can't Answer a Call", norma="AI Voice Receptionist — Escalation & Handoff",
+        short_title="When AI Can't Answer a Call",
         dor="worry that a hard question gets dropped instead of handed to a human",
         stripe_link=VOICE_RECEPTIONIST_CHECKOUT,
         markets=("US", "UK", "CA", "AU"),
@@ -159,6 +174,7 @@ CAPABILITY_TOPICS: list[Topic] = [
     Topic(
         key="ai-receptionist-appointment-booking", kind="capability", product="voice_receptionist",
         nome="AI Receptionist Appointment & Scheduling Info", norma="AI Voice Receptionist — Booking Integration",
+        short_title="AI Appointment Scheduling",
         dor="callers asking about availability with no one free to check the calendar",
         stripe_link=VOICE_RECEPTIONIST_CHECKOUT,
         markets=("US", "UK", "CA", "AU"),
@@ -166,6 +182,7 @@ CAPABILITY_TOPICS: list[Topic] = [
     Topic(
         key="ai-receptionist-data-security", kind="capability", product="voice_receptionist",
         nome="How Secure Is an AI Receptionist With Customer Data", norma="AI Voice Receptionist — Privacy & Data Handling",
+        short_title="AI Receptionist Data Security",
         dor="uncertainty about call recording, data retention, and caller privacy compliance",
         stripe_link=VOICE_RECEPTIONIST_CHECKOUT,
         markets=("US", "UK", "CA", "AU"),
@@ -180,6 +197,7 @@ CAPABILITY_TOPICS: list[Topic] = [
     Topic(
         key="ai-receptionist-setup-time", kind="capability", product="voice_receptionist",
         nome="How Fast Can You Set Up an AI Receptionist", norma="AI Voice Receptionist — Setup & Onboarding",
+        short_title="Fast AI Receptionist Setup",
         dor="expecting a long implementation project when the business needs coverage now",
         stripe_link=VOICE_RECEPTIONIST_CHECKOUT,
         markets=("US", "UK", "CA", "AU"),
@@ -187,6 +205,7 @@ CAPABILITY_TOPICS: list[Topic] = [
     Topic(
         key="ai-receptionist-concurrent-calls", kind="capability", product="voice_receptionist",
         nome="Can an AI Receptionist Handle Multiple Calls at Once", norma="AI Voice Receptionist — Concurrent Call Capacity",
+        short_title="AI Receptionist Concurrent Calls",
         dor="busy periods where every call would otherwise hit a busy signal or hold queue",
         stripe_link=VOICE_RECEPTIONIST_CHECKOUT,
         markets=("US", "UK", "CA", "AU"),
@@ -209,6 +228,7 @@ CAPABILITY_TOPICS: list[Topic] = [
     Topic(
         key="ai-answering-service", kind="capability", product="voice_receptionist",
         nome="AI Answering Service for Small Business", norma="AI Voice Receptionist — Answering Service",
+        short_title="AI Answering Service",
         dor="a traditional answering service that just takes a message instead of actually resolving the call",
         stripe_link=VOICE_RECEPTIONIST_CHECKOUT,
         markets=("US", "UK", "CA", "AU"),
