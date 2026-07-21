@@ -280,8 +280,29 @@ async def _fetch_seo_pages():
     if not supa_url or not supa_key:
         return None
     headers = {"apikey": supa_key, "Authorization": "Bearer " + supa_key}
-    r = httpx.get(supa_url + "/rest/v1/seo_pages?select=slug,market,topic_kind&published=eq.true", headers=headers, timeout=10)
-    return r.json()
+    # PostgREST caps a response at 1000 rows by default. With 1141+ published
+    # pages, an unpaginated fetch here silently dropped ~140 pages from every
+    # sitemap (main + all 4 per-country) -- confirmed 2026-07-21 via direct
+    # Supabase count (US/UK/CA/AU sum to 1134, but the site's sitemaps only
+    # showed 993-1058). Page through with Range until a partial page confirms
+    # the end.
+    all_rows: list[dict] = []
+    page_size = 1000
+    offset = 0
+    while True:
+        r = httpx.get(
+            supa_url + "/rest/v1/seo_pages?select=slug,market,topic_kind&published=eq.true",
+            headers={**headers, "Range-Unit": "items", "Range": f"{offset}-{offset + page_size - 1}"},
+            timeout=15,
+        )
+        batch = r.json()
+        if not isinstance(batch, list) or not batch:
+            break
+        all_rows.extend(batch)
+        if len(batch) < page_size:
+            break
+        offset += page_size
+    return all_rows
 
 
 @router.get("/sitemap.xml")
