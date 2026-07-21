@@ -128,6 +128,22 @@ CREATE INDEX IF NOT EXISTS idx_voice_calls_started ON voice_calls(started_at);
 -- table makes voice_overage_billing_agent.py idempotent: one row per
 -- (customer_email, billing_month) so a cron that runs daily never
 -- double-charges the same month twice.
+-- Real Zapier/webhook subscriptions for Voice Receptionist events, scoped
+-- per customer. The prior implementation kept subscriptions in an in-memory
+-- Python dict (_webhook_subscriptions in zapier_integration.py) -- wiped on
+-- every Render restart/redeploy, and not scoped to any customer, so it
+-- could never actually deliver a specific customer's call events to their
+-- own Zap. This table is what makes the "Zapier integration" real instead
+-- of a dead endpoint nobody's data ever reached.
+CREATE TABLE IF NOT EXISTS zapier_webhook_subscriptions (
+    id TEXT PRIMARY KEY,
+    customer_email TEXT NOT NULL,
+    event TEXT NOT NULL,  -- 'call_completed' | 'lead_captured'
+    target_url TEXT NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS idx_zapier_subs_customer_event ON zapier_webhook_subscriptions(customer_email, event);
+
 CREATE TABLE IF NOT EXISTS voice_overage_billing_log (
     id TEXT PRIMARY KEY,
     customer_email TEXT NOT NULL,

@@ -1,86 +1,104 @@
-import json
+"""Zapier REST Hooks for Voice Receptionist events (call_completed,
+lead_captured). This is what a customer's "Webhooks by Zapier" trigger
+step points at -- not a published native Zapier app yet (that requires
+submitting to Zapier's own developer platform and review process, a
+separate step outside this codebase), but it's the real, working
+subscribe/fire mechanism a Zap needs, scoped per customer.
+
+Replaces the prior version, which kept subscriptions in an in-memory dict
+(wiped on every Render restart) with no customer scoping and no connection
+to any real voice_calls event -- functionally dead despite being "live".
+"""
 import logging
-import os
 import uuid
 
-from fastapi import APIRouter, HTTPException, Query, Request
+import httpx
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
-from src.monetization.plans import PLANS
-from src.monetization.subscription_activator import (
-    activate_subscription,
-    get_subscription as get_active_sub,
-)
+from src.config import Settings
+from src.database.supabase_client import SupabaseClient
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/zapier", tags=["zapier"])
 
-
-class ZapierWebhookPayload(BaseModel):
-    event: str = ""
-    target_url: str = ""
-    payload: dict = {}
+SUPPORTED_EVENTS = ("call_completed", "lead_captured")
 
 
-class ZapierCheckRequest(BaseModel):
-    api_key: str = ""
-    service: str = "compliance-nr1"
-    company: str = ""
-    sector: str = ""
-    data_types: str = ""
-    ai_systems: str = ""
-    frameworks: str = "nr1,lgpd,eu-ai-act"
+class ZapierSubscribeRequest(BaseModel):
+    customer_email: str
+    event: str
+    target_url: str
 
 
 @router.post("/webhook/subscribe")
-async def subscribe_webhook(payload: ZapierWebhookPayload):
-    if not payload.target_url:
-        raise HTTPException(status_code=400, detail="target_url é obrigatorio")
+async def subscribe_webhook(payload: ZapierSubscribeRequest):
+    if payload.event not in SUPPORTED_EVENTS:
+        raise HTTPException(status_code=400, detail=f"event must be one of {SUPPORTED_EVENTS}")
+    if not (payload.customer_email and payload.target_url):
+        raise HTTPException(status_code=400, detail="customer_email and target_url are required")
+
+    db = SupabaseClient(Settings())
     subscription_id = str(uuid.uuid4())
-    _webhook_subscriptions[subscription_id] = {
+    db.client.table("zapier_webhook_subscriptions").insert({
+        "id": subscription_id,
+        "customer_email": payload.customer_email.strip().lower(),
         "event": payload.event,
         "target_url": payload.target_url,
-        "payload_template": payload.payload,
-    }
-    logger.info(
-        "Zapier webhook subscribed: event=%s target=%s sub=%s",
-        payload.event, payload.target_url, subscription_id,
-    )
+    }).execute()
+    logger.info("Zapier webhook subscribed: customer=%s event=%s sub=%s", payload.customer_email, payload.event, subscription_id)
     return {"subscription_id": subscription_id, "status": "active"}
 
 
 @router.delete("/webhook/subscribe/{subscription_id}")
 async def unsubscribe_webhook(subscription_id: str):
-    removed = _webhook_subscriptions.pop(subscription_id, None)
-    if not removed:
+    db = SupabaseClient(Settings())
+    resp = db.client.table("zapier_webhook_subscriptions").delete().eq("id", subscription_id).execute()
+    if not resp.data:
         raise HTTPException(status_code=404, detail="Subscription nao encontrada")
     return {"status": "removed", "subscription_id": subscription_id}
 
 
+@router.get("/webhook/subscriptions/{customer_email}")
+async def list_subscriptions(customer_email: str):
+    db = SupabaseClient(Settings())
+    resp = (
+        db.client.table("zapier_webhook_subscriptions")
+        .select("id,event,target_url,created_at")
+        .eq("customer_email", customer_email.strip().lower())
+        .execute()
+    )
+    return {"subscriptions": resp.data or []}
+
+
 @router.get("/health")
 async def health_check():
-    return {
-        "name": "AION Zapier Integration",
-        "version": "1.0.0",
-        "status": "operational",
-        "active_webhooks": len(_webhook_subscriptions),
-    }
+    return {"name": "AION Zapier Integration", "version": "2.0.0", "status": "operational", "events": SUPPORTED_EVENTS}
 
 
-@router.get("/plans")
-async def list_plans():
-    return {
-        "plans": [
-            {
-                "id": p["id"],
-                "name": p["name"],
-                "price_usd": f"${p['price_usd']:,.2f}",
-                "agents": p["agents"],
-            }
-            for p in PLANS
-        ]
-    }
-
-
-_webhook_subscriptions: dict[str, dict] = {}
+async def fire_customer_webhooks(customer_email: str, event: str, payload: dict) -> None:
+    """Called from voice_agent.py's end-of-call-report handler. Best-effort:
+    a customer's Zap being slow/down must never break call logging."""
+    if event not in SUPPORTED_EVENTS or not customer_email:
+        return
+    try:
+        db = SupabaseClient(Settings())
+        resp = (
+            db.client.table("zapier_webhook_subscriptions")
+            .select("target_url")
+            .eq("customer_email", customer_email.strip().lower())
+            .eq("event", event)
+            .execute()
+        )
+        targets = [r["target_url"] for r in (resp.data or [])]
+        if not targets:
+            return
+        async with httpx.AsyncClient(timeout=8) as client:
+            for url in targets:
+                try:
+                    await client.post(url, json=payload)
+                except Exception as e:
+                    logger.warning("Zapier webhook delivery failed: customer=%s event=%s url=%s err=%s", customer_email, event, url, e)
+    except Exception as e:
+        logger.warning("Zapier webhook lookup failed for %s/%s: %s", customer_email, event, e)

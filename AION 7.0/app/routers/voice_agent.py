@@ -263,6 +263,14 @@ async def vapi_webhook(data: dict):
     _log_supabase_upsert("voice_calls", row)
     logger.info("Voice call logged: id=%s duration=%ss trial=%s", call_id, duration_seconds, is_trial)
 
+    if customer_email and not is_trial:
+        from app.routers.zapier_integration import fire_customer_webhooks
+        await fire_customer_webhooks(customer_email, "call_completed", {
+            "call_id": call_id, "caller_number": row["caller_number"],
+            "duration_seconds": duration_seconds, "outcome": row["outcome"],
+            "started_at": started_at, "ended_at": ended_at,
+        })
+
     transcript = row["transcript"]
     if call_id and transcript.strip():
         try:
@@ -278,6 +286,16 @@ async def vapi_webhook(data: dict):
                 "urgency": intelligence.get("urgency", ""),
             })
             logger.info("Call intelligence classified: id=%s intent=%s urgency=%s", call_id, intelligence.get("intent"), intelligence.get("urgency"))
+            if customer_email and not is_trial and (intelligence.get("lead_name") or intelligence.get("lead_phone")):
+                from app.routers.zapier_integration import fire_customer_webhooks
+                await fire_customer_webhooks(customer_email, "lead_captured", {
+                    "call_id": call_id,
+                    "lead_name": intelligence.get("lead_name", ""),
+                    "lead_phone": intelligence.get("lead_phone", ""),
+                    "intent": intelligence.get("intent", ""),
+                    "summary": intelligence.get("summary", ""),
+                    "urgency": intelligence.get("urgency", ""),
+                })
         except Exception as e:
             logger.warning("Call intelligence classification failed for %s: %s", call_id, e)
 
@@ -303,6 +321,8 @@ async def add_knowledge(data: dict):
 
 @router.get("/calls/{customer_email}")
 async def list_calls(customer_email: str):
+    if not tem_licenca_premium(customer_email):
+        raise HTTPException(status_code=403, detail="Active subscription required")
     from src.database.supabase_client import SupabaseClient
 
     db = SupabaseClient(Settings())
@@ -317,6 +337,70 @@ async def list_calls(customer_email: str):
     calls = resp.data or []
     total_seconds = sum(c.get("duration_seconds", 0) for c in calls)
     return {"calls": calls, "total_minutes_this_page": round(total_seconds / 60, 1)}
+
+
+@router.get("/dashboard/{customer_email}")
+async def customer_dashboard(customer_email: str):
+    """Real value delivered this calendar month -- calls answered, leads
+    captured, unique callers vs. the plan's caller cap. Backs
+    get-started.html's post-signup view and (item 4) the standalone
+    dashboard.html, both self-serve like the rest of this product (no
+    login system exists anywhere else in it either -- gated by the same
+    tem_licenca_premium check used for knowledge base and call history)."""
+    customer_email = customer_email.strip().lower()
+    if not tem_licenca_premium(customer_email):
+        raise HTTPException(status_code=403, detail="Active subscription required")
+
+    from src.database.supabase_client import SupabaseClient
+    from src.agents.voice_overage_billing_agent import AGENCY_MINUTES_PER_LINE, _minutes_included
+
+    db = SupabaseClient(Settings())
+    sub = get_subscription(customer_email) or {}
+    plan_id = sub.get("plan_id", "voice_receptionist_starter")
+
+    month_start = datetime.now(timezone.utc).replace(day=1, hour=0, minute=0, second=0, microsecond=0).isoformat()
+    resp = (
+        db.client.table("voice_calls")
+        .select("caller_number,duration_seconds,is_trial_call")
+        .eq("customer_email", customer_email)
+        .eq("is_trial_call", False)
+        .gte("started_at", month_start)
+        .execute()
+    )
+    calls = resp.data or []
+    total_minutes = round(sum((c.get("duration_seconds") or 0) for c in calls) / 60.0, 1)
+    unique_callers = len({c["caller_number"] for c in calls if c.get("caller_number")})
+
+    leads_resp = (
+        db.client.table("voice_call_intelligence")
+        .select("call_id,lead_name,lead_phone")
+        .execute()
+    )
+    call_ids = [c["id"] for c in (
+        db.client.table("voice_calls")
+        .select("id")
+        .eq("customer_email", customer_email)
+        .eq("is_trial_call", False)
+        .gte("started_at", month_start)
+        .execute()
+    ).data or []]
+    leads = [r for r in (leads_resp.data or []) if r.get("call_id") in call_ids and (r.get("lead_name") or r.get("lead_phone"))]
+
+    minutes_included = _minutes_included(plan_id, customer_email, db)
+    caller_cap = {"voice_receptionist_starter": 120, "voice_receptionist_growth": 300}.get(plan_id)
+    if plan_id == "voice_receptionist_agency":
+        caller_cap = round(minutes_included / AGENCY_MINUTES_PER_LINE) * 80
+
+    return {
+        "customer_email": customer_email,
+        "plan_id": plan_id,
+        "month": datetime.now(timezone.utc).strftime("%Y-%m"),
+        "calls_answered": len(calls),
+        "leads_captured": len(leads),
+        "minutes_used": total_minutes,
+        "unique_callers": unique_callers,
+        "unique_caller_cap": caller_cap,
+    }
 
 
 async def _build_assistant_response(phone_number_id: str) -> dict:
