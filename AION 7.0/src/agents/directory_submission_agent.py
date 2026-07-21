@@ -139,12 +139,12 @@ Product Details:
 - Website: {product_url}
 - Category: AI Voice Agent / Virtual Receptionist / Answering Service
 - Description: AI receptionist that answers business phone calls 24/7, texts back missed calls instantly, and captures every lead as a message. Self-service setup, live in under 20 minutes, no developer or sales call required.
-- Pricing: $89/month flat, 300 minutes included, $0.15/min after — no per-call fee, no customer cap
+- Pricing: $89/month flat, unlimited minutes for up to 120 unique callers/mo — no per-call fee
 - Markets: United States, United Kingdom, Canada, Australia
 
 Key differentiators:
 - Flat monthly price with no per-call fee (unlike some competitors charging $1.60-1.90/call)
-- No cap on unique callers per month
+- Unlimited minutes on every plan, not just a bundled allotment
 - Live demo line — prospects can call and test the exact experience before signing up
 - Missed-call text-back included on the base plan, not an add-on
 
@@ -167,7 +167,7 @@ SAO PAULO, Brazil — July 2026 — Global Match Engenharia today announced the 
 
 The AI voice agent market is growing from $2.4 billion in 2024 to a projected $47.5 billion by 2034, and 97% of small businesses using an AI voice agent report an increase in revenue — but most existing tools charge per call or cap the number of unique customers on entry-level plans.
 
-AION Voice Receptionist is priced at a flat $89/month with 300 minutes included and no per-call fee or customer cap, targeting dental clinics, law firms, real estate agencies, home services, salons, and medical clinics across the US, UK, Canada, and Australia.
+AION Voice Receptionist is priced at a flat $89/month with unlimited minutes and no per-call fee, targeting dental clinics, law firms, real estate agencies, home services, salons, and medical clinics across the US, UK, Canada, and Australia.
 
 "You shouldn't need a developer or a sales call to get an AI receptionist running," said founder Cristiano Arruda, a licensed production engineer (CREA-SP 5071200171). "We built a live demo line — call it, and you're talking to the exact assistant your customers would get, no signup required."
 
@@ -207,7 +207,7 @@ Most AI phone receptionists charge per call ($1.60-1.90/call) or cap you at a fi
 
 ## Pricing
 
-Flat $89/month, 300 minutes included, $0.15/min after. No per-call fee, no cap on unique callers.
+Flat $89/month, unlimited minutes. No per-call fee.
 
 ## Try it
 
@@ -216,7 +216,7 @@ There's a live demo line — call it and test the exact experience your customer
 
 PR_REDDIT_POST = f"""**Built an AI phone receptionist with no per-call fees or customer caps — feedback welcome**
 
-Most AI receptionist tools either charge per call or cap you at ~100 unique customers/month on the entry plan. Built this one flat-rate instead: $89/mo, 300 min included, $0.15/min after, no cap.
+Most AI receptionist tools either charge per call or bundle a fixed number of minutes. Built this one flat-rate instead: $89/mo, unlimited minutes, up to 120 unique callers included.
 
 Answers calls 24/7, texts back missed calls instantly, captures leads automatically. There's a live demo number you can call to test it before signing up — no account needed.
 
@@ -224,6 +224,48 @@ Answers calls 24/7, texts back missed calls instantly, captures leads automatica
 
 Happy to answer questions about how it's built or the pricing model.
 """
+
+# Vertical marketplace/integration partnerships -- real distribution channel
+# identified from competitor research: Goodcall's Yelp partnership and
+# Zapier/HubSpot/Salesforce integrations are what actually put them in front
+# of warm-intent buyers instead of relying only on SEO/Ads. Unlike the
+# generic DIRECTORIES list above (free self-serve profile listings), these
+# are application-based technology-partner programs -- ServiceTitan and Clio
+# both require registering as a developer partner and building a real API
+# integration before marketplace listing, not a one-email signup. This is
+# the START of that process (real, current URLs), not the whole thing.
+PARTNERSHIPS = [
+    {
+        "name": "ServiceTitan Marketplace", "url": "https://www.servicetitan.com/partners",
+        "vertical": "home services (HVAC, plumbing, electrical)",
+        "note": "Application-based App Marketplace program (Silver/Gold/Titanium tiers). Requires an Integration Evaluation Call before certification -- this email requests that first conversation.",
+    },
+    {
+        "name": "Clio App Directory", "url": "https://www.clio.com/partnerships/developers/",
+        "vertical": "law firms",
+        "note": "Free to join the Developer/Tech Partner Program. Path: register on the developer portal -> build the integration -> security review -> demo -> App Directory listing. This email requests developer-portal access to start.",
+    },
+]
+
+PARTNERSHIP_EMAIL_TEMPLATE = """Subject: Partnership inquiry — AION Voice Receptionist x {partner}
+
+Hi {partner} team,
+
+We're Global Match Engenharia, and we build AION Voice Receptionist — an AI phone agent that answers business calls 24/7, texts back missed calls instantly, and captures every lead. It's live today at {product_url}, self-service, no developer required to set up.
+
+We'd like to explore becoming an integration partner. Specifically for {vertical} businesses using {partner}: a missed or unanswered call is a missed job, and we think a native connection here (call outcomes, lead capture, and missed-call alerts flowing directly into your platform) is a real, specific value-add for your shared customers — not a generic CRM sync.
+
+Could you point us to the right first step to start the partner/integration application process?
+
+Happy to share more product detail, a live demo call, or technical documentation as needed.
+
+Best regards,
+Cristiano Arruda
+Global Match Engenharia
+contact@global-engenharia.com
+{product_url}
+"""
+
 
 # Small-business/service-industry subreddits — relevant to Voice Receptionist's
 # actual audience, not the retired compliance product's legal/regtech ones.
@@ -266,6 +308,32 @@ async def _send_listing_email(directory: dict) -> bool:
     return await asyncio.to_thread(
         _send_via_smtp, OWNER_EMAIL, f"[Listing draft] {directory['name']}", body,
     )
+
+
+async def _send_partnership_email(partner: dict) -> bool:
+    body = PARTNERSHIP_EMAIL_TEMPLATE.format(
+        partner=partner["name"], product_url=PRODUCT_URL, vertical=partner["vertical"],
+    )
+    # Same pattern as _send_listing_email: drafted to the owner's inbox for
+    # review/send, since both ServiceTitan and Clio's real first step is a
+    # developer-portal registration or application form, not a raw email
+    # address we can post to programmatically.
+    return await asyncio.to_thread(
+        _send_via_smtp, OWNER_EMAIL, f"[Partnership draft] {partner['name']}", body,
+    )
+
+
+@router.post("/partnerships/run-now")
+async def run_partnerships_now():
+    """Drafts real partnership-inquiry emails for ServiceTitan Marketplace
+    and Clio App Directory to the owner's inbox. Manual/on-demand -- these
+    are application-based programs, not a recurring cron like the generic
+    directory listings."""
+    results = []
+    for partner in PARTNERSHIPS:
+        sent = await _send_partnership_email(partner)
+        results.append({"partner": partner["name"], "url": partner["url"], "drafted": sent})
+    return {"partnerships": results}
 
 
 async def _publish_pr_to_devto(angle: dict) -> bool:
