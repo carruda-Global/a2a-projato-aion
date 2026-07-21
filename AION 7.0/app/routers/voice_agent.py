@@ -205,6 +205,38 @@ async def run_overage_billing_endpoint(month: str | None = None):
     return await run_overage_billing(target_month=month)
 
 
+@router.get("/billing/cost-per-minute")
+async def measured_cost_per_minute(days: int = 30):
+    """Real, measured infra cost per talk-minute from Vapi's own cost_usd
+    per call -- the number that anchors pricing decisions (e.g. whether
+    Growth can drop to \$119 vs Goodcall's \$99) in measured data instead
+    of estimates. Windows on created_at, not started_at: early webhook
+    versions logged started_at as null and those rows carry real cost."""
+    from datetime import timedelta
+    from src.database.supabase_client import SupabaseClient
+
+    db = SupabaseClient(Settings())
+    cutoff = (datetime.now(timezone.utc) - timedelta(days=days)).isoformat()
+    resp = (
+        db.client.table("voice_calls")
+        .select("duration_seconds,cost_usd,is_trial_call")
+        .gte("created_at", cutoff)
+        .gt("duration_seconds", 0)
+        .execute()
+    )
+    rows = [r for r in (resp.data or []) if (r.get("cost_usd") or 0) > 0]
+    total_minutes = sum(r["duration_seconds"] for r in rows) / 60.0
+    total_cost = sum(float(r["cost_usd"]) for r in rows)
+    return {
+        "window_days": days,
+        "calls_measured": len(rows),
+        "total_minutes": round(total_minutes, 1),
+        "total_cost_usd": round(total_cost, 4),
+        "avg_cost_per_minute_usd": round(total_cost / total_minutes, 4) if total_minutes else None,
+        "note": "Vapi-reported real cost per call; small samples of short calls skew low (context grows on long calls).",
+    }
+
+
 @router.get("/billing/customer-count")
 async def voice_receptionist_customer_count():
     """Real count of active paying Voice Receptionist subscriptions --
