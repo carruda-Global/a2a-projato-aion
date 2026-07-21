@@ -219,27 +219,97 @@ async def get_seo_page(slug: str):
     return HTMLResponse(content=html)
 
 
-@router.get("/sitemap.xml")
-async def sitemap():
+# Real ISO hreflang codes for the 4 validated markets -- used to tell Google
+# "these N URLs are equivalent content for different countries" without
+# moving a single existing URL (the slugs/paths never change).
+_HREFLANG_BY_MARKET = {"US": "en-us", "UK": "en-gb", "CA": "en-ca", "AU": "en-au"}
+
+
+def _cluster_key(slug: str, market: str) -> str | None:
+    """Strip the leading market prefix from a combinatorial slug (format
+    '{market}-{topic}-{sector}-{size}') so pages sharing the same
+    topic+sector+size across markets can be grouped for hreflang. Returns
+    None for slugs that don't start with their own market prefix (static
+    guide/comparison pages, legacy rows) -- those get no hreflang cluster."""
+    prefix = market.lower() + "-"
+    if not slug.startswith(prefix):
+        return None
+    return slug[len(prefix):]
+
+
+def _sitemap_xml(pages: list[dict], market_filter: str | None = None) -> str:
+    # Build hreflang clusters first: cluster_key -> {market: slug}
+    clusters: dict[str, dict[str, str]] = {}
+    for p in pages or []:
+        if p.get("topic_kind") in _STATIC_KINDS:
+            continue
+        m = (p.get("market") or "").upper()
+        key = _cluster_key(p["slug"], m)
+        if key is None or m not in _HREFLANG_BY_MARKET:
+            continue
+        clusters.setdefault(key, {})[m] = p["slug"]
+
+    items = []
+    for p in pages or []:
+        m = (p.get("market") or "").upper()
+        if market_filter and m != market_filter:
+            continue
+        base = "/ecosystem/callreception/" if p.get("topic_kind") in _STATIC_KINDS else "/artigos/"
+        loc = "https://global-engenharia.com" + base + p["slug"]
+        alt_links = ""
+        key = _cluster_key(p["slug"], m) if p.get("topic_kind") not in _STATIC_KINDS else None
+        variants = clusters.get(key) if key else None
+        if variants and len(variants) > 1:
+            alt_links = "".join(
+                f'<xhtml:link rel="alternate" hreflang="{hl}" href="https://global-engenharia.com/artigos/{v_slug}" />'
+                for v_market, v_slug in variants.items()
+                if (hl := _HREFLANG_BY_MARKET.get(v_market))
+            )
+        items.append(f'  <url><loc>{loc}</loc>{alt_links}<changefreq>monthly</changefreq><priority>0.7</priority></url>')
+    return (
+        '<?xml version="1.0" encoding="UTF-8"?>\n'
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n'
+        + "\n".join(items) + "\n</urlset>"
+    )
+
+
+async def _fetch_seo_pages():
     import os, httpx
     supa_url = os.getenv("SUPABASE_URL", "")
     supa_key = os.getenv("SUPABASE_API_KEY", "")
     if not supa_url or not supa_key:
-        return HTMLResponse(content="", status_code=503)
+        return None
+    headers = {"apikey": supa_key, "Authorization": "Bearer " + supa_key}
+    r = httpx.get(supa_url + "/rest/v1/seo_pages?select=slug,market,topic_kind&published=eq.true", headers=headers, timeout=10)
+    return r.json()
+
+
+@router.get("/sitemap.xml")
+async def sitemap():
     try:
-        headers = {"apikey": supa_key, "Authorization": "Bearer " + supa_key}
-        r = httpx.get(supa_url + "/rest/v1/seo_pages?select=slug,market,topic_kind&published=eq.true", headers=headers, timeout=10)
-        pages = r.json()
-    except:
+        pages = await _fetch_seo_pages()
+    except Exception:
         return HTMLResponse(content="", status_code=500)
-    # (previously redefined this set locally; both were emitted as /artigos/
-    # at one point, which 404'd the static pages in any real crawl.)
-    items = []
-    for p in pages or []:
-        base = "/ecosystem/callreception/" if p.get("topic_kind") in _STATIC_KINDS else "/artigos/"
-        items.append('  <url><loc>https://global-engenharia.com' + base + p["slug"] + '</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>')
-    xml = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + "\n".join(items) + "\n</urlset>"
-    return HTMLResponse(content=xml, media_type="application/xml")
+    if pages is None:
+        return HTMLResponse(content="", status_code=503)
+    return HTMLResponse(content=_sitemap_xml(pages), media_type="application/xml")
+
+
+@router.get("/sitemap-{market}.xml")
+async def sitemap_by_market(market: str):
+    """Per-country sitemap (sitemap-us.xml, sitemap-uk.xml, sitemap-ca.xml,
+    sitemap-au.xml) -- same page set as sitemap.xml, filtered to one market,
+    for separate GSC/Ads-per-country submission without any URL migration."""
+    market = market.upper()
+    if market not in _HREFLANG_BY_MARKET:
+        return HTMLResponse(content="Unknown market", status_code=404)
+    try:
+        pages = await _fetch_seo_pages()
+    except Exception:
+        return HTMLResponse(content="", status_code=500)
+    if pages is None:
+        return HTMLResponse(content="", status_code=503)
+    return HTMLResponse(content=_sitemap_xml(pages, market_filter=market), media_type="application/xml")
 
 
 @router.delete("/legacy-pages")
