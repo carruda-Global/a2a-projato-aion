@@ -194,6 +194,17 @@ async def import_business(data: dict):
     return {"found": True, **business_data}
 
 
+@router.post("/billing/run-overage")
+async def run_overage_billing_endpoint(month: str | None = None):
+    """Manual/cron trigger for real overage-minute billing (see
+    voice_overage_billing_agent.py). `month` is optional 'YYYY-MM', defaults
+    to the previous completed calendar month. Safe to call repeatedly --
+    idempotent per (customer_email, billing_month)."""
+    from src.agents.voice_overage_billing_agent import run_overage_billing
+
+    return await run_overage_billing(target_month=month)
+
+
 @router.post("/webhook/vapi")
 async def vapi_webhook(data: dict):
     """Receives Vapi server-side call events. `assistant-request` fires the

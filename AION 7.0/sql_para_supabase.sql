@@ -122,6 +122,27 @@ CREATE TABLE IF NOT EXISTS voice_calls (
 CREATE INDEX IF NOT EXISTS idx_voice_calls_customer ON voice_calls(customer_email);
 CREATE INDEX IF NOT EXISTS idx_voice_calls_started ON voice_calls(started_at);
 
+-- Overage billing was advertised on vendas.html ("$0.15/min after 300 min")
+-- but never actually metered or charged -- every customer using more than
+-- their plan cap was pure margin loss with no invoice ever created. This
+-- table makes voice_overage_billing_agent.py idempotent: one row per
+-- (customer_email, billing_month) so a cron that runs daily never
+-- double-charges the same month twice.
+CREATE TABLE IF NOT EXISTS voice_overage_billing_log (
+    id TEXT PRIMARY KEY,
+    customer_email TEXT NOT NULL,
+    billing_month TEXT NOT NULL,  -- 'YYYY-MM'
+    plan_id TEXT NOT NULL,
+    minutes_used NUMERIC(10,2) NOT NULL,
+    minutes_included NUMERIC(10,2) NOT NULL,
+    overage_minutes NUMERIC(10,2) NOT NULL,
+    overage_rate_usd NUMERIC(6,4) NOT NULL,
+    amount_usd_cents INTEGER NOT NULL,
+    stripe_invoice_item_id TEXT,
+    billed_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    UNIQUE(customer_email, billing_month)
+);
+
 CREATE TABLE IF NOT EXISTS voice_agent_numbers (
     customer_email TEXT PRIMARY KEY,
     phone_number_id TEXT,

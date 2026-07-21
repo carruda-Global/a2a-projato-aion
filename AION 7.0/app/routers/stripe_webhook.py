@@ -62,7 +62,7 @@ async def _send_ga4_purchase_event(session, plan_id: str, customer_email: str) -
         logger.warning("GA4 purchase event failed for %s: %s", customer_email, e)
 
 
-async def _send_welcome_email(customer_email: str, plan_id: str) -> None:
+async def _send_welcome_email(customer_email: str, plan_id: str, session=None) -> None:
     # Previously sent via Resend, whose sending domain isn't verified —
     # every welcome email across every plan was silently failing. Hostinger
     # SMTP is the confirmed-working channel (see directory listing emails
@@ -75,10 +75,19 @@ async def _send_welcome_email(customer_email: str, plan_id: str) -> None:
 
     if plan_id == VOICE_RECEPTIONIST_PLAN_ID:
         subject = "Your AI Voice Receptionist is ready to set up"
+        # Real charged amount/currency, so get-started.html reports the
+        # actual Google Ads conversion value instead of a fixed placeholder
+        # -- Smart Bidding can't optimize for value it never sees.
+        onboarding_url = VOICE_RECEPTIONIST_ONBOARDING_URL
+        if session is not None:
+            amount = (getattr(session, "amount_total", 0) or 0) / 100
+            currency = (getattr(session, "currency", "") or "usd").upper()
+            if amount:
+                onboarding_url = f"{VOICE_RECEPTIONIST_ONBOARDING_URL}?value={amount:.2f}&currency={currency}"
         body = (
             f"<p>Welcome to AION Voice Receptionist!</p>"
             f"<p>Your <strong>{plan_name}</strong> subscription is now active.</p>"
-            f"<p><a href='{VOICE_RECEPTIONIST_ONBOARDING_URL}'>Click here to set up your AI receptionist</a> — "
+            f"<p><a href='{onboarding_url}'>Click here to set up your AI receptionist</a> — "
             f"enter your business name and we'll pull your hours and address automatically, "
             f"then your dedicated phone number goes live in under a minute.</p>"
             f"<p>Questions? Just reply — a real person reads this inbox.</p>"
@@ -154,7 +163,7 @@ async def stripe_webhook(request: Request):
             plan_id=plan_id,
             customer_email=customer_email,
         )
-        await _send_welcome_email(customer_email, plan_id)
+        await _send_welcome_email(customer_email, plan_id, session)
         await _send_ga4_purchase_event(session, plan_id, customer_email)
 
         referral_code = getattr(session, "client_reference_id", None)

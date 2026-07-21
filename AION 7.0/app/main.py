@@ -634,9 +634,20 @@ async def startup_event():
         result = await purge_expired_call_data()
         logger.info("[24/7] Voice data retention: %s", result)
 
+    # ── Voice overage billing — real charge for minutes over plan cap.
+    # Idempotent (voice_overage_billing_log UNIQUE per customer/month), so
+    # running daily is just "check if this month is already billed" for
+    # almost every run, and actually bills once, right after each month ends.
+    async def _voice_overage_billing():
+        from src.agents.voice_overage_billing_agent import run_overage_billing
+        result = await run_overage_billing()
+        if result.get("billed"):
+            logger.info("[24/7] Voice-Overage-Billing: %s", result)
+
     JOBS = [
         ("Keep-Alive",       _keepalive,                    600),     # 10min
         ("Voice-Data-Retention", _voice_data_retention,      86400),  # 24h
+        ("Voice-Overage-Billing", _voice_overage_billing,    86400),  # 24h, idempotent per month
         ("SEO-Ecosystem",    _seo,                          16200),   # 4.5h (2026-07-20: migration at 99.4%, spacing out from 3h test)
         ("SEO-Feedback",     _seo_feedback,                 604800),  # 7d (GSC pull + bucket scoring)
         ("Dev.to",           _devto,                        28800),   # 8h
