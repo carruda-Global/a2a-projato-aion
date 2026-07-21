@@ -1,0 +1,28 @@
+{
+  "name": "aion-voice-receptionist",
+  "version": "1.0.0",
+  "description": "AION Voice Receptionist answers your business phone 24/7, texts back missed calls, and captures leads. This Zap connects real call and lead events to the rest of your stack.",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest --testTimeout 10000",
+    "build": "zapier build",
+    "deploy": "zapier push",
+    "validate": "zapier validate"
+  },
+  "engines": {
+    "node": ">=18",
+    "zapier": ">=14"
+  },
+  "dependencies": {
+    "zapier-platform-core": "15.19.0",
+    "node-fetch": "^3.3.0"
+  },
+  "devDependencies": {
+    "jest": "^29.0.0"
+  },
+  "zapier": {
+    "conceptual_dir": ".",
+    "app": "./index.js",
+    "build": "build/"
+  }
+}
