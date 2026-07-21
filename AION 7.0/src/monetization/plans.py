@@ -12,7 +12,7 @@ PLANS = [
     {"id": "cross_sell_pack", "name": "Cross-Sell Pack", "price_brl": 297, "price_usd": 79, "agents": ["N1", "N2", "N3"]},
     {"id": "full_suite", "name": "Full Suite", "price_brl": 19997, "price_usd": 4999, "agents": ["all_71"]},
     {"id": "voice_receptionist_starter", "name": "AI Voice Receptionist", "price_brl": 0, "price_usd": 89, "agents": ["#64"]},
-    {"id": "voice_receptionist_growth", "name": "AI Voice Receptionist — Growth", "price_brl": 0, "price_usd": 179, "agents": ["#64"]},
+    {"id": "voice_receptionist_growth", "name": "AI Voice Receptionist — Growth", "price_brl": 0, "price_usd": 169, "agents": ["#64"]},
     # Wholesale tier for agency resellers (home services, real estate,
     # property management) -- requires a minimum 5-line commitment, priced
     # for real partner margin, not a race-to-bottom single-seat discount.
