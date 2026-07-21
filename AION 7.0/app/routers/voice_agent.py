@@ -450,6 +450,16 @@ async def _build_assistant_response(phone_number_id: str) -> dict:
         "a legal requirement in every market this product serves (US two-party-consent "
         "states, UK, Canada, Australia), not optional phrasing."
     )
+    # LLM provider is env-switchable: gpt-4o costs ~5x more per token than
+    # deepseek-chat, and that difference alone is what blocks pricing the
+    # Growth plan near Goodcall's $99 (margin math from 2026-07-21: at
+    # ~$0.12/min all-in, $99 is negative-margin in the heavy-usage case; at
+    # ~$0.07/min, $109-119 is safely profitable). Defaults to gpt-4o so a
+    # deploy without the DeepSeek key configured in Vapi's dashboard
+    # (Provider Keys -- a manual step outside this repo) degrades to the
+    # current working setup instead of breaking live calls.
+    llm_provider = os.getenv("VOICE_LLM_PROVIDER", "openai")
+    llm_model = os.getenv("VOICE_LLM_MODEL", "deepseek-chat" if llm_provider == "deep-seek" else "gpt-4o")
     return {
         "assistant": {
             # Legal requirement across every market this product serves (US
@@ -458,8 +468,8 @@ async def _build_assistant_response(phone_number_id: str) -> dict:
             # call start too) -- this line is not just a nicety.
             "firstMessage": f"Thanks for calling {business_name}. This call may be recorded and analyzed by AI to help us follow up with you. How can I help today?",
             "model": {
-                "provider": "openai",
-                "model": "gpt-4o",
+                "provider": llm_provider,
+                "model": llm_model,
                 "messages": [{"role": "system", "content": system_prompt}],
             },
         }
