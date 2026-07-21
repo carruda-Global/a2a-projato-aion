@@ -372,6 +372,20 @@ async def debug_migration_progress():
     }
 
 
+@router.post("/gsc/run-now")
+async def gsc_feedback_run_now():
+    """Manual trigger for the GSC feedback pull -- normally only runs on the
+    7-day cron. Added so GSC_CLIENT_ID/SECRET/REFRESH_TOKEN can be verified
+    right after being set in Render, instead of waiting up to a week."""
+    from src.agents.seo_feedback_agent import SEOFeedbackAgent
+
+    feedback = SEOFeedbackAgent(Settings())
+    if not feedback.is_configured():
+        return {"configured": False, "error": "GSC_CLIENT_ID/SECRET/REFRESH_TOKEN not set or invalid"}
+    result = feedback.pull_and_store()
+    return {"configured": True, "result": result}
+
+
 @router.get("/debug/list-static-pages")
 async def debug_list_static_pages():
     """Diagnostic-only: lists every seo_pages row with topic_kind in
