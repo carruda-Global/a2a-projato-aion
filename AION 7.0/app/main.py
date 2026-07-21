@@ -588,7 +588,10 @@ async def startup_event():
             # Verticais reais do Voice Receptionist (mesmas de seo_topics.py) -- os
             # setores antigos (construction/finance/tech_saas/manufacturing_eu/any_eu)
             # eram 100% do catalogo de compliance aposentado.
-            for sector in ["dental_clinics", "law_firms", "real_estate", "home_services", "salons_spas", "medical_clinics", "auto_repair", "any_market"]:
+            # "agencies" targets resellers for the Agency Partner plan (1:N
+            # channel), not end-users -- gets the wholesale pitch, see
+            # PRODUCT_PITCH_BY_SECTOR in outbound_sdr_agent.py.
+            for sector in ["dental_clinics", "law_firms", "real_estate", "home_services", "salons_spas", "medical_clinics", "auto_repair", "agencies", "any_market"]:
                 try:
                     await _process_campaign([], sector, limit=15)
                 except Exception as e:

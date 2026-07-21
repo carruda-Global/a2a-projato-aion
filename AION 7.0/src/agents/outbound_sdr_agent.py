@@ -103,6 +103,16 @@ SECTOR_SEARCH_QUERIES = {
     "medical_clinics": [q + _EXCLUDE_TERMS for q in ["independent medical clinic small practice contact email United States", "local GP clinic contact email UK"]],
     "auto_repair": [q + _EXCLUDE_TERMS for q in ["independent auto repair shop owner contact email United States", "local car mechanic garage contact email Canada"]],
     "any_market": [q + _EXCLUDE_TERMS for q in ["small business owner \"contact us\" email United States missed calls", "local family business contact email Australia phone"]],
+    # 1:N channel — recruit agencies to RESELL white-label (Agency Partner
+    # plan, $59/line wholesale) instead of selling one end-customer at a
+    # time. One signed agency = dozens of client lines. Same verticals the
+    # Agency plan card on vendas.html targets (home services, real estate,
+    # property management).
+    "agencies": [q + _EXCLUDE_TERMS for q in [
+        "marketing agency for home services contractors clients \"contact us\" email United States",
+        "digital marketing agency real estate agents clients contact email",
+        "property management marketing agency contact email United States",
+    ]],
 }
 
 
@@ -234,7 +244,24 @@ SECTORS = {
     "medical_clinics": "Missed calls mean patients reschedule with a clinic that actually picks up",
     "auto_repair": "A missed call often means the car goes to the shop down the street instead",
     "any_market": "Every missed call is a customer calling the next business on the list instead",
+    "agencies": "Your home-services/real-estate clients lose jobs to missed calls every week — agencies that resell an AI receptionist under their own brand turn that recurring problem into recurring revenue",
 }
+
+# The default pitch sells the product to the business that will USE it.
+# Agencies get the reseller pitch instead: white-label under their brand at
+# wholesale pricing -- selling them the end-user pitch would be the wrong
+# offer entirely.
+PRODUCT_PITCH_BY_SECTOR = {
+    "agencies": (
+        "AION Voice Receptionist — Agency Partner program: resell a 24/7 AI phone "
+        "receptionist under YOUR agency's brand (your name in every greeting), "
+        "$59/line/mo wholesale (min 5 lines), unlimited minutes, you set your own retail price"
+    ),
+}
+DEFAULT_PRODUCT_PITCH = (
+    "AION Voice Receptionist — AI phone receptionist, answers every call 24/7, "
+    "no per-call fees, from $89/mo"
+)
 
 
 @router.post("/generate-email")
@@ -361,13 +388,13 @@ async def _process_campaign(leads: list, sector: str, limit: int = 10):
                     f"global-engenharia.com/ecosystem"
                 )
             else:
+                product_pitch = PRODUCT_PITCH_BY_SECTOR.get(sector, DEFAULT_PRODUCT_PITCH)
                 prompt = (
                     f"Company: {lead.get('company', '')}\n"
                     f"Contact: {lead.get('name', '')}\n"
                     f"Sector: {sector}\n"
                     f"Pain: {pain_point}\n"
-                    f"Product: AION Voice Receptionist — AI phone receptionist, answers every call 24/7, "
-                    f"no per-call fees, from $89/mo\n"
+                    f"Product: {product_pitch}\n"
                     f"Trial: https://global-engenharia.com/ecosystem\n"
                     f"Output JSON: subject, body"
                 )
