@@ -353,7 +353,11 @@ async def vapi_webhook(data: dict):
     if customer_email and not is_trial:
         from app.routers.zapier_integration import fire_customer_webhooks
         await fire_customer_webhooks(customer_email, "call_completed", {
-            "call_id": call_id, "caller_number": row["caller_number"],
+            # Zapier triggers require a unique "id" field per event to
+            # dedupe -- without it, deliveries land but Zapier can't treat
+            # them as valid distinct tasks (blocked the T004/T005/T006
+            # publishing checks from ever resolving even with real traffic).
+            "id": call_id, "call_id": call_id, "caller_number": row["caller_number"],
             "duration_seconds": duration_seconds, "outcome": row["outcome"],
             "started_at": started_at, "ended_at": ended_at,
         })
@@ -376,7 +380,7 @@ async def vapi_webhook(data: dict):
             if customer_email and not is_trial and (intelligence.get("lead_name") or intelligence.get("lead_phone")):
                 from app.routers.zapier_integration import fire_customer_webhooks
                 await fire_customer_webhooks(customer_email, "lead_captured", {
-                    "call_id": call_id,
+                    "id": call_id, "call_id": call_id,
                     "lead_name": intelligence.get("lead_name", ""),
                     "lead_phone": intelligence.get("lead_phone", ""),
                     "intent": intelligence.get("intent", ""),
@@ -946,7 +950,7 @@ async def fire_zapier_test_webhooks():
     now = datetime.now(timezone.utc).isoformat()
     call_id = f"zapier_review_sample_{uuid.uuid4().hex[:8]}"
     await fire_customer_webhooks(ZAPIER_TEST_ACCOUNT_EMAIL, "call_completed", {
-        "call_id": call_id,
+        "id": call_id, "call_id": call_id,
         "caller_number": "+14065550199",
         "duration_seconds": 87,
         "outcome": "lead_captured",
@@ -954,7 +958,7 @@ async def fire_zapier_test_webhooks():
         "ended_at": now,
     })
     await fire_customer_webhooks(ZAPIER_TEST_ACCOUNT_EMAIL, "lead_captured", {
-        "call_id": call_id,
+        "id": call_id, "call_id": call_id,
         "lead_name": "Sample Lead",
         "lead_phone": "+14065550199",
         "intent": "appointment_request",
