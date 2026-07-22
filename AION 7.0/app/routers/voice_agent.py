@@ -925,3 +925,40 @@ async def seed_zapier_test_call():
     db = SupabaseClient(Settings())
     db.client.table("voice_calls").upsert(row).execute()
     return {"status": "seeded", "call_id": call_id, "customer_email": ZAPIER_TEST_ACCOUNT_EMAIL}
+
+
+@router.post("/debug/fire-zapier-test-webhooks")
+async def fire_zapier_test_webhooks():
+    """Actually delivers a REST Hook event to whatever Zap(s) are subscribed
+    for the Zapier review test account -- seed_zapier_test_call's row has
+    is_trial_call=True *on purpose* (keeps it out of real billing), but the
+    real webhook_vapi handler only calls fire_customer_webhooks for non-trial
+    calls, so that seeded row alone never reaches a subscriber's Zap. Without
+    this, a reviewer's Zap can stay "on" indefinitely and still never receive
+    a real task, so Zapier's publishing checks (e.g. T001 "needs a successful
+    task") never resolve. Payload shapes match exactly what the production
+    end-of-call-report handler sends today -- this is a faithful replay, not
+    an idealized sample. Same no-input, no-attacker-controlled-data pattern
+    as the sibling debug/* endpoints."""
+    import uuid
+    from app.routers.zapier_integration import fire_customer_webhooks
+
+    now = datetime.now(timezone.utc).isoformat()
+    call_id = f"zapier_review_sample_{uuid.uuid4().hex[:8]}"
+    await fire_customer_webhooks(ZAPIER_TEST_ACCOUNT_EMAIL, "call_completed", {
+        "call_id": call_id,
+        "caller_number": "+14065550199",
+        "duration_seconds": 87,
+        "outcome": "lead_captured",
+        "started_at": now,
+        "ended_at": now,
+    })
+    await fire_customer_webhooks(ZAPIER_TEST_ACCOUNT_EMAIL, "lead_captured", {
+        "call_id": call_id,
+        "lead_name": "Sample Lead",
+        "lead_phone": "+14065550199",
+        "intent": "appointment_request",
+        "summary": "Caller wants to book an appointment for next week.",
+        "urgency": "normal",
+    })
+    return {"status": "fired", "customer_email": ZAPIER_TEST_ACCOUNT_EMAIL, "call_id": call_id}

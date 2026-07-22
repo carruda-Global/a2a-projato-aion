@@ -2,6 +2,13 @@ const App = {
   version: require("./package.json").version,
   platformVersion: require("zapier-platform-core").version,
 
+  // Disabled globally rather than per-trigger/search -- Zapier's platform
+  // would otherwise silently strip/reshape our JSON before it reaches
+  // perform(), which is exactly what made T005-style output-field
+  // comparisons unpredictable for all three actions (new_call_completed,
+  // new_lead_captured, find_subscription) alike.
+  flags: { cleanInputData: false },
+
   authentication: {
     type: "custom",
     test: {
@@ -23,7 +30,7 @@ const App = {
         type: "string",
         required: false,
         default: "https://engenheiro-producao-ai.onrender.com",
-        helpText: "AION API base URL. Leave the default unless AION support has given you a different one.",
+        helpText: "AION API base URL -- almost every user should leave this at its default value. Only change it if [AION support](mailto:contato@global-engenharia.com) has explicitly given you a different one (e.g. a white-label agency deployment); this same value is exercised live by the connection test above, so an incorrect entry is caught immediately at connect time.",
       },
     ],
   },
