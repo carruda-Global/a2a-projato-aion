@@ -660,3 +660,38 @@ async def grant_zapier_test_account():
         customer_name="Zapier App Review",
     )
     return {"status": "granted", "customer_email": ZAPIER_TEST_ACCOUNT_EMAIL, "record": record}
+
+
+@router.post("/debug/seed-zapier-test-call")
+async def seed_zapier_test_call():
+    """One-off, hardcoded sample call for Zapier's app-review test account
+    -- lets the New Call Completed / New Lead Captured triggers' performList
+    fallback return real data during Zap testing. Same no-input pattern as
+    grant_zapier_test_account: nothing here is attacker-controlled.
+    is_trial_call=True keeps it out of real billing/usage counts."""
+    import uuid
+
+    from src.database.supabase_client import SupabaseClient
+
+    now = datetime.now(timezone.utc).isoformat()
+    call_id = f"zapier_review_sample_{uuid.uuid4().hex[:8]}"
+    row = {
+        "id": call_id,
+        "customer_email": ZAPIER_TEST_ACCOUNT_EMAIL,
+        "phone_number": "+14065550100",
+        "caller_number": "+14065550199",
+        "direction": "inbound",
+        "started_at": now,
+        "ended_at": now,
+        "duration_seconds": 87,
+        "outcome": "lead_captured",
+        "transcript": "[Sample call for Zapier app review] Hi, I'd like to book an appointment for next week -- Sure, let me take your name and number so the team can follow up.",
+        "lead_name": "Sample Lead",
+        "lead_phone": "+14065550199",
+        "lead_intent": "appointment_request",
+        "is_trial_call": True,
+        "cost_usd": 0,
+    }
+    db = SupabaseClient(Settings())
+    db.client.table("voice_calls").upsert(row).execute()
+    return {"status": "seeded", "call_id": call_id, "customer_email": ZAPIER_TEST_ACCOUNT_EMAIL}
