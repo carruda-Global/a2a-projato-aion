@@ -456,3 +456,26 @@ ALTER TABLE agent_execution_log ADD COLUMN IF NOT EXISTS commit_hash TEXT;
 -- in the customer's chosen language ('en'|'pt'|'es'). DEFAULT 'en' so every
 -- existing US/UK/CA/AU customer's behavior is unchanged by this column.
 ALTER TABLE voice_agent_numbers ADD COLUMN IF NOT EXISTS language TEXT NOT NULL DEFAULT 'en';
+
+-- Telnyx carrier pool (2026-07-22): numbers are bought in Telnyx and
+-- imported into Vapi ahead of time (see POST /admin/carrier-numbers/import),
+-- then handed out to customers by country on /provision -- unlike the
+-- existing on-demand Vapi-native flow, these can't be created per-signup,
+-- so unassigned rows are a real inventory /provision must check and can run
+-- out of. assigned_customer_email stays NULL until a customer claims the row.
+CREATE TABLE IF NOT EXISTS voice_carrier_numbers (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    country_code TEXT NOT NULL,
+    language TEXT NOT NULL DEFAULT 'en',
+    e164_number TEXT NOT NULL UNIQUE,
+    vapi_phone_number_id TEXT NOT NULL UNIQUE,
+    provider TEXT NOT NULL DEFAULT 'telnyx',
+    fallback_vapi_phone_number_id TEXT,
+    assigned_customer_email TEXT,
+    assigned_location_label TEXT,
+    assigned_at TIMESTAMPTZ,
+    imported_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS idx_carrier_numbers_country_unassigned
+    ON voice_carrier_numbers(country_code)
+    WHERE assigned_customer_email IS NULL;

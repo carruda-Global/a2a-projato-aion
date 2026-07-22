@@ -73,6 +73,17 @@ class Settings:
         self.vapi_demo_phone_number_id: str = os.getenv("VAPI_DEMO_PHONE_NUMBER_ID", "")
         self.google_places_api_key: str = os.getenv("GOOGLE_PLACES_API_KEY", "")
 
+        # Telnyx is the international carrier for phone numbers Vapi's native
+        # provider can't issue on demand (BR, LatAm, UK, CA, AU) -- numbers are
+        # bought and imported ahead of time (see /admin/carrier-numbers/import),
+        # not created per-customer like the US-only native flow. The key is
+        # only used by that one-off import call, never at call time.
+        self.telnyx_api_key: str = os.getenv("TELNYX_API_KEY", "")
+        # Vapi phone_number_id of an always-on native/Twilio number used as
+        # fallbackDestination when a Telnyx-carried number's routing fails --
+        # without this, an imported number has no PATCH-time fallback to set.
+        self.vapi_fallback_number_id: str = os.getenv("VAPI_FALLBACK_NUMBER_ID", "")
+
         self.app_env: str = os.getenv("APP_ENV", "development")
         self.log_level: str = os.getenv("LOG_LEVEL", "INFO")
         self.debug: bool = self.config.get("app", {}).get("debug", False)

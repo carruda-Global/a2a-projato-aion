@@ -12,8 +12,9 @@ import os
 from datetime import datetime, timezone
 
 import httpx
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request
 
+from app.app_utils.marketplace_auth import require_marketplace_admin_secret
 from src.config import Settings
 from src.agents._copilot_common import tem_licenca_premium
 from src.monetization.subscription_activator import get_subscription
@@ -55,6 +56,10 @@ PLAN_LINE_LIMITS = {
     "voice_receptionist_growth": 2,
     "voice_receptionist_agency": 50,  # wholesale tier: many client lines under one agency account
 }
+# Fallback when a signup gives a language but no explicit country_code --
+# best-effort guess, not a real geo lookup (es is ambiguous across all of
+# LatAm; MX is just the most common single market to seed the pool with).
+LANGUAGE_DEFAULT_COUNTRY = {"pt": "BR", "es": "MX", "en": "US"}
 
 
 @router.get("/lines/{customer_email}")
@@ -81,6 +86,7 @@ async def provision_number(data: dict):
     vertical = (data.get("vertical") or "").strip().lower()
     reseller_agency = (data.get("reseller_agency") or "").strip()
     language = resolve_language(data.get("language"))
+    country_code = (data.get("country_code") or "").strip().upper() or LANGUAGE_DEFAULT_COUNTRY.get(language, "US")
 
     if not tem_licenca_premium(customer_email):
         settings = Settings()
@@ -110,24 +116,39 @@ async def provision_number(data: dict):
     if not settings.vapi_api_key:
         raise HTTPException(status_code=503, detail="Voice provider not configured")
 
-    async with httpx.AsyncClient(timeout=30) as client:
-        resp = await client.post(
-            f"{VAPI_API_BASE}/phone-number",
-            headers={"Authorization": f"Bearer {settings.vapi_api_key}"},
-            json={
-                "provider": "vapi",
-                "name": f"aion-{customer_email}-{location_label}",
-                "numberDesiredAreaCode": VAPI_DEFAULT_AREA_CODE,
-                # Only customer numbers get this — the shared demo number keeps
-                # its dashboard-configured default assistant untouched, so a bug
-                # here can't break the public demo line.
-                "server": {"url": f"{BASE_URL}/api/voice-agent/webhook/vapi"},
-            },
+    # Telnyx-carried numbers are bought and imported ahead of time (see
+    # /admin/carrier-numbers/import), not created on demand -- so the first
+    # move is to claim one from the pool for this country. Only countries
+    # Vapi's native provider can't issue directly (BR, LatAm, UK, CA, AU)
+    # need this; falling back to on-demand creation below is what already
+    # served every US customer before this pool existed.
+    claimed = _claim_carrier_number(country_code, customer_email, location_label)
+    if claimed:
+        phone = {"id": claimed["vapi_phone_number_id"], "number": claimed["e164_number"]}
+    else:
+        logger.warning(
+            "No Telnyx carrier number available for country=%s (customer=%s) -- "
+            "falling back to on-demand Vapi-native provisioning",
+            country_code, customer_email,
         )
-        if resp.status_code >= 400:
-            logger.error("Vapi provisioning failed for %s: %s", customer_email, resp.text)
-            raise HTTPException(status_code=502, detail="Could not provision a phone number right now")
-        phone = resp.json()
+        async with httpx.AsyncClient(timeout=30) as client:
+            resp = await client.post(
+                f"{VAPI_API_BASE}/phone-number",
+                headers={"Authorization": f"Bearer {settings.vapi_api_key}"},
+                json={
+                    "provider": "vapi",
+                    "name": f"aion-{customer_email}-{location_label}",
+                    "numberDesiredAreaCode": VAPI_DEFAULT_AREA_CODE,
+                    # Only customer numbers get this — the shared demo number keeps
+                    # its dashboard-configured default assistant untouched, so a bug
+                    # here can't break the public demo line.
+                    "server": {"url": f"{BASE_URL}/api/voice-agent/webhook/vapi"},
+                },
+            )
+            if resp.status_code >= 400:
+                logger.error("Vapi provisioning failed for %s: %s", customer_email, resp.text)
+                raise HTTPException(status_code=502, detail="Could not provision a phone number right now")
+            phone = resp.json()
 
     _upsert_voice_agent_line(customer_email, location_label, {
         "customer_email": customer_email,
@@ -568,6 +589,39 @@ def _get_lines_for_customer(customer_email: str) -> list[dict]:
         return []
 
 
+def _claim_carrier_number(country_code: str, customer_email: str, location_label: str) -> dict | None:
+    """Grabs one unassigned Telnyx-imported number for this country from the
+    pool and marks it assigned. Not race-proof under concurrent signups for
+    the same country/instant (no atomic claim -- Supabase update has no
+    SELECT..FOR UPDATE SKIP LOCKED here), but at this product's signup
+    volume a double-claim is a manual-fix edge case, not a load-bearing risk."""
+    try:
+        from src.database.supabase_client import SupabaseClient
+
+        db = SupabaseClient(Settings())
+        resp = (
+            db.client.table("voice_carrier_numbers")
+            .select("*")
+            .eq("country_code", country_code)
+            .is_("assigned_customer_email", "null")
+            .limit(1)
+            .execute()
+        )
+        rows = resp.data or []
+        if not rows:
+            return None
+        row = rows[0]
+        db.client.table("voice_carrier_numbers").update({
+            "assigned_customer_email": customer_email,
+            "assigned_location_label": location_label,
+            "assigned_at": datetime.now(timezone.utc).isoformat(),
+        }).eq("id", row["id"]).execute()
+        return row
+    except Exception as e:
+        logger.warning("Falha ao buscar/reservar voice_carrier_numbers para %s: %s", country_code, e)
+        return None
+
+
 def _upsert_voice_agent_line(customer_email: str, location_label: str, row: dict) -> None:
     # voice_agent_numbers is keyed on (customer_email, location_label) since
     # the Growth plan allows more than one line per customer -- conflict
@@ -714,6 +768,108 @@ async def create_demo_number(data: dict):
         "language": language,
     })
     return {"status": "created", "customer_email": demo_email, "phone_number": phone.get("number"), "phone_number_id": phone.get("id")}
+
+
+@router.post("/admin/carrier-numbers/import")
+async def import_carrier_number(data: dict, request: Request):
+    """Imports one already-purchased Telnyx number into Vapi and adds it to
+    the assignment pool -- the scriptable equivalent of the manual Vapi
+    Dashboard > Phone Numbers > Create > Telnyx flow, run once per number
+    bought (see runbook: Telnyx account/number purchase/Outbound Voice
+    Profile are manual steps in the Telnyx dashboard, not doable from here).
+    Requires MARKETPLACE_ADMIN_SECRET -- this both spends nothing itself
+    (the Telnyx number is already paid for) and mutates live call routing,
+    so it can't be open.
+    """
+    require_marketplace_admin_secret(request, Settings().marketplace_admin_secret)
+
+    e164_number = (data.get("e164_number") or "").strip()
+    country_code = (data.get("country_code") or "").strip().upper()
+    language = resolve_language(data.get("language"))
+    telnyx_credential_id = (data.get("telnyx_credential_id") or "").strip()
+    name = (data.get("name") or f"aion-{country_code.lower()}-{e164_number}").strip()
+    fallback_phone_number_id = (data.get("fallback_phone_number_id") or Settings().vapi_fallback_number_id).strip()
+    if not (e164_number and country_code and telnyx_credential_id):
+        raise HTTPException(status_code=400, detail="e164_number, country_code and telnyx_credential_id are required")
+
+    settings = Settings()
+    if not settings.vapi_api_key:
+        raise HTTPException(status_code=503, detail="Voice provider not configured")
+
+    async with httpx.AsyncClient(timeout=30) as client:
+        resp = await client.post(
+            f"{VAPI_API_BASE}/phone-number",
+            headers={"Authorization": f"Bearer {settings.vapi_api_key}"},
+            json={
+                "provider": "telnyx",
+                "number": e164_number,
+                "credentialId": telnyx_credential_id,
+                "name": name,
+                "server": {"url": f"{BASE_URL}/api/voice-agent/webhook/vapi"},
+            },
+        )
+        if resp.status_code >= 400:
+            logger.error("Vapi Telnyx import failed for %s: %s", e164_number, resp.text)
+            raise HTTPException(status_code=502, detail="Could not import this number into Vapi")
+        phone = resp.json()
+        vapi_phone_number_id = phone.get("id")
+
+        if fallback_phone_number_id:
+            fb_resp = await client.patch(
+                f"{VAPI_API_BASE}/phone-number/{vapi_phone_number_id}",
+                headers={"Authorization": f"Bearer {settings.vapi_api_key}"},
+                json={"fallbackDestination": {
+                    "type": "number",
+                    "number": fallback_phone_number_id,
+                    "numberE164CheckEnabled": True,
+                }},
+            )
+            if fb_resp.status_code >= 400:
+                # Number is already live in Vapi at this point -- log and
+                # continue rather than discard a successfully imported
+                # number over a fallback config error the operator can retry.
+                logger.error("Fallback config failed for %s: %s", vapi_phone_number_id, fb_resp.text)
+
+    row = {
+        "country_code": country_code,
+        "language": language,
+        "e164_number": e164_number,
+        "vapi_phone_number_id": vapi_phone_number_id,
+        "provider": "telnyx",
+        "fallback_vapi_phone_number_id": fallback_phone_number_id or None,
+    }
+    try:
+        from src.database.supabase_client import SupabaseClient
+
+        db = SupabaseClient(Settings())
+        db.client.table("voice_carrier_numbers").upsert(row, on_conflict="e164_number").execute()
+    except Exception as e:
+        logger.error("Number %s imported into Vapi but pool insert failed: %s", e164_number, e)
+        raise HTTPException(status_code=500, detail="Imported into Vapi but failed to record in the pool -- check logs")
+
+    return {"status": "imported", **row}
+
+
+@router.get("/admin/carrier-numbers")
+async def list_carrier_numbers(request: Request, country_code: str | None = None):
+    """Pool inventory -- which countries still have unassigned Telnyx
+    numbers, so an operator knows when to buy/import more before running
+    out mid-signup (see /provision's fallback-to-on-demand-Vapi warning)."""
+    require_marketplace_admin_secret(request, Settings().marketplace_admin_secret)
+
+    from src.database.supabase_client import SupabaseClient
+
+    db = SupabaseClient(Settings())
+    query = db.client.table("voice_carrier_numbers").select("*")
+    if country_code:
+        query = query.eq("country_code", country_code.strip().upper())
+    rows = query.execute().data or []
+    unassigned_by_country: dict[str, int] = {}
+    for r in rows:
+        if not r.get("assigned_customer_email"):
+            cc = r["country_code"]
+            unassigned_by_country[cc] = unassigned_by_country.get(cc, 0) + 1
+    return {"numbers": rows, "unassigned_by_country": unassigned_by_country}
 
 
 @router.post("/debug/grant-zapier-test-account")
