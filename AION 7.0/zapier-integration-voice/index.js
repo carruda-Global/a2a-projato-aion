@@ -8,13 +8,14 @@ const App = {
       url: "{{bundle.authData.base_url}}/api/v1/subscriptions/by-email/{{bundle.authData.customer_email}}",
       method: "GET",
     },
+    connectionLabel: "{{bundle.authData.customer_email}}",
     fields: [
       {
         key: "customer_email",
         label: "Customer Email",
         type: "string",
         required: true,
-        helpText: "The email address used at checkout for your AION Voice Receptionist subscription. Access is granted per subscription, not a static API key.",
+        helpText: "The email address used at checkout for your AION Voice Receptionist subscription ([see plans](https://global-engenharia.com/vendas.html#plans)). Access is granted per subscription, not a static API key.",
       },
       {
         key: "base_url",
@@ -22,7 +23,7 @@ const App = {
         type: "string",
         required: false,
         default: "https://engenheiro-producao-ai.onrender.com",
-        helpText: "AION API base URL",
+        helpText: "AION API base URL. Leave the default unless AION support has given you a different one.",
       },
     ],
   },
@@ -129,11 +130,17 @@ const App = {
             .map((c) => ({ id: c.id, ...c }));
         },
         sample: {
-          call_id: "call_sample123",
+          id: "call_sample123",
           customer_email: "owner@example.com",
+          phone_number: "+15550000000",
+          caller_number: "+15559876543",
+          direction: "inbound",
+          duration_seconds: 87,
+          outcome: "lead_captured",
           lead_name: "Jane Smith",
           lead_phone: "+15559876543",
           lead_intent: "appointment_request",
+          is_trial_call: false,
         },
       },
     },
