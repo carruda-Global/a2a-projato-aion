@@ -1,7 +1,7 @@
 {
   "name": "aion-voice-receptionist",
   "version": "1.0.0",
-  "description": "AION Voice Receptionist answers your business phone 24/7, texts back missed calls, and captures leads. This Zap connects real call and lead events to the rest of your stack.",
+  "description": "AION Voice Receptionist is an AI phone agent that answers your business phone 24/7, texts back missed calls, and captures every lead.",
   "main": "index.js",
   "scripts": {
     "test": "jest --testTimeout 10000",

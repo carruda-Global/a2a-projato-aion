@@ -637,3 +637,26 @@ async def purge_expired_call_data() -> dict:
     }).in_("call_id", call_ids).execute()
     logger.info("[Retention] Purged content for %d calls older than %d days", len(call_ids), CALL_DATA_RETENTION_DAYS)
     return {"purged": len(call_ids)}
+
+
+ZAPIER_TEST_ACCOUNT_EMAIL = "integration-testing@zapier.com"
+
+
+@router.post("/debug/grant-zapier-test-account")
+async def grant_zapier_test_account():
+    """One-off, hardcoded grant for Zapier's app-review test account --
+    intentionally takes no input (email/plan are fixed constants) so this
+    can't be repurposed into the unauthenticated arbitrary-email grant
+    vulnerability fixed earlier in this product's history. Safe to call
+    repeatedly (idempotent upsert via activate_subscription)."""
+    from src.monetization.subscription_activator import activate_subscription
+
+    record = activate_subscription(
+        source="zapier_review",
+        external_id="zapier-app-review-244200",
+        customer_id=ZAPIER_TEST_ACCOUNT_EMAIL,
+        plan_id="voice_receptionist_starter",
+        customer_email=ZAPIER_TEST_ACCOUNT_EMAIL,
+        customer_name="Zapier App Review",
+    )
+    return {"status": "granted", "customer_email": ZAPIER_TEST_ACCOUNT_EMAIL, "record": record}
