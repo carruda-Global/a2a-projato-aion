@@ -515,16 +515,21 @@ async def _build_assistant_response(phone_number_id: str) -> dict:
         # untouched, so no existing US/UK/CA/AU customer is affected.
         # Forces Deepgram explicitly (provider is required alongside
         # "language" -- Vapi does not accept a bare {"language": ...}
-        # partial). NOTE: this switches speech-to-text locale only; the TTS
-        # voice itself still speaks with whatever voice is set on the Vapi
-        # dashboard default assistant, which may not sound native in pt/es --
-        # a real pt/es voice needs to be picked in the Vapi dashboard and
-        # wired here as a follow-up.
+        # partial).
         assistant["transcriber"] = {
             "provider": "deepgram",
             "model": "nova-2",
             "language": TRANSCRIBER_LANGUAGE[language],
         }
+        # Azure's "multilingual-auto" voice picks a native-accented voice
+        # based on the text's actual language instead of forcing one fixed
+        # accent -- avoids hardcoding a single pt-BR/es-419 voiceId that
+        # might not exist across every market this expansion targets
+        # (Brazil, Mexico, Argentina, Bolivia, Chile, Paraguay). Untested
+        # against a real call so far -- no pt/es phone number exists yet to
+        # verify against (see debug/create-demo-number, currently blocked by
+        # Vapi's org-level 403 on new number provisioning).
+        assistant["voice"] = {"provider": "azure", "voiceId": "multilingual-auto"}
     return {"assistant": assistant}
 
 
