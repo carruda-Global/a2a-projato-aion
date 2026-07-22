@@ -352,15 +352,13 @@ async def vapi_webhook(data: dict):
 
     if customer_email and not is_trial:
         from app.routers.zapier_integration import fire_customer_webhooks
-        await fire_customer_webhooks(customer_email, "call_completed", {
-            # Zapier triggers require a unique "id" field per event to
-            # dedupe -- without it, deliveries land but Zapier can't treat
-            # them as valid distinct tasks (blocked the T004/T005/T006
-            # publishing checks from ever resolving even with real traffic).
-            "id": call_id, "call_id": call_id, "caller_number": row["caller_number"],
-            "duration_seconds": duration_seconds, "outcome": row["outcome"],
-            "started_at": started_at, "ended_at": ended_at,
-        })
+        # Sends the full voice_calls row -- Zapier's "static/polling sample
+        # must be a subset of the live result" check was failing because
+        # performList (used to build that sample) reads every column off
+        # this same row, while this delivery used to send only a handful of
+        # curated fields. Keeping them in sync means one source of truth
+        # instead of a second field list to maintain by hand.
+        await fire_customer_webhooks(customer_email, "call_completed", {**row, "call_id": call_id})
 
     transcript = row["transcript"]
     if call_id and transcript.strip():
@@ -379,10 +377,15 @@ async def vapi_webhook(data: dict):
             logger.info("Call intelligence classified: id=%s intent=%s urgency=%s", call_id, intelligence.get("intent"), intelligence.get("urgency"))
             if customer_email and not is_trial and (intelligence.get("lead_name") or intelligence.get("lead_phone")):
                 from app.routers.zapier_integration import fire_customer_webhooks
+                # Same reasoning as the call_completed delivery above: send
+                # the full row plus the intelligence fields, so this stays a
+                # superset of whatever performList's sample exposes.
                 await fire_customer_webhooks(customer_email, "lead_captured", {
-                    "id": call_id, "call_id": call_id,
+                    **row,
+                    "call_id": call_id,
                     "lead_name": intelligence.get("lead_name", ""),
                     "lead_phone": intelligence.get("lead_phone", ""),
+                    "lead_intent": intelligence.get("intent", ""),
                     "intent": intelligence.get("intent", ""),
                     "summary": intelligence.get("summary", ""),
                     "urgency": intelligence.get("urgency", ""),
@@ -949,18 +952,33 @@ async def fire_zapier_test_webhooks():
 
     now = datetime.now(timezone.utc).isoformat()
     call_id = f"zapier_review_sample_{uuid.uuid4().hex[:8]}"
-    await fire_customer_webhooks(ZAPIER_TEST_ACCOUNT_EMAIL, "call_completed", {
-        "id": call_id, "call_id": call_id,
+    # Mirrors the full voice_calls row shape the production handler now
+    # sends (see vapi_webhook), so this stays a superset of whatever
+    # performList's sample exposes -- same reasoning, just replayed here
+    # since there's no real Vapi call to read a row from.
+    base_row = {
+        "id": call_id,
+        "call_id": call_id,
+        "customer_email": ZAPIER_TEST_ACCOUNT_EMAIL,
+        "phone_number": "+14065550100",
         "caller_number": "+14065550199",
-        "duration_seconds": 87,
-        "outcome": "lead_captured",
+        "direction": "inbound",
         "started_at": now,
         "ended_at": now,
-    })
+        "duration_seconds": 87,
+        "outcome": "lead_captured",
+        "transcript": "[Sample call for Zapier app review] Hi, I'd like to book an appointment for next week -- Sure, let me take your name and number so the team can follow up.",
+        "recording_url": "",
+        "is_trial_call": False,
+        "cost_usd": 0,
+        "created_at": now,
+    }
+    await fire_customer_webhooks(ZAPIER_TEST_ACCOUNT_EMAIL, "call_completed", base_row)
     await fire_customer_webhooks(ZAPIER_TEST_ACCOUNT_EMAIL, "lead_captured", {
-        "id": call_id, "call_id": call_id,
+        **base_row,
         "lead_name": "Sample Lead",
         "lead_phone": "+14065550199",
+        "lead_intent": "appointment_request",
         "intent": "appointment_request",
         "summary": "Caller wants to book an appointment for next week.",
         "urgency": "normal",
