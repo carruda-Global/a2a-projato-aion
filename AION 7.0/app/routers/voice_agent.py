@@ -58,8 +58,8 @@ PLAN_LINE_LIMITS = {
 }
 # Fallback when a signup gives a language but no explicit country_code --
 # best-effort guess, not a real geo lookup (es is ambiguous across all of
-# LatAm; MX is just the most common single market to seed the pool with).
-LANGUAGE_DEFAULT_COUNTRY = {"pt": "BR", "es": "MX", "en": "US"}
+# LatAm; CL is just whichever single market got seeded into the pool first).
+LANGUAGE_DEFAULT_COUNTRY = {"pt": "BR", "es": "CL", "en": "US"}
 
 
 @router.get("/lines/{customer_email}")
