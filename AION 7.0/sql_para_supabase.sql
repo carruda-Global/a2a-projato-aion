@@ -451,3 +451,8 @@ CREATE INDEX IF NOT EXISTS idx_agent_execution_agent_time ON agent_execution_log
 -- and there's a single shared DeepSeekClient today, so a per-agent
 -- model/prompt table would just duplicate what git already tracks.
 ALTER TABLE agent_execution_log ADD COLUMN IF NOT EXISTS commit_hash TEXT;
+
+-- LatAm/multi-language expansion (2026-07-22): each line's assistant answers
+-- in the customer's chosen language ('en'|'pt'|'es'). DEFAULT 'en' so every
+-- existing US/UK/CA/AU customer's behavior is unchanged by this column.
+ALTER TABLE voice_agent_numbers ADD COLUMN IF NOT EXISTS language TEXT NOT NULL DEFAULT 'en';

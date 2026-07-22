@@ -21,6 +21,8 @@ from src.agents.voice_rag import ingest_knowledge, retrieve_context
 from src.agents.voice_call_intelligence import classify_call
 from src.agents.voice_compliance_receipts import record_call_receipt
 from src.agents.voice_vertical_templates import seed_vertical_knowledge
+from src.agents.voice_i18n import TRANSCRIBER_LANGUAGE, resolve_language
+from src.agents import voice_i18n
 
 logger = logging.getLogger(__name__)
 
@@ -43,6 +45,11 @@ DEFAULT_LOCATION_LABEL = "primary"
 CALL_DATA_RETENTION_DAYS = 90
 # How many phone lines/locations each plan includes. Unknown/legacy plan_id
 # falls back to 1 rather than silently allowing unlimited lines.
+DEMO_EMAIL_PREFIX = "demo-"
+DEMO_BUSINESS_NAME = {
+    "pt": "Recepcionista de IA da AION (Demonstração)",
+    "es": "Recepcionista de IA de AION (Demostración)",
+}
 PLAN_LINE_LIMITS = {
     "voice_receptionist_starter": 1,
     "voice_receptionist_growth": 2,
@@ -73,6 +80,7 @@ async def provision_number(data: dict):
     location_label = (data.get("location_label") or DEFAULT_LOCATION_LABEL).strip() or DEFAULT_LOCATION_LABEL
     vertical = (data.get("vertical") or "").strip().lower()
     reseller_agency = (data.get("reseller_agency") or "").strip()
+    language = resolve_language(data.get("language"))
 
     if not tem_licenca_premium(customer_email):
         settings = Settings()
@@ -129,6 +137,7 @@ async def provision_number(data: dict):
         "provisioned_at": datetime.now(timezone.utc).isoformat(),
         "reseller_agency": reseller_agency or None,
         "vertical": vertical or None,
+        "language": language,
     })
 
     seeded_chunks = 0
@@ -138,6 +147,7 @@ async def provision_number(data: dict):
     return {
         "licensed": True, "phone_number": phone.get("number"), "phone_number_id": phone.get("id"),
         "location_label": location_label, "vertical_knowledge_seeded": seeded_chunks,
+        "language": language,
     }
 
 
@@ -286,13 +296,19 @@ async def vapi_webhook(data: dict):
     ended_at = call.get("endedAt")
     duration_seconds = int(message.get("durationSeconds", 0) or 0)
     phone_number_id = call.get("phoneNumberId", "")
-    is_trial = phone_number_id == Settings().vapi_demo_phone_number_id
     # assistantOverrides.metadata.customer_email is never actually set by
     # anything in this flow (assistant-request builds the prompt inline, no
     # metadata attached) -- the real, working way to attribute a call is the
     # same phoneNumberId lookup _build_assistant_response already uses.
     owner = _get_business_by_phone_number_id(phone_number_id) if phone_number_id else None
     customer_email = (owner or {}).get("customer_email", "")
+    # The pt/es demo lines (see debug/create-demo-number) aren't the single
+    # env-configured English demo number, so they need their own check --
+    # both are real Vapi numbers but neither is a paying customer's line.
+    is_trial = (
+        phone_number_id == Settings().vapi_demo_phone_number_id
+        or customer_email.startswith(DEMO_EMAIL_PREFIX)
+    )
 
     row = {
         "id": call_id,
@@ -457,6 +473,7 @@ async def _build_assistant_response(phone_number_id: str) -> dict:
     hours_text = "; ".join(hours) if hours else "standard business hours"
     address = (business or {}).get("business_address") or ""
 
+    language = resolve_language((business or {}).get("language"))
     knowledge_text = ""
     customer_email = (business or {}).get("customer_email", "")
     location_label = (business or {}).get("location_label", DEFAULT_LOCATION_LABEL)
@@ -469,19 +486,7 @@ async def _build_assistant_response(phone_number_id: str) -> dict:
         if chunks:
             knowledge_text = "Known info about this business:\n" + "\n".join(f"- {c}" for c in chunks) + "\n"
 
-    system_prompt = (
-        f"You are the AI phone receptionist for {business_name}. "
-        f"Business hours: {hours_text}. "
-        + (f"Address: {address}. " if address else "")
-        + knowledge_text
-        + "Greet callers warmly, answer questions about hours and location, and if you "
-        "can't fully help, take their name, phone number, and reason for calling so the "
-        "business can follow up. Keep responses brief and natural, like a real "
-        "receptionist, not a robot reading a script. "
-        "Do not omit the recording/AI-analysis disclosure in your first message -- it is "
-        "a legal requirement in every market this product serves (US two-party-consent "
-        "states, UK, Canada, Australia), not optional phrasing."
-    )
+    system_prompt = voice_i18n.system_prompt(language, business_name, hours_text, address, knowledge_text)
     # LLM provider is env-switchable: gpt-4o costs ~5x more per token than
     # deepseek-chat, and that difference alone is what blocks pricing the
     # Growth plan near Goodcall's $99 (margin math from 2026-07-21: at
@@ -492,20 +497,35 @@ async def _build_assistant_response(phone_number_id: str) -> dict:
     # current working setup instead of breaking live calls.
     llm_provider = os.getenv("VOICE_LLM_PROVIDER", "openai")
     llm_model = os.getenv("VOICE_LLM_MODEL", "deepseek-chat" if llm_provider == "deep-seek" else "gpt-4o")
-    return {
-        "assistant": {
-            # Legal requirement across every market this product serves (US
-            # two-party-consent states carry criminal penalties for recording
-            # without notice; UK/Canada/Australia all require disclosure at
-            # call start too) -- this line is not just a nicety.
-            "firstMessage": f"Thanks for calling {business_name}. This call may be recorded and analyzed by AI to help us follow up with you. How can I help today?",
-            "model": {
-                "provider": llm_provider,
-                "model": llm_model,
-                "messages": [{"role": "system", "content": system_prompt}],
-            },
-        }
+    assistant: dict = {
+        # Legal requirement across every market this product serves (US
+        # two-party-consent states carry criminal penalties for recording
+        # without notice; UK/Canada/Australia all require disclosure at
+        # call start too) -- this line is not just a nicety.
+        "firstMessage": voice_i18n.first_message(language, business_name),
+        "model": {
+            "provider": llm_provider,
+            "model": llm_model,
+            "messages": [{"role": "system", "content": system_prompt}],
+        },
     }
+    if language != "en":
+        # Only overridden for pt/es -- omitting it for "en" leaves the phone
+        # number's Vapi-dashboard-configured default transcriber/voice
+        # untouched, so no existing US/UK/CA/AU customer is affected.
+        # Forces Deepgram explicitly (provider is required alongside
+        # "language" -- Vapi does not accept a bare {"language": ...}
+        # partial). NOTE: this switches speech-to-text locale only; the TTS
+        # voice itself still speaks with whatever voice is set on the Vapi
+        # dashboard default assistant, which may not sound native in pt/es --
+        # a real pt/es voice needs to be picked in the Vapi dashboard and
+        # wired here as a follow-up.
+        assistant["transcriber"] = {
+            "provider": "deepgram",
+            "model": "nova-2",
+            "language": TRANSCRIBER_LANGUAGE[language],
+        }
+    return {"assistant": assistant}
 
 
 def _get_business_by_phone_number_id(phone_number_id: str) -> dict | None:
@@ -640,6 +660,55 @@ async def purge_expired_call_data() -> dict:
 
 
 ZAPIER_TEST_ACCOUNT_EMAIL = "integration-testing@zapier.com"
+
+
+@router.post("/debug/create-demo-number")
+async def create_demo_number(data: dict):
+    """Provisions a real Vapi number for a pt/es demo line -- the English
+    demo number is a static env var set up manually at integration time, but
+    pt/es didn't exist yet, so this does the same thing for those two via
+    API instead of the dashboard. Idempotent: calling it twice for the same
+    language returns the already-provisioned number instead of creating a
+    second one (same safety pattern as grant_zapier_test_account)."""
+    language = (data.get("language") or "").strip().lower()
+    if language not in ("pt", "es"):
+        raise HTTPException(status_code=400, detail="language must be 'pt' or 'es' (English demo already exists)")
+
+    demo_email = f"{DEMO_EMAIL_PREFIX}{language}@aion.internal"
+    existing = _get_lines_for_customer(demo_email)
+    if existing:
+        return {"status": "already_exists", "customer_email": demo_email, "phone_number": existing[0].get("phone_number")}
+
+    settings = Settings()
+    if not settings.vapi_api_key:
+        raise HTTPException(status_code=503, detail="Voice provider not configured")
+
+    async with httpx.AsyncClient(timeout=30) as client:
+        resp = await client.post(
+            f"{VAPI_API_BASE}/phone-number",
+            headers={"Authorization": f"Bearer {settings.vapi_api_key}"},
+            json={
+                "provider": "vapi",
+                "name": f"aion-demo-{language}",
+                "numberDesiredAreaCode": VAPI_DEFAULT_AREA_CODE,
+                "server": {"url": f"{BASE_URL}/api/voice-agent/webhook/vapi"},
+            },
+        )
+        if resp.status_code >= 400:
+            logger.error("Vapi demo number creation failed for %s: %s", language, resp.text)
+            raise HTTPException(status_code=502, detail="Could not create the demo number right now")
+        phone = resp.json()
+
+    _upsert_voice_agent_line(demo_email, DEFAULT_LOCATION_LABEL, {
+        "customer_email": demo_email,
+        "location_label": DEFAULT_LOCATION_LABEL,
+        "phone_number_id": phone.get("id"),
+        "phone_number": phone.get("number"),
+        "provisioned_at": datetime.now(timezone.utc).isoformat(),
+        "business_name": DEMO_BUSINESS_NAME[language],
+        "language": language,
+    })
+    return {"status": "created", "customer_email": demo_email, "phone_number": phone.get("number"), "phone_number_id": phone.get("id")}
 
 
 @router.post("/debug/grant-zapier-test-account")
