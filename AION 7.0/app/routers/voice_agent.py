@@ -923,9 +923,11 @@ async def seed_zapier_test_call():
         "duration_seconds": 87,
         "outcome": "lead_captured",
         "transcript": "[Sample call for Zapier app review] Hi, I'd like to book an appointment for next week -- Sure, let me take your name and number so the team can follow up.",
-        "lead_name": "Sample Lead",
-        "lead_phone": "+14065550199",
-        "lead_intent": "appointment_request",
+        # No lead_name/lead_phone/lead_intent here -- real production rows
+        # never carry those on voice_calls (they live in the separate
+        # voice_call_intelligence table), so seeding them here made the
+        # polling sample look like every call_completed row has lead data,
+        # which real call_completed tasks never do.
         "is_trial_call": True,
         "cost_usd": 0,
     }
